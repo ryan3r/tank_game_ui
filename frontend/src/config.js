@@ -1,8 +1,5 @@
 ///// User List /////
 
-// Keys in a user object to hide from end users
-export const keysToIgnore = new Set(["type", "dead"]);
-
 // The keys we want to be in a specific order
 export const orderedKeys = ["name"];
 

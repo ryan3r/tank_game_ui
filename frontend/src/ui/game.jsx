@@ -4,8 +4,6 @@ import { useGameInfo } from "../api/game.js";
 import { TurnSelector } from "./game_state/turn_selector.jsx"
 import { SubmitTurn } from "./game_state/submit_turn.jsx";
 import { UserList } from "./game_state/user_list.jsx";
-import { useMemo } from "preact/hooks";
-import { buildUserList } from "../api/user_list";
 import { LogBook } from "./game_state/log_book.jsx";
 import { useTurnStateManager } from "../api/turn-state-manager.js";
 
@@ -22,13 +20,9 @@ export function Game({ game, setGame, debug }) {
 
     const turnStateManager = useTurnStateManager(gameInfo?.turnMap, game);
 
-    const users = useMemo(() => {
-        return buildUserList(turnStateManager.turnState);
-    }, [turnStateManager.turnState]);
-
-    const errorMessage = (!turnStateManager.turnState || turnStateManager.turnState.valid) ? null : (
+    const errorMessage = (!turnStateManager.rawTurnState || turnStateManager.rawTurnState.valid) ? null : (
         <div className="app-turn-invalid">
-            {turnStateManager.turnState.error}
+            {turnStateManager.rawTurnState.error}
         </div>
     );
 
@@ -44,11 +38,11 @@ export function Game({ game, setGame, debug }) {
                     <LogBook gameInfo={gameInfo} currentTurn={turnStateManager.turnId} changeTurn={turnStateManager.playerSetTurn}></LogBook>
                 </div>
                 <div className="app-side-by-side-main">
-                    <GameBoard boardState={turnStateManager.turnState?.gameState?.board}></GameBoard>
+                    <GameBoard boardState={turnStateManager.rawTurnState?.gameState?.board}></GameBoard>
                 </div>
                 <div>
-                    <p>Coffer: {turnStateManager.turnState?.gameState?.council?.coffer || ""}</p>
-                    <UserList users={users}></UserList>
+                    <p>Coffer: {turnStateManager.rawTurnState?.gameState?.council?.coffer}</p>
+                    <UserList turnState={turnStateManager.turnState}></UserList>
                 </div>
             </div>
             <div className="centered">
@@ -56,19 +50,19 @@ export function Game({ game, setGame, debug }) {
                     {errorMessage}
                     <SubmitTurn
                         game={game}
-                        boardState={turnStateManager.turnState?.gameState?.board}
+                        boardState={turnStateManager.rawTurnState?.gameState?.board}
                         isLastTurn={turnStateManager.isLastTurn}
-                        users={users}
+                        turnState={turnStateManager.turnState}
                         refreshGameInfo={refreshGameInfo}
                         debug={debug}></SubmitTurn>
                     {debug ? <>
-                        <details>
+                        {/* <details>
                             <summary>Users (JSON)</summary>
                             <pre>{JSON.stringify(users, null, 4)}</pre>
-                        </details>
+                        </details> */}
                         <details>
                             <summary>Current board state (JSON)</summary>
-                            <pre>{JSON.stringify(turnStateManager?.turnState, null, 4)}</pre>
+                            <pre>{JSON.stringify(turnStateManager?.rawTurnState, null, 4)}</pre>
                         </details>
                     </> : undefined}
                 </div>

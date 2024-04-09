@@ -26,6 +26,4 @@ function App() {
     );
 }
 
-console.log("You can toggle debug mode by running: toggleTankGameDebug()");
-
 render(<App></App>, document.body);

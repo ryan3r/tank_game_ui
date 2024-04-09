@@ -1,5 +1,5 @@
 import "./user_list.css";
-import { keysToIgnore, orderedKeys, userTypeToHeaders, fieldAlignment, defaultAlignment } from "../../config.js";
+import { orderedKeys, userTypeToHeaders, fieldAlignment, defaultAlignment } from "../../config.js";
 
 function capitalize(text) {
     if(text.length == 0) return "";
@@ -7,28 +7,16 @@ function capitalize(text) {
     return text[0].toUpperCase() + text.slice(1);
 }
 
-function getKeysFromUser(user) {
-    let keys = new Set(
-        orderedKeys.filter(key => user.hasOwnProperty(key))
-    );
-
-    let newKeys = Object.keys(user)
-        .filter(key => !keysToIgnore.has(key));
-
-    newKeys.sort();
-    newKeys.forEach(key => keys.add(key));
-
-    return Array.from(keys);
-}
-
-export function UserList({ users }) {
-    const sections = users.usersByType;
+export function UserList({ turnState }) {
+    if(!turnState) {
+        return "Loading...";
+    }
 
     return (
         <div className="user-list">
-            {Object.keys(sections).map(sectionName => {
+            {turnState.getAllPlayerTypes().map(playerType => {
                 return (
-                    <Section name={sectionName} users={sections[sectionName]}></Section>
+                    <Section name={playerType} users={turnState.getEntitiesByType(playerType)}></Section>
                 );
             })}
         </div>
@@ -38,7 +26,7 @@ export function UserList({ users }) {
 
 function Section({ name, users }) {
     // Each section is guarenteed to have at least 1 user
-    const tableHeader = getKeysFromUser(users[0]);
+    const tableHeader = ["name"].concat(Object.keys(users[0].resources));
 
     let content;
 
@@ -81,7 +69,7 @@ function UserInfo({ user, tableHeader }) {
                 const alignment = fieldAlignment[key] || defaultAlignment;
 
                 return (
-                    <td style={`text-align: ${alignment};`}>{user[key]}</td>
+                    <td style={`text-align: ${alignment};`}>{user.resources[key] ? user.resources[key].value : user[key]}</td>
                 );
             })}
         </tr>

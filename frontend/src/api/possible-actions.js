@@ -4,22 +4,21 @@ import { Position } from "../position";
 import { LOG_BOOK_FIELD_MAPPINGS, TARGET_TYPE_FOR_ACTION } from "../config.js";
 
 
-export function usePossibleActions(game, users, selectedUser, boardState) {
+export function usePossibleActions(game, turnState, selectedUser, boardState) {
     const [actionTemplate, __] = useActionTemplate(game);
 
     return useMemo(() => {
-        return buildPossibleActionsForUser(actionTemplate, users, selectedUser, boardState)
-    }, [actionTemplate, users, selectedUser, boardState]);
+        return buildPossibleActionsForUser(actionTemplate, turnState, selectedUser, boardState)
+    }, [actionTemplate, turnState, selectedUser, boardState]);
 }
 
 
-function buildPossibleActionsForUser(actionTemplate, users, selectedUser, boardState) {
-    if(!users || !actionTemplate || !selectedUser) return {};
-    const user = users.usersByName[selectedUser];
+function buildPossibleActionsForUser(actionTemplate, turnState, selectedUser, boardState) {
+    if(!turnState || !actionTemplate || !selectedUser) return {};
+    const user = turnState.getEntityByName(selectedUser);
 
     // Get the action template for this user's class
-    const basicType = user.type == "senate" ? "council" : user.type;
-    actionTemplate = actionTemplate[basicType];
+    actionTemplate = actionTemplate[user.playerClass];
 
     // No actions for this user class
     if(!actionTemplate) return {};
@@ -50,7 +49,7 @@ function buildPossibleActionsForUser(actionTemplate, users, selectedUser, boardS
             }
             else if(fieldTemplate.type == "tank") {
                 uiFieldSpec.type = "select";
-                uiFieldSpec.options = users.usersByType.tank.map(tank => tank.name);
+                uiFieldSpec.options = turnState.getEntitiesByType("tank").map(tank => tank.name);
             }
             else {
                 uiFieldSpec.type = "input";
