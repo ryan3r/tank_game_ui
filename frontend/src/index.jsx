@@ -21,7 +21,7 @@ function App() {
     return (
         <>
             {debugModeMessage}
-            {content}
+            <div className="app-wrapper">{content}</div>
         </>
     );
 }
