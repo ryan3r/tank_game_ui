@@ -18,7 +18,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Pin the included tank game engine to the last compatible version
-ARG ENGINE_VERSION=03b84692b591905b627f5613d430f3dd4a2294cf
+ARG ENGINE_VERSION=f7735edc3ecea59c1b7fa59ebebe4358c3374296
 
 # Build tank game engine to be included with the default image
 RUN --mount=type=cache,target=/root/.m2 \
