@@ -20,9 +20,9 @@ export function Game({ game, setGame, debug }) {
 
     const turnStateManager = useTurnStateManager(gameInfo?.turnMap, game);
 
-    const errorMessage = (!turnStateManager.rawTurnState || turnStateManager.rawTurnState.valid) ? null : (
+    const errorMessage = (!turnStateManager.turnState || turnStateManager.turnState.valid) ? null : (
         <div className="app-turn-invalid">
-            {turnStateManager.rawTurnState.error}
+            {turnStateManager.turnState.error}
         </div>
     );
 
@@ -41,7 +41,7 @@ export function Game({ game, setGame, debug }) {
                     <GameBoard boardState={turnStateManager.rawTurnState?.gameState?.board}></GameBoard>
                 </div>
                 <div>
-                    <p>Coffer: {turnStateManager.rawTurnState?.gameState?.council?.coffer}</p>
+                    <p>Coffer: {turnStateManager.turnState?.council?.coffer}</p>
                     <UserList turnState={turnStateManager.turnState}></UserList>
                 </div>
             </div>
@@ -55,16 +55,10 @@ export function Game({ game, setGame, debug }) {
                         turnState={turnStateManager.turnState}
                         refreshGameInfo={refreshGameInfo}
                         debug={debug}></SubmitTurn>
-                    {debug ? <>
-                        {/* <details>
-                            <summary>Users (JSON)</summary>
-                            <pre>{JSON.stringify(users, null, 4)}</pre>
-                        </details> */}
-                        <details>
-                            <summary>Current board state (JSON)</summary>
-                            <pre>{JSON.stringify(turnStateManager?.rawTurnState, null, 4)}</pre>
-                        </details>
-                    </> : undefined}
+                    {debug ? <details>
+                        <summary>Current board state (JSON)</summary>
+                        <pre>{JSON.stringify(turnStateManager?.rawTurnState, null, 4)}</pre>
+                    </details> : undefined}
                 </div>
             </div>
             <footer>

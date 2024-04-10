@@ -1,8 +1,20 @@
 import Entity from "./entity.mjs";
 
 export default class GameState {
-    static fromRawState(rawGameState) {
-        let state = new GameState();
+    constructor(options) {
+        Object.assign(this, options);
+    }
+
+    static fromRawState(error, rawGameState) {
+        let state = new GameState({
+            day: rawGameState.day,
+            error,
+            council: {
+                coffer: rawGameState.council.coffer,
+            }
+        });
+
+        console.log(rawGameState.board);
         state._convertBoard("unitBoard", rawGameState.board.unit_board, space => new Entity(space));
         state._buildUserLists(rawGameState);
         return state;
@@ -93,6 +105,10 @@ export default class GameState {
     }
 
     // Public accessors
+
+    get valid() {
+        return this.error === undefined;
+    }
 
     getEntityByName(name) {
         return this._entityByName[name];

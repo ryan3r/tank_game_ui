@@ -64,8 +64,7 @@ export function useTurnStateManager(turnMap, game) {
         setPlayback(false);
     };
 
-    const turnState = useMemo(() => state ? GameState.fromRawState(state.gameState) : undefined, [state]);
-
+    const turnState = useMemo(() => state ? GameState.fromRawState(state.error, state.gameState) : undefined, [state]);
 
     return {
         rawTurnState: state,
