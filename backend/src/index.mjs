@@ -13,7 +13,7 @@ const buildInfo = process.env.BUILD_INFO;
 if(buildInfo) logger.info(`Build info: ${buildInfo}`);
 
 const PORT = 3333;
-const STATIC_DIR = "www";
+const STATIC_DIR = "../www";
 
 const app = express();
 
