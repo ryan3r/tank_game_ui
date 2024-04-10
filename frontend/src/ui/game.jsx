@@ -38,7 +38,7 @@ export function Game({ game, setGame, debug }) {
                     <LogBook gameInfo={gameInfo} currentTurn={turnStateManager.turnId} changeTurn={turnStateManager.playerSetTurn}></LogBook>
                 </div>
                 <div className="app-side-by-side-main">
-                    <GameBoard boardState={turnStateManager.rawTurnState?.gameState?.board}></GameBoard>
+                    <GameBoard gameState={turnStateManager.turnState}></GameBoard>
                 </div>
                 <div>
                     <p>Coffer: {turnStateManager.turnState?.council?.coffer}</p>
@@ -50,14 +50,13 @@ export function Game({ game, setGame, debug }) {
                     {errorMessage}
                     <SubmitTurn
                         game={game}
-                        boardState={turnStateManager.rawTurnState?.gameState?.board}
                         isLastTurn={turnStateManager.isLastTurn}
                         turnState={turnStateManager.turnState}
                         refreshGameInfo={refreshGameInfo}
                         debug={debug}></SubmitTurn>
                     {debug ? <details>
                         <summary>Current board state (JSON)</summary>
-                        <pre>{JSON.stringify(turnStateManager?.rawTurnState, null, 4)}</pre>
+                        <pre>{JSON.stringify(turnStateManager?.turnState, null, 4)}</pre>
                     </details> : undefined}
                 </div>
             </div>

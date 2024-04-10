@@ -1,4 +1,6 @@
 import Entity from "./entity.mjs";
+import { FloorTile } from "./floor-tile.mjs";
+import { Position } from "./position.mjs";
 
 export default class GameState {
     constructor(options) {
@@ -14,8 +16,8 @@ export default class GameState {
             }
         });
 
-        console.log(rawGameState.board);
-        state._convertBoard("unitBoard", rawGameState.board.unit_board, space => new Entity(space));
+        state._convertBoard("unitBoard", rawGameState.board.unit_board, (space, x, y) => new Entity(space, new Position(x, y)));
+        state._convertBoard("floorBoard", rawGameState.board.floor_board, space => new FloorTile(space));
         state._buildUserLists(rawGameState);
         return state;
     }
@@ -47,7 +49,7 @@ export default class GameState {
             }
 
             for(let x = 0; x < row.length; ++x) {
-                newBoard[y].push(boardSpaceFactory(board[y][x]));
+                newBoard[y].push(boardSpaceFactory(board[y][x], x, y));
             }
         }
     }
@@ -127,5 +129,25 @@ export default class GameState {
     getAllPlayerTypes() {
         return Object.keys(this._entityByType)
             .filter(type => type != Entity.NON_PLAYER);
+    }
+
+    getEntityAt(position) {
+        return this._unitBoard[position.y][position.x];
+    }
+
+    getFloorTileAt(position) {
+        return this._floorBoard[position.y][position.x];
+    }
+
+    getAllSpaces() {
+        let spaces = [];
+
+        for(let y = 0; y < this.height; ++ y) {
+            for(let x = 0; x < this.width; ++ x) {
+                spaces.push(this.getEntityAt(new Position(x, y)));
+            }
+        }
+
+        return spaces;
     }
 }

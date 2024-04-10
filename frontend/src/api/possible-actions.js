@@ -1,19 +1,19 @@
 import { useMemo } from "preact/hooks";
 import { useActionTemplate } from "./game";
-import { Position } from "../position";
+import { Position } from "../../../common/position.mjs";
 import { LOG_BOOK_FIELD_MAPPINGS, TARGET_TYPE_FOR_ACTION } from "../config.js";
 
 
-export function usePossibleActions(game, turnState, selectedUser, boardState) {
+export function usePossibleActions(game, turnState, selectedUser) {
     const [actionTemplate, __] = useActionTemplate(game);
 
     return useMemo(() => {
-        return buildPossibleActionsForUser(actionTemplate, turnState, selectedUser, boardState)
-    }, [actionTemplate, turnState, selectedUser, boardState]);
+        return buildPossibleActionsForUser(actionTemplate, turnState, selectedUser)
+    }, [actionTemplate, turnState, selectedUser]);
 }
 
 
-function buildPossibleActionsForUser(actionTemplate, turnState, selectedUser, boardState) {
+function buildPossibleActionsForUser(actionTemplate, turnState, selectedUser) {
     if(!turnState || !actionTemplate || !selectedUser) return {};
     const user = turnState.getEntityByName(selectedUser);
 
@@ -45,7 +45,10 @@ function buildPossibleActionsForUser(actionTemplate, turnState, selectedUser, bo
             else if(fieldTemplate.type == "position") {
                 uiFieldSpec.targetTypes = TARGET_TYPE_FOR_ACTION[actionName] || ["any"];
                 uiFieldSpec.type = "select-position";
-                uiFieldSpec.options = findEntityPositions(boardState, uiFieldSpec.targetTypes);
+
+                uiFieldSpec.options = turnState.getAllSpaces()
+                    .filter(entity => uiFieldSpec.targetTypes.includes(entity.type) || uiFieldSpec.targetTypes.includes("any"))
+                    .map(entity => entity.position.humanReadable);
             }
             else if(fieldTemplate.type == "tank") {
                 uiFieldSpec.type = "select";
@@ -58,20 +61,4 @@ function buildPossibleActionsForUser(actionTemplate, turnState, selectedUser, bo
     }
 
     return possibleActions;
-}
-
-function findEntityPositions(boardState, entityType) {
-    let positions = [];
-
-    for(let y = 0; y < boardState.unit_board.length; y++) {
-        for(let x = 0; x < boardState.unit_board[y].length; x++) {
-            const unit = boardState.unit_board[y][x];
-
-            if(entityType.includes(unit.type) || entityType.includes("any")) {
-                positions.push(new Position(x, y).humanReadable());
-            }
-        }
-    }
-
-    return positions;
 }

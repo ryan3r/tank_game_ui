@@ -15,9 +15,11 @@ const entityTypeToPlayerClass = {
 export default class Entity {
     static NON_PLAYER = "non-player";
 
-    constructor(rawEntity) {
+    constructor(rawEntity, position) {
         this.name = rawEntity.name;
         this.type = rawEntity.type;
+        this.dead = rawEntity.dead;
+        this.position = position;
 
         // Resources are stored as properties directly on the rawEntity extract them
         this.resources = new ResourceHolder(

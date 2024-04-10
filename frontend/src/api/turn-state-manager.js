@@ -67,7 +67,6 @@ export function useTurnStateManager(turnMap, game) {
     const turnState = useMemo(() => state ? GameState.fromRawState(state.error, state.gameState) : undefined, [state]);
 
     return {
-        rawTurnState: state,
         turnState,
         turnId: turn,
         isLastTurn,

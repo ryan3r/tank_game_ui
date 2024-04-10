@@ -19,7 +19,7 @@ export const defaultAlignment = "end";
 ///// Possible Actions /////
 
 export const TARGET_TYPE_FOR_ACTION = {
-    "shoot": ["tank", "wall"],
+    "shoot": ["tank", "wall", "council"],
     "move": ["empty"],
 };
 
