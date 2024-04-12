@@ -15,10 +15,10 @@ export function usePossibleActions(game, turnState, selectedUser) {
 
 function buildPossibleActionsForUser(actionTemplate, turnState, selectedUser) {
     if(!turnState || !actionTemplate || !selectedUser) return {};
-    const user = turnState.getEntityByName(selectedUser);
+    const user = turnState.players.getPlayerByName(selectedUser);
 
     // Get the action template for this user's class
-    actionTemplate = actionTemplate[user.playerClass];
+    actionTemplate = actionTemplate[user.type];
 
     // No actions for this user class
     if(!actionTemplate) return {};
@@ -46,13 +46,12 @@ function buildPossibleActionsForUser(actionTemplate, turnState, selectedUser) {
                 uiFieldSpec.targetTypes = TARGET_TYPE_FOR_ACTION[actionName] || ["any"];
                 uiFieldSpec.type = "select-position";
 
-                uiFieldSpec.options = turnState.getAllSpaces()
-                    .filter(entity => uiFieldSpec.targetTypes.includes(entity.type) || uiFieldSpec.targetTypes.includes("any"))
+                uiFieldSpec.options = turnState.board.getEntitiesOfType(uiFieldSpec.targetTypes)
                     .map(entity => entity.position.humanReadable);
             }
             else if(fieldTemplate.type == "tank") {
                 uiFieldSpec.type = "select";
-                uiFieldSpec.options = turnState.getEntitiesByType("tank").map(tank => tank.name);
+                uiFieldSpec.options = turnState.players.getPlayersByType("tank").map(tank => tank.name);
             }
             else {
                 uiFieldSpec.type = "input";

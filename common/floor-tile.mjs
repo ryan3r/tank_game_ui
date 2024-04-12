@@ -1,5 +1,6 @@
 export class FloorTile {
-    constructor({ type }) {
+    constructor(type, position) {
         this.type = type;
+        this.position = position;
     }
 }

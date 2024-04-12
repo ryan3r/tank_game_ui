@@ -2,7 +2,7 @@ import "./tank.css";
 
 export function Tank({ tank }) {
     let tankStats;
-    if(tank.dead) {
+    if(tank.type == "destroyed-tank") {
         tankStats = (
             <div className={`board-space-centered board-space-tank-dead board-space-wall-${tank.resources.health.value}`}>
                 {tank.resources.health.value}
@@ -23,7 +23,7 @@ export function Tank({ tank }) {
     return (
         <div className="board-space-entity">
             <div className="board-space-tank-title board-space-centered">
-                <div className="board-space-tank-title-inner">{tank.name}</div>
+                <div className="board-space-tank-title-inner">{tank.player.name}</div>
             </div>
             {tankStats}
         </div>

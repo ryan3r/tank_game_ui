@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import { useTurn } from "./game";
 import { TURN_SWITCH_FREQENCY } from "../config.js";
-import GameState from "../../../common/game-state.mjs";
+import { turnFromRawState } from "../../../common/engine-interop.mjs";
 
 
 export function useTurnStateManager(turnMap, game) {
@@ -64,7 +64,7 @@ export function useTurnStateManager(turnMap, game) {
         setPlayback(false);
     };
 
-    const turnState = useMemo(() => state ? GameState.fromRawState(state.error, state.gameState) : undefined, [state]);
+    const turnState = useMemo(() => state ? turnFromRawState(state.error, state.gameState) : undefined, [state]);
 
     return {
         turnState,

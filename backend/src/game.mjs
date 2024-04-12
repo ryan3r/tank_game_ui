@@ -191,6 +191,11 @@ class Game {
 
             this._actionTemplate[userType][actionType] = descriptor;
         }
+
+        // Use our type names
+        this._actionTemplate.councilor = this._actionTemplate.council;
+        this._actionTemplate.senator = this._actionTemplate.councilor;
+        delete this._actionTemplate.council;
     }
 }
 

@@ -38,7 +38,7 @@ export function Game({ game, setGame, debug }) {
                     <LogBook gameInfo={gameInfo} currentTurn={turnStateManager.turnId} changeTurn={turnStateManager.playerSetTurn}></LogBook>
                 </div>
                 <div className="app-side-by-side-main">
-                    <GameBoard gameState={turnStateManager.turnState}></GameBoard>
+                    <GameBoard gameState={turnStateManager.turnState?.board}></GameBoard>
                 </div>
                 <div>
                     <p>Coffer: {turnStateManager.turnState?.council?.coffer}</p>

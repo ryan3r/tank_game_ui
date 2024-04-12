@@ -1,5 +1,5 @@
 import "./user_list.css";
-import { orderedKeys, userTypeToHeaders, fieldAlignment, defaultAlignment } from "../../config.js";
+import { userTypeToHeaders, fieldAlignment, defaultAlignment } from "../../config.js";
 
 function capitalize(text) {
     if(text.length == 0) return "";
@@ -14,9 +14,9 @@ export function UserList({ turnState }) {
 
     return (
         <div className="user-list">
-            {turnState.getAllPlayerTypes().map(playerType => {
+            {turnState.players.getAllPlayerTypes().map(playerType => {
                 return (
-                    <Section name={playerType} users={turnState.getEntitiesByType(playerType)}></Section>
+                    <Section name={playerType} users={turnState.players.getPlayersByType(playerType)}></Section>
                 );
             })}
         </div>
@@ -26,7 +26,8 @@ export function UserList({ turnState }) {
 
 function Section({ name, users }) {
     // Each section is guarenteed to have at least 1 user
-    const tableHeader = ["name"].concat(Object.keys(users[0].resources));
+    const header = users[0].entities.length > 0 ? Object.keys(users[0].entities[0].resources) : []; // TODO: Assumption users only have one entity
+    const tableHeader = ["name"].concat(header);
 
     let content;
 
@@ -68,8 +69,10 @@ function UserInfo({ user, tableHeader }) {
             {tableHeader.map(key => {
                 const alignment = fieldAlignment[key] || defaultAlignment;
 
+                const resources = user.entities.length > 0 ? user.entities[0].resources : []; // TODO: Assumption users only have one entity
+
                 return (
-                    <td style={`text-align: ${alignment};`}>{user.resources[key] ? user.resources[key].value : user[key]}</td>
+                    <td style={`text-align: ${alignment};`}>{resources[key] ? resources[key].value : user[key]}</td>
                 );
             })}
         </tr>

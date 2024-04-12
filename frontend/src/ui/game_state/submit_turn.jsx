@@ -22,7 +22,7 @@ function isValidEntry(spec, logBookEntry) {
 
 
 export function SubmitTurn({ isLastTurn, turnState, refreshGameInfo, game, debug }) {
-    const usernames = turnState ? (turnState.getAllUsers().map(user => user.name)) : [];
+    const usernames = turnState ? (turnState.players.getAllUsers().map(user => user.name)) : [];
     const [selectedUser, setSelectedUser] = useState();
     const [actionType, setActionType] = useState();
     const [actionSpecific, setActionSpecific] = useState({});
