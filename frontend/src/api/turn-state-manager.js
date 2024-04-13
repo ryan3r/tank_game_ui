@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import { useTurn } from "./game";
-import { turnFromRawState } from "../../../common/engine-interop.mjs";
+import { turnFromRawState } from "../../../common/engine-interop/board-state.mjs";
 
 
 const TURN_SWITCH_FREQENCY = 700;  // 0.7 seconds in ms

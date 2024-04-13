@@ -3,14 +3,14 @@
 // These functions serve to create an abstraction between tank_game_ui and TankGame engine.
 // By doing so we limit the scope of the changes required to support new versions of the engine.
 
-import Board from "./board.mjs";
-import Entity from "./entity.mjs";
-import { FloorTile } from "./floor-tile.mjs";
-import Turn from "./turn.mjs";
-import Player from "./player.mjs";
-import Players from "./players.mjs";
-import { Position } from "./position.mjs";
-import { Resource } from "./resource.mjs";
+import Board from "../state/board/board.mjs";
+import Entity from "../state/board/entity.mjs";
+import { FloorTile } from "../state/board/floor-tile.mjs";
+import Turn from "../state/turn.mjs";
+import Player from "../state/players/player.mjs";
+import Players from "../state/players/players.mjs";
+import { Position } from "../state/board/position.mjs";
+import { Resource } from "../state/resource.mjs";
 
 
 // User keys that should be treated as resources

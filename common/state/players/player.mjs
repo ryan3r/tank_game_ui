@@ -1,4 +1,4 @@
-import { ResourceHolder } from "./resource.mjs";
+import { ResourceHolder } from "../resource.mjs";
 
 export default class Player {
     constructor(name, type, entities) {
