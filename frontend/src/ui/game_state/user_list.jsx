@@ -1,11 +1,18 @@
 import "./user_list.css";
-import { userTypeToHeaders, fieldAlignment, defaultAlignment } from "../../config.js";
+
+// Display friendly names for the user types
+export const userTypeToHeaders = {
+    council: "Councilors",
+    senate: "Senators",
+};
+
 
 function capitalize(text) {
     if(text.length == 0) return "";
 
     return text[0].toUpperCase() + text.slice(1);
 }
+
 
 export function UserList({ turnState }) {
     if(!turnState) {
@@ -26,7 +33,7 @@ export function UserList({ turnState }) {
 
 function Section({ name, users }) {
     // Each section is guarenteed to have at least 1 user
-    const header = users[0].entities.length > 0 ? Object.keys(users[0].entities[0].resources) : []; // TODO: Assumption users only have one entity
+    const header = users[0].entities.length > 0 ? Object.keys(users[0].getControlledResources()) : [];
     const tableHeader = ["name"].concat(header);
 
     let content;
@@ -64,12 +71,12 @@ function Section({ name, users }) {
 
 
 function UserInfo({ user, tableHeader }) {
+    const resources = user.getControlledResources();
+
     return (
         <tr>
             {tableHeader.map(key => {
-                const alignment = fieldAlignment[key] || defaultAlignment;
-
-                const resources = user.entities.length > 0 ? user.entities[0].resources : []; // TODO: Assumption users only have one entity
+                const alignment = key == "name" ? "start" : "end";
 
                 return (
                     <td style={`text-align: ${alignment};`}>{resources[key] ? resources[key].value : user[key]}</td>

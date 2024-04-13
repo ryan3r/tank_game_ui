@@ -7,7 +7,7 @@ export class Resource {
 
 
 export class ResourceHolder {
-    constructor(resources) {
+    constructor(resources = []) {
         for(const resource of resources) {
             this[resource.name] = resource;
         }

@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
 import { useTurn } from "./game";
-import { TURN_SWITCH_FREQENCY } from "../config.js";
 import { turnFromRawState } from "../../../common/engine-interop.mjs";
+
+
+const TURN_SWITCH_FREQENCY = 700;  // 0.7 seconds in ms
 
 
 export function useTurnStateManager(turnMap, game) {
