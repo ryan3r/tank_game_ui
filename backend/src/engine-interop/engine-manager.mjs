@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import fs from "node:fs";
-import { getLogger } from "./logging.mjs"
+import { getLogger } from "../logging.mjs"
 import path from "node:path";
 
 const logger = getLogger(import.meta.url);

@@ -4,7 +4,7 @@
     "description": "A basic web UI for playing tank game",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "test": "mocha",
         "develop": "LOG_LEVEL=debug TANK_GAMES_FOLDER=../example/ npm start",
         "start": "node src/index.mjs | pino-pretty"
     },
@@ -15,5 +15,8 @@
         "pino": "^8.19.0",
         "pino-http": "^9.0.0",
         "pino-pretty": "^11.0.0"
+    },
+    "devDependencies": {
+        "mocha": "^10.4.0"
     }
 }

@@ -1,6 +1,6 @@
 import "./board.css";
 import { targetSelectionState } from "../../api/space-selecting-state";
-import { Position } from "../../../../common/state/board/position.mjs";
+import { Position } from "../../../../../common/state/board/position.mjs";
 import { Tank } from "./board_tiles/tank.jsx";
 import { Wall } from "./board_tiles/wall.jsx";
 

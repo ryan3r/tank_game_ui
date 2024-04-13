@@ -15,8 +15,8 @@ export class ResourceHolder {
 
     // Helper to reduce the number of Object.keys calls
     *[Symbol.iterator]() {
-        for(const resource of Object.keys(this)) {
-            yield resource;
+        for(const resourceName of Object.keys(this)) {
+            yield this[resourceName];
         }
     }
 }

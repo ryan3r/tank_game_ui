@@ -1,9 +1,9 @@
 import express from "express";
 import fs from "node:fs";
-import {getGame, getGameNames} from "./game.mjs";
+import {getGame, getGameNames} from "./game-manager.mjs";
 import pinoHttp from "pino-http";
 import { getLogger } from "./logging.mjs"
-import { getEngineName } from "./tank-game-engine.mjs";
+// import { getEngineName } from "./tank-game-engine.mjs";
 import path from "node:path";
 
 const logger = getLogger(import.meta.url);
@@ -65,7 +65,7 @@ app.get("/api/game/:gameName/turn/:turnId", async (req, res) => {
     const game = await checkGame(req, res);
     if(!game) return;
 
-    res.json(game.getStateById(req.params.turnId));
+    res.json(game.getGameStateById(req.params.turnId));
 });
 
 app.post("/api/game/:gameName/turn", async (req, res) => {

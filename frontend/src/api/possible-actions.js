@@ -1,6 +1,6 @@
 import { useMemo } from "preact/hooks";
 import { useActionTemplate } from "./game";
-import { Position } from "../../../common/state/board/position.mjs";
+import { Position } from "../../../../common/state/board/position.mjs";
 import { LOG_BOOK_FIELD_MAPPINGS, TARGET_TYPE_FOR_ACTION } from "../config.js";
 
 

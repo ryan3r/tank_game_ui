@@ -1,21 +1,18 @@
 import fs from "node:fs/promises";
-import {getEngine} from "./tank-game-engine.mjs";
+import { getEngine } from "./engine-interop/engine-manager.mjs";
 import path from "node:path";
 import { getLogger } from "./logging.mjs"
-import { format } from "./utils.mjs";
-import { GameFile } from "./game-file.mjs";
-import { VERSION_SPECIFIC_CONFIG } from "./version-specific-config.mjs";
+import { load } from "./game-file.mjs";
 
 const logger = getLogger(import.meta.url);
 
 
-class Game {
-    constructor(gameFile) {
-        this._gameFile = gameFile;
-        this._states = [];
+class GameManager {
+    constructor({ logBook, initialGameState }) {
+        this._logBook = logBook;
+        this._initialGameState = initialGameState;
+        this._gameStates = [];
         this._ready = Promise.resolve();
-
-        this._buildDayMap();
 
         // Process any unprocessed log book entries.
         this._processActions();
@@ -30,22 +27,13 @@ class Game {
 
     async _processActionsLogic() {
         // Nothing to process
-        if(this._states.length === this._gameFile.getNumLogEntries()) return;
+        if(this._gameStates.length === this._logBook.getLastEntryId() + 1) return; // +1 for index to length
 
-        const startIndex = this._states.length;
-        const endIndex = this._gameFile.getNumLogEntries() - 1;
+        const startIndex = this._gameStates.length;
+        const endIndex = this._logBook.getLastEntryId();
 
         if(startIndex > endIndex) {
             throw new Error(`startIndex (${startIndex}) can't be larger than endIndex (${endIndex})`);
-        }
-
-        if(endIndex >= this._gameFile.getNumLogEntries()) {
-            throw new Error(`Index ${endIndex} is past the end of the logbook`);
-        }
-
-        this._versionSpecific = VERSION_SPECIFIC_CONFIG[this._gameFile.gameVersion];
-        if(!this._versionSpecific) {
-            throw new Error(`Unsupported game version ${this._gameFile.gameVersion}`);
         }
 
         // If the tank game engine isn't already running start it
@@ -53,99 +41,47 @@ class Game {
             this._engine = getEngine();
         }
 
-        if(!this._actionTemplate) {
-            this._parseActionTemplate(await this._engine.getActionTemplate());
-        }
-
         await this._sendPreviousState(startIndex);
 
         // Remove any states that might already be there
-        this._states.splice(startIndex, (endIndex - startIndex) + 1);
+        this._gameStates.splice(startIndex, (endIndex - startIndex) + 1);
 
         for(let i = startIndex; i <= endIndex; ++i) {
-            const state = await this._engine.processAction(this._gameFile.getLogEntryAt(i));
-            this._states.splice(i, 0, state); // Insert state at i
+            const turn = this._logBook.getEntry(i);
+            const state = await this._engine.processAction(turn.serialize());
+            this._gameStates.splice(i, 0, state); // Insert state at i
         }
 
-        await this._rebuildGeneratedState();
-    }
-
-    async _rebuildGeneratedState() {
-        this._buildDayMap();
-        this._buildGameStatesSummary();
+        if(!this._actionTemplate) {
+            this._parseActionTemplate(await this._engine.getActionTemplate());
+        }
     }
 
     getActionTemplate() {
         return this._actionTemplate;
     }
 
-    async _sendPreviousState(stateIndex) {
-        // Send our previous state to tank game
-        const initialState = stateIndex === 0 ?
-            this._gameFile.getInitialState() : this._states[stateIndex - 1];
-        if(!initialState) {
-            throw new Error(`Expected a state at index ${stateIndex}`);
+    async _sendPreviousState(currentStateIndex) {
+        const previousStateIndex = currentStateIndex - 1;
+
+        // Send our previous state to the engine
+        const previousState =  previousStateIndex === -1 ?
+            this._initialGameState :
+            this._gameStates[previousStateIndex];
+
+        if(!previousState) {
+            throw new Error(`Expected a state at index ${previousStateIndex}`);
         }
 
-        await this._engine.setBoardState(initialState.gameState);
+        await this._engine.setBoardState(previousState);
     }
 
-    _buildDayMap() {
-        this._dayMap = {
-            "0": 0, // Initial state is concidered day 0
-        };
-        let day = 0;
-        this._states.forEach((state, idx) => {
-            state = state.gameState;
-
-            if(day != state.day && state.day) {
-                // Externally states[0] is initial state so indicies are offset by 1
-                this._dayMap[state.day] = idx + 1;
-            }
-            day = state.day;
-        });
-    }
-
-    _buildGameStatesSummary() {
-        this._gameStatesSummary = [];
-
-        for(let i = 0; i < this._states.length; ++i) {
-            const logEntry = this._gameFile.getLogEntryAt(i);
-            const state = this._states[i];
-
-            const actionType = logEntry.action || "start_of_day";
-            const formatter = this._versionSpecific.entryFormatters[actionType];
-            if(!formatter) {
-                throw new Error(`Invlaid log book entry action ${actionType}`);
-            }
-
-            this._gameStatesSummary.push({
-                logEntryStr: format(formatter, { ...logEntry, hit: logEntry.hit ? "hit" : "miss" }),
-                valid: state.valid,
-                logEntry,
-            });
-        }
-    }
-
-    getGameStatesSummary() {
-        return this._gameStatesSummary;
-    }
-
-    getStateById(id) {
+    getGameStateById(id) {
         // State 0 is initial state to external consumers
-        if(id == 0) return this._gameFile.getInitialState();
+        if(id == 0) return this._game.initialGameState;
 
-        return this._states[id - 1];
+        return this._gameStates[id - 1];
     }
-
-    getDayMappings() {
-        return this._dayMap;
-    }
-
-    getMaxTurnId() {
-        return this._states.length;
-    }
-
 
     async _addLogBookEntry(entry) {
         await this._sendPreviousState(this._states.length);
@@ -207,7 +143,7 @@ async function loadGamesFromFolder(dir) {
         const name = path.parse(gameFile).name;
 
         logger.info(`Loading ${name} from ${filePath}`);
-        games[name] = new Game(await GameFile.load(filePath));
+        games[name] = new GameManager(await load(filePath));
     }
 
     return games;

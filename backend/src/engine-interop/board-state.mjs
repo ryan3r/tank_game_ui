@@ -3,14 +3,15 @@
 // These functions serve to create an abstraction between tank_game_ui and TankGame engine.
 // By doing so we limit the scope of the changes required to support new versions of the engine.
 
-import Board from "../state/board/board.mjs";
-import Entity from "../state/board/entity.mjs";
-import { FloorTile } from "../state/board/floor-tile.mjs";
-import Turn from "../state/turn.mjs";
-import Player from "../state/players/player.mjs";
-import Players from "../state/players/players.mjs";
-import { Position } from "../state/board/position.mjs";
-import { Resource } from "../state/resource.mjs";
+import Board from "../common/state/board/board.mjs";
+import Entity from "../common/state/board/entity.mjs";
+import { FloorTile } from "../common/state/board/floor-tile.mjs";
+import { GameState } from "../common/state/game-state.mjs";
+import Player from "../common/state/players/player.mjs";
+import Players from "../common/state/players/players.mjs";
+import { Position } from "../common/state/board/position.mjs";
+import { Resource } from "../common/state/resource.mjs";
+import { Council } from "../common/state/players/council.mjs";
 
 
 // User keys that should be treated as resources
@@ -21,7 +22,7 @@ const resourceKeys = {
 };
 
 
-export function turnFromRawState(error, rawGameState) {
+export function gameStateFromRawState(rawGameState) {
     const playersByName = buildUserLists(rawGameState);
 
     let board = convertBoard(undefined, rawGameState.board.unit_board, (newBoard, rawEntity, position) => {
@@ -32,17 +33,16 @@ export function turnFromRawState(error, rawGameState) {
         newBoard.setFloorTile(new FloorTile(space.type, position));
     });
 
-    let state = new Turn({
-        day: rawGameState.day,
-        error,
+    const gameState = new GameState(
+        new Players(Object.values(playersByName)),
         board,
-        players: new Players(Object.values(playersByName)),
-        council: {
-            coffer: rawGameState.council.coffer,
-        },
-    });
+        new Council(rawGameState.council.coffer),
+    );
 
-    return state;
+    return {
+        day: rawGameState.day,
+        gameState
+    };
 }
 
 
@@ -131,5 +131,61 @@ function findUsersOnGameBoard(rawGameState, playersByName) {
                 }
             }
         }
+    }
+}
+
+
+export function gameStateToRawState(day, gameState) {
+    return {
+        type: "state",
+        day,
+        board: buildRawBoard(gameState.board),
+        council: buildCouncil(gameState.players, gameState.council.coffer),
+    };
+}
+
+function buildRawBoard(board) {
+    let serializedUnitBoard = [];
+    let serializedFloorBoard = [];
+
+    for(let y = 0; y < board.height; ++y) {
+        serializedUnitBoard.push([]);
+        serializedFloorBoard.push([]);
+
+        for(let x = 0; x < board.width; ++x) {
+            const position = new Position(x, y);
+            const entity = board.getEntityAt(position);
+            const floorBoard = board.getFloorTileAt(position);
+
+            let rawEntity = {
+                name: entity.player?.name,
+                type: entity.type == "destroyed-tank" ? "tank" : entity.type,
+                dead: entity.type == "destroyed-tank",
+            };
+
+            for(const resource of entity.resources) {
+                rawEntity[resource.name] = resource.value;
+            }
+
+            serializedUnitBoard[y].push(rawEntity);
+            serializedFloorBoard[y].push({ type: floorBoard.type });
+        }
+    }
+
+    return {
+        type: "board",
+        unit_board: serializedUnitBoard,
+        floor_board: serializedFloorBoard,
+    };
+}
+
+function buildCouncil(players, coffer) {
+    return {
+        type: "council",
+        coffer,
+        council: (players.getPlayersByType("councilor") || [])
+            .map(player => player.name),
+        senate: (players.getPlayersByType("senator") || [])
+            .map(player => player.name),
     }
 }
