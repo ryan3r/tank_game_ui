@@ -1,10 +1,27 @@
 import { LogEntry } from "./entry.mjs";
 
 export class LogBook {
-    constructor(gameVersion, entries) {
+    constructor(gameVersion, entries, versionConfig) {
         this.gameVersion = gameVersion;
         this._entries = entries;
-        this.dayMap = DayMap.buildFromEntries(entries);
+        this._versionConfig = versionConfig;
+        this._buildDayMap();
+    }
+
+    _buildDayMap() {
+        this._dayMap = {};
+
+        let previousDay = 0;
+        for(const entry of this._entries) {
+            if(entry.day != previousDay) {
+                this._dayMap[entry.day] = entry.id;
+            }
+
+            if(this._minDay === undefined) this._minDay = entry.day;
+            this._maxDay = entry.day;
+
+            previousDay = entry.day;
+        }
     }
 
     static deserialize({gameVersion, rawEntries}, gameConfig) {
@@ -17,7 +34,7 @@ export class LogBook {
             return entry;
         });
 
-        return new LogBook(gameVersion, entries, gameConfig);
+        return new LogBook(gameVersion, entries, versionConfig);
     }
 
     serialize() {
@@ -31,9 +48,11 @@ export class LogBook {
         return this._entries[entryId];
     }
 
-    addEntry(entry) {
-        entry.id = this._entries.length;
+    addEntry(rawEntry) {
+        const day = rawEntry.day || this.getMaxDay();
+        const entry = new LogEntry(day, rawEntry, this._entries.length, this._versionConfig);
         this._entries.push(entry);
+        return entry.id;
     }
 
     getFirstEntryId() {
@@ -44,39 +63,6 @@ export class LogBook {
         return this._entries.length - 1;
     }
 
-    findNextEntryId(currentEntry) {
-        return Math.min(currentEntry + 1, this.getLastEntryId());
-    }
-
-    findPreviousEntryId(currentEntry) {
-        return Math.max(currentEntry - 1, this.getFirstEntryId());
-    }
-}
-
-
-class DayMap {
-    constructor(dayMap) {
-        this._dayMap = dayMap;
-        const days = Object.keys(dayMap);
-        this._minDay = +days[0]
-        this._maxDay = +days[days.length - 1];
-    }
-
-    static buildFromEntries(entries) {
-        let dayMap = {};
-
-        let previousDay = 0;
-        for(const entry of entries) {
-            if(entry.day != previousDay) {
-                dayMap[entry.day] = entry.id;
-            }
-
-            previousDay = entry.day;
-        }
-
-        return dayMap;
-    }
-
     getMinDay() {
         return this._minDay;
     }
@@ -85,32 +71,27 @@ class DayMap {
         return this._maxDay;
     }
 
-    findDayForEntryId(entryId) {
-        const day = Object.keys(this._dayMap)
-            .find(day => {
-                day = +day;
-                const minTurn = this._dayMap[day];
-                const maxTurn = this._dayMap[day + 1] || Infinity;
-                return minTurn <= entryId && entryId < maxTurn;
-            });
-
-        return day ? +day : 0;
+    findNextEntry(currentEntry) {
+        const nextId = Math.min(currentEntry.id + 1, this.getLastEntryId());
+        return this.getEntry(nextId);
     }
 
-    findNextDay(entryId) {
-        const currentDay = this.findDayForEntryId(entryId);
-        const newDay = Math.min(currentDay + 1, this.getMaxDay());
-        return this._dayMap[newDay];
+    findPreviousEntry(currentEntry) {
+        const previousId = Math.max(currentEntry.id - 1, this.getFirstEntryId());
+        return this.getEntry(previousId);
     }
 
-    findPreviousDay(entryId) {
-        const currentDay = this.findDayForEntryId(entryId);
-        const newDay =  Math.max(currentDay - 1, this.getMinDay());
-        return this._dayMap[newDay];
+    findFirstEntryOfNextDay(entry) {
+        const newDay = Math.min(entry.day + 1, this.getMaxDay());
+        return this.getFirstEntryOfDay(newDay);
     }
 
-    getFirstEntryIdOfDay(day) {
-        const entry = this._dayMap[day];
-        return entry || 0;
+    findFirstEntryOfPreviousDay(entry) {
+        const newDay =  Math.max(entry.day - 1, this.getMinDay());
+        return this.getFirstEntryOfDay(newDay);
+    }
+
+    getFirstEntryOfDay(day) {
+        return this.getEntry(this._dayMap[day]);
     }
 }
