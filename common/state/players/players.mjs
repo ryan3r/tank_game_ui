@@ -1,3 +1,5 @@
+import Player from "./player.mjs";
+
 export default class Players {
     constructor(players) {
         this._playersByName = {};
@@ -14,7 +16,18 @@ export default class Players {
         }
     }
 
-    getAllUsers() {
+    static deserialize(rawPlayers, board) {
+        return new Players(
+            rawPlayers.map(rawPlayer => Player.deserialize(rawPlayer, board))
+        );
+    }
+
+    serialize() {
+        return this.getAllPlayers()
+            .map(player => player.serialize());
+    }
+
+    getAllPlayers() {
         return Object.values(this._playersByName);
     }
 
