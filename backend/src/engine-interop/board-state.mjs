@@ -3,15 +3,15 @@
 // These functions serve to create an abstraction between tank_game_ui and TankGame engine.
 // By doing so we limit the scope of the changes required to support new versions of the engine.
 
-import Board from "../common/state/board/board.mjs";
-import Entity from "../common/state/board/entity.mjs";
-import { FloorTile } from "../common/state/board/floor-tile.mjs";
-import { GameState } from "../common/state/game-state.mjs";
-import Player from "../common/state/players/player.mjs";
-import Players from "../common/state/players/players.mjs";
-import { Position } from "../common/state/board/position.mjs";
-import { Resource } from "../common/state/resource.mjs";
-import { Council } from "../common/state/players/council.mjs";
+import Board from "../../../common/state/board/board.mjs";
+import Entity from "../../../common/state/board/entity.mjs";
+import { FloorTile } from "../../../common/state/board/floor-tile.mjs";
+import { GameState } from "../../../common/state/game-state.mjs";
+import Player from "../../../common/state/players/player.mjs";
+import Players from "../../../common/state/players/players.mjs";
+import { Position } from "../../../common/state/board/position.mjs";
+import { Resource } from "../../../common/state/resource.mjs";
+import { Council } from "../../../common/state/players/council.mjs";
 
 
 // User keys that should be treated as resources
@@ -158,10 +158,16 @@ function buildRawBoard(board) {
             const floorBoard = board.getFloorTileAt(position);
 
             let rawEntity = {
-                name: entity.player?.name,
                 type: entity.type == "destroyed-tank" ? "tank" : entity.type,
-                dead: entity.type == "destroyed-tank",
             };
+
+            if(entity.type.includes("tank")) {
+                rawEntity.dead = entity.type == "destroyed-tank";
+            }
+
+            if(entity.player?.name) {
+                rawEntity.name = entity.player?.name;
+            }
 
             for(const resource of entity.resources) {
                 rawEntity[resource.name] = resource.value;
