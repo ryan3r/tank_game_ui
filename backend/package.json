@@ -4,7 +4,7 @@
     "description": "A basic web UI for playing tank game",
     "main": "index.js",
     "scripts": {
-        "test": "mocha --reporter-option maxDiffSize=0",
+        "test": "mocha --reporter-option maxDiffSize=0 --recursive test/",
         "develop": "LOG_LEVEL=debug TANK_GAMES_FOLDER=../example/ npm start",
         "start": "node src/index.mjs | pino-pretty"
     },
