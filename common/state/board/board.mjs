@@ -1,3 +1,4 @@
+import { ResourceHolder } from "../resource.mjs";
 import Entity from "./entity.mjs";
 import { FloorTile } from "./floor-tile.mjs";
 import { Position } from "./position.mjs";
@@ -14,10 +15,28 @@ export default class Board {
             this._floor.push([]);
 
             for(let x = 0; x < this.width; ++x) {
-                this._entities[y].push(new Entity("empty", new Position(x, y), undefined, []));
-                this._floor[y].push(new FloorTile("empty"));
+                const position = new Position(x, y);
+                this._entities[y].push(new Entity("empty", position, new ResourceHolder()));
+                this._floor[y].push(new FloorTile("empty", position));
             }
         }
+    }
+
+    static deserialize(rawBoard) {
+        // Skip the constructor to avoid filling the board twice
+        let board = Object.create(Board.prototype);
+        board.width = rawBoard.entities[0].length;
+        board.height = rawBoard.entities.length;
+        board._entities = rawBoard.entities.map((row, y) => row.map((entity, x) => Entity.deserialize(entity, new Position(x, y))));
+        board._floor = rawBoard.floor.map((row, y) => row.map((floor, x) => FloorTile.deserialize(floor, new Position(x, y))));
+        return board;
+    }
+
+    serialize() {
+        return {
+            entities: this._entities.map(row => row.map(entity => entity.serialize())),
+            floor: this._floor.map(row => row.map(tile => tile.serialize())),
+        };
     }
 
     getEntityAt(position) {

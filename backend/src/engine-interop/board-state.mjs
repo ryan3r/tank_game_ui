@@ -55,9 +55,11 @@ function entityFromBoard(rawEntity, position, playersByName) {
         .map(name => new Resource(name, rawEntity[name]));
 
     const player = playersByName[rawEntity.name];
-    const entity = new Entity(type, position, player, resources);
+    let entity = new Entity(type, position, resources);
 
-    if(player) player.entities.push(entity);
+    if(player) {
+        player.adopt(entity);
+    }
 
     return entity;
 }

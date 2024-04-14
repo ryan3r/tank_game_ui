@@ -12,11 +12,11 @@ describe("Board", () => {
             const straw = new Resource("straw", 16);
 
             let ty = new Player("Ty", "tank", [
-                new Entity("tank", new Position(0, 0), undefined, new ResourceHolder([
+                new Entity("tank", new Position(0, 0), new ResourceHolder([
                     gold,
                     health,
                 ])),
-                new Entity("stable", new Position(5, 2), undefined, new ResourceHolder([
+                new Entity("stable", new Position(5, 2), new ResourceHolder([
                     straw,
                 ])),
             ]);

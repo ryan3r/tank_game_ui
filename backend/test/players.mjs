@@ -41,7 +41,7 @@ describe("Board", () => {
 
         it("can be serialized and deserialized", () => {
             let board = new Board(2, 2);
-            let beyerTank = new Entity("tank", new Position(1, 0), undefined, new ResourceHolder());
+            let beyerTank = new Entity("tank", new Position(1, 0), new ResourceHolder());
             let beyer = new Player("Beyer", "tank", [beyerTank]);
             beyerTank.player = beyer;
             board.setEntity(beyerTank);

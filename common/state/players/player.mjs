@@ -5,10 +5,10 @@ export default class Player {
     constructor(name, type, entities) {
         this.name = name;
         this.type = type;
-        this.entities = entities;
+        this.entities = [];
 
         for(let entity of entities) {
-            entity.player = this;
+            this.adopt(entity);
         }
     }
 
@@ -25,6 +25,11 @@ export default class Player {
             type: this.type,
             entities: this.entities.map(entity => entity.position.humanReadable)
         };
+    }
+
+    adopt(entity) {
+        this.entities.push(entity);
+        entity.player = this;
     }
 
     getControlledResources() {
