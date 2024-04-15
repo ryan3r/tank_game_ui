@@ -25,7 +25,7 @@ export class LogBook {
     }
 
     static deserialize({gameVersion, rawEntries}, gameConfig) {
-        const versionConfig = gameConfig.getGameVersion(gameVersion);
+        const versionConfig = gameConfig && gameConfig.getGameVersion(gameVersion);
 
         let previousDay = 0;
         const entries = rawEntries.map((rawEntry, idx) => {

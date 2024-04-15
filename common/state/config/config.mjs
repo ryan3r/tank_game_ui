@@ -10,7 +10,7 @@ export class Config {
     }
 
     isGameVersionSupported(version) {
-        return !!this.getVersion(version);
+        return !!this.getGameVersion(version);
     }
 
     getGameVersion(version) {

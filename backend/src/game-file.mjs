@@ -1,55 +1,95 @@
 import fs from "node:fs/promises";
-import { LogBook } from "common/state/log-book/log-book.mjs";
+import path from "node:path";
+import { LogBook } from "../../common/state/log-book/log-book.mjs";
+import { readJson, writeJson } from "./utils.mjs";
+import { getLogger } from "./logging.mjs";
+import { gameStateFromRawState } from "./engine-interop/board-state.mjs";
+import { GameState } from "../../common/state/game-state.mjs";
 
-const FILE_FORMAT_VERSION = 2;
+const logger = getLogger(import.meta.url);
 
-async function readJson(path) {
-    return JSON.parse(await fs.readFile(path, "utf-8"));
-}
+export const FILE_FORMAT_VERSION = 2;
+export const MINIMUM_SUPPORTED_FILE_FORMAT_VERSION = 1;
 
-async function writeJson(path, data) {
-    return await fs.writeFile(path, JSON.stringify(data, null, 4));
-}
-
-export async function load(filePath) {
+export async function load(filePath, gameConfig) {
     let content = await readJson(filePath);
+    let fileFormatVersion = content?.versions?.fileFormat || content.fileFormatVersion;
 
-    if(content?.versions?.fileFormat > FILE_FORMAT_VERSION) {
-        throw new Error(`File version ${content?.versions?.fileFormat} is not supported`);
+    if(fileFormatVersion > FILE_FORMAT_VERSION) {
+        throw new Error(`File version ${fileFormatVersion} is not supported.  Try a newer Tank Game UI version..`);
+    }
+
+    if(fileFormatVersion < MINIMUM_SUPPORTED_FILE_FORMAT_VERSION) {
+        throw new Error(`File version ${fileFormatVersion} is no longer supported.  Try an older Tank Game UI version.`);
     }
 
     // Version 1 used a states array instead of initialState and only supported game version 3
-    if(content?.versions?.fileFormat == 1) {
+    if(fileFormatVersion == 1) {
         content.initialState = content.gameStates[0];
         delete content.states;
         content.versions.game = 3;
-        content.versions.fileFormat = 2;
+        fileFormatVersion = 2;
     }
 
-    // Version 2
-    if(content?.versions?.fileFormat == 2) {
-        content.initialState = content.initialState.gameState;
+    // Version 2 uses the jar format for initial state and an array of log enties
+    if(fileFormatVersion == 2) {
+        content.initialState = gameStateFromRawState(content.initialState.gameState)
+            // It seems kind of silly to deserialize, serialize, and deserialize but normal v3 files will have
+            // the initial state serialized so we need to leave it that way for consistency
+            .gameState.serialize();
+
+        content.logBook = {
+            gameVersion: content.versions.game.toString(),
+            rawEntries: content.logBook,
+        };
+
+        fileFormatVersion = 3;
     }
 
-    const logBook = LogBook.deserialize({
-        gameVersion: content.versions.game,
-        rawEntries: content.logBook
-    });
+    // Make sure we have the config required to load this game.  This
+    // does not check if the engine supports this game version.
+    if(!gameConfig.isGameVersionSupported(content.versions.game)) {
+        logger.warn({
+            msg: `Tank Game UI is not configured for game version ${content.versions.game}.  You may experience strage behavior.`,
+            supportedVersions: gameConfig.getSupportedGameVersions(),
+        });
+    }
+
+    const logBook = LogBook.deserialize(content.logBook);
+    const initialGameState = GameState.deserialize(content.initialState)
 
     return {
         logBook,
-        initialGameState: content.initialState
+        initialGameState,
     };
 }
 
-export async function save(filePath, game) {
+export async function save(filePath, {logBook, initialGameState}) {
     await writeJson(filePath, {
-        versions: {
-            fileFormat: FILE_FORMAT_VERSION,
-            game: game.gameVersion,
-        },
-        // TODO: No private access?
-        logBook: game._logBook,
-        initialState: game._initialState,
+        fileFormatVersion: FILE_FORMAT_VERSION,
+        logBook: logBook.serialize(),
+        initialState: initialGameState.serialize(),
     });
+}
+
+export async function loadGamesFromFolder(dir, gameConfig) {
+    let games = {};
+
+    for(const gameFile of await fs.readdir(dir)) {
+        const filePath = path.join(dir, gameFile);
+        const {name} = path.parse(gameFile);
+
+        logger.info(`Loading ${name} from ${filePath}`);
+        try {
+            games[name] = await load(filePath, gameConfig);
+        }
+        catch(err) {
+            logger.warn({
+                msg: `Failed to load ${name} from ${filePath} (skipping)`,
+                err,
+            });
+        }
+    }
+
+    return games;
 }

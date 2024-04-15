@@ -5,7 +5,7 @@ export class LogEntry {
         this.type = rawLogEntry.action || "start_of_day";
         this.rawLogEntry = rawLogEntry;
 
-        const formatter = versionConfig.getLogEntryFormatter(this.type);
+        const formatter = versionConfig && versionConfig.getLogEntryFormatter(this.type);
         this.message = `You might want to define a formatter for ${this.type}`;
 
         if(formatter) {
