@@ -2,11 +2,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { LogBook } from "../../common/state/log-book/log-book.mjs";
 import { readJson, writeJson } from "./utils.mjs";
-import { getLogger } from "./logging.mjs";
+import { logger } from "./logging.mjs";
 import { gameStateFromRawState } from "./engine-interop/board-state.mjs";
 import { GameState } from "../../common/state/game-state.mjs";
-
-const logger = getLogger(import.meta.url);
 
 export const FILE_FORMAT_VERSION = 2;
 export const MINIMUM_SUPPORTED_FILE_FORMAT_VERSION = 1;

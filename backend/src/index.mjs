@@ -1,12 +1,10 @@
 import express from "express";
 import fs from "node:fs";
 import {getGame, getGameNames} from "./game-manager.mjs";
-import pinoHttp from "pino-http";
-import { getLogger } from "./logging.mjs"
+import { logger } from "./logging.mjs"
 // import { getEngineName } from "./tank-game-engine.mjs";
 import path from "node:path";
-
-const logger = getLogger(import.meta.url);
+import { makeHttpLogger } from "./logging.mjs";
 
 // If build info is supplied print it
 const buildInfo = process.env.BUILD_INFO;
@@ -17,8 +15,7 @@ const STATIC_DIR = "../www";
 
 const app = express();
 
-app.use(pinoHttp({ logger }));
-
+app.use(makeHttpLogger());
 app.use(express.json());
 
 try {

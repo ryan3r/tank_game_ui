@@ -1,13 +1,8 @@
-import fs from "node:fs/promises";
 import { getEngine } from "./engine-interop/engine-manager.mjs";
-import path from "node:path";
-import { getLogger } from "./logging.mjs"
-import { load } from "./game-file.mjs";
-
-const logger = getLogger(import.meta.url);
+import { loadGamesFromFolder } from "./game-file.mjs";
 
 
-class GameManager {
+export class GameManager {
     constructor({ logBook, initialGameState }) {
         this._logBook = logBook;
         this._initialGameState = initialGameState;
@@ -133,20 +128,6 @@ class GameManager {
         this._actionTemplate.senator = this._actionTemplate.councilor;
         delete this._actionTemplate.council;
     }
-}
-
-async function loadGamesFromFolder(dir) {
-    let games = {};
-
-    for(const gameFile of await fs.readdir(dir)) {
-        const filePath = path.join(dir, gameFile);
-        const name = path.parse(gameFile).name;
-
-        logger.info(`Loading ${name} from ${filePath}`);
-        games[name] = new GameManager(await load(filePath));
-    }
-
-    return games;
 }
 
 let gamePromises = loadGamesFromFolder(process.env.TANK_GAMES_FOLDER);
