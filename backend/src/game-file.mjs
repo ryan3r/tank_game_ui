@@ -83,7 +83,9 @@ export async function loadGamesFromFolder(dir, gameConfig, createEngine) {
             const saveHandler = data => save(filePath, data);
             const engine = createEngine();
 
-            games[name] = new GameInteractor(engine, await load(filePath, gameConfig), saveHandler);
+            const game = new GameInteractor(engine, await load(filePath, gameConfig), saveHandler);
+            await game.loaded;
+            games[name] = game;
         }
         catch(err) {
             logger.warn({
@@ -92,9 +94,6 @@ export async function loadGamesFromFolder(dir, gameConfig, createEngine) {
             });
         }
     }
-
-    // Wait for all of the games to finish loading
-    await Promise.all(Object.values(games).map(game => game.loaded));
 
     return games;
 }

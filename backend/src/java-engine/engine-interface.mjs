@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import fs from "node:fs";
 import { logger } from "../logging.mjs"
 import path from "node:path";
+import { gameStateFromRawState, gameStateToRawState } from "./board-state.mjs";
 
 const TANK_GAME_TIMEOUT = 3000; // 3 seconds
 
@@ -52,7 +53,7 @@ class TankGameEngine {
         });
 
         this._proc.on("exit", status => {
-            const logLevel = status > 0 ? "warning" : "debug";
+            const logLevel = status > 0 ? "warn" : "debug";
             logger[logLevel](`Tank game engine exited with ${status}`);
             this._proc = undefined;
         });
@@ -149,8 +150,8 @@ class TankGameEngine {
         });
     }
 
-    getBoardState() {
-        return this._runCommand("display");
+    async getBoardState() {
+        return gameStateFromRawState(await this._runCommand("display")).gameState; // TODO: Use day?
     }
 
     async getActionTemplate() {
@@ -160,29 +161,17 @@ class TankGameEngine {
     setBoardState(state) {
         return this._sendRequestAndWait({
             type: "state",
-            ...state,
+            ...gameStateToRawState(0, state), // TODO: Get actual day
         });
     }
 
     async processAction(action) {
-        let result = {
-            valid: true,
-        };
+        await this._sendRequestAndWait({
+            type: "action",
+            ...action.serialize(),
+        });
 
-        try {
-            await this._sendRequestAndWait({
-                type: "action",
-                ...action,
-            });
-        }
-        catch(err) {
-            result.valid = false;
-            result.error = err.message;
-            logger.info({ msg: "Got error", result });
-        }
-
-        result.gameState = await this._runCommand("display");
-        return result;
+        return this.getBoardState();
     }
 }
 

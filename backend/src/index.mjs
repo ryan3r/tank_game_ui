@@ -1,10 +1,11 @@
 import express from "express";
 import fs from "node:fs";
-import {getGame, getGameNames} from "./game-manager.mjs";
 import { logger } from "./logging.mjs"
-// import { getEngineName } from "./tank-game-engine.mjs";
 import path from "node:path";
 import { makeHttpLogger } from "./logging.mjs";
+import { loadGamesFromFolder } from "./game-file.mjs";
+import { Config } from "../../common/state/config/config.mjs";
+import { createEngine } from "./java-engine/engine-interface.mjs";
 
 // If build info is supplied print it
 const buildInfo = process.env.BUILD_INFO;
@@ -25,8 +26,14 @@ try {
 }
 catch(err) {}
 
-async function checkGame(req, res) {
-    const game = await getGame(req.params.gameName);
+function checkGame(req, res) {
+    if(!games) {
+        res.json({
+            error: "Tank Game UI is still starting",
+        });
+    }
+
+    const game = games[req.params.gameName];
 
     if(!game) {
         logger.info(`Could not find game ${req.params.gameName}`)
@@ -38,35 +45,43 @@ async function checkGame(req, res) {
     return game;
 }
 
+// Load the games
+let config = new Config({ gameVersionConfigs: {} });
+let games;
+loadGamesFromFolder(process.env.TANK_GAMES_FOLDER, config, createEngine)
+    .then(loadedGames => games = loadedGames)
+    .catch(() => process.exit(1));
+
 
 app.get("/api/games", async (req, res) => {
-    res.json(await getGameNames());
+    if(games === undefined) {
+        res.json({
+            error: "Tank Game UI is still starting",
+        });
+
+        return;
+    }
+
+    res.json(Object.keys(games));
 });
 
-app.get("/api/game/:gameName/header", async (req, res) => {
-    const game = await checkGame(req, res);
+app.get("/api/game/:gameName/log-book", (req, res) => {
+    const game = checkGame(req, res);
     if(!game) return;
 
-    res.json({
-        turnMap: {
-            days: game.getDayMappings(),
-            maxTurnId: game.getMaxTurnId(),
-            maxDay: Object.keys(game.getDayMappings()).map(key => +key).reduce((a, b) => b > a ? b : a, 0),
-        },
-        statesSummary: game.getGameStatesSummary(),
-        engine: getEngineName(),
-    });
+    res.json(game.getLogBook().serialize());
 });
 
-app.get("/api/game/:gameName/turn/:turnId", async (req, res) => {
-    const game = await checkGame(req, res);
+app.get("/api/game/:gameName/turn/:turnId", (req, res) => {
+    const game = checkGame(req, res);
     if(!game) return;
 
-    res.json(game.getGameStateById(req.params.turnId));
+    const state = game.getGameStateById(req.params.turnId);
+    res.json(state && state.serialize());
 });
 
 app.post("/api/game/:gameName/turn", async (req, res) => {
-    const game = await checkGame(req, res);
+    const game = checkGame(req, res);
     if(!game) return;
 
     try {
@@ -81,7 +96,7 @@ app.post("/api/game/:gameName/turn", async (req, res) => {
 });
 
 app.get("/api/game/:gameName/action-template", async (req, res) => {
-    const game = await checkGame(req, res);
+    const game = checkGame(req, res);
     if(!game) return;
 
     res.json(game.getActionTemplate());

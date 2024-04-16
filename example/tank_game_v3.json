@@ -2444,7 +2444,7 @@
                             "type": "wall"
                         },
                         {
-                            "gold": 0,
+                            "gold": 5,
                             "bounty": 0,
                             "name": "Stomp",
                             "health": 3,
@@ -2564,7 +2564,7 @@
                             "type": "empty"
                         },
                         {
-                            "gold": 0,
+                            "gold": 5,
                             "bounty": 0,
                             "name": "Lena",
                             "health": 3,
