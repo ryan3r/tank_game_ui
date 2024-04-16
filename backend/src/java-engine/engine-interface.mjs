@@ -151,7 +151,7 @@ class TankGameEngine {
     }
 
     async getBoardState() {
-        return gameStateFromRawState(await this._runCommand("display")).gameState; // TODO: Use day?
+        return gameStateFromRawState(await this._runCommand("display")); // TODO: Use day?
     }
 
     async getActionTemplate() {
@@ -161,7 +161,7 @@ class TankGameEngine {
     setBoardState(state) {
         return this._sendRequestAndWait({
             type: "state",
-            ...gameStateToRawState(0, state), // TODO: Get actual day
+            ...gameStateToRawState(state), // TODO: Get actual day
         });
     }
 

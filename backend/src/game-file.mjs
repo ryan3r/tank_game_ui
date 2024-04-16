@@ -35,7 +35,7 @@ export async function load(filePath, gameConfig) {
         content.initialState = gameStateFromRawState(content.initialState.gameState)
             // It seems kind of silly to deserialize, serialize, and deserialize but normal v3 files will have
             // the initial state serialized so we need to leave it that way for consistency
-            .gameState.serialize();
+            .serialize();
 
         content.logBook = {
             gameVersion: content.versions.game.toString(),

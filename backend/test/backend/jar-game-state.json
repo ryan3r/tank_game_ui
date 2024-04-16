@@ -28,8 +28,8 @@
                     "bounty": 0,
                     "name": "Dan",
                     "health": 3,
-                    "range": 2,
-                    "dead": false,
+                    "range": 0,
+                    "dead": true,
                     "type": "tank",
                     "actions": 0
                 },

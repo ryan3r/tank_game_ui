@@ -1,3 +1,5 @@
+import { logger } from "../../backend/src/logging.mjs";
+
 export class GameInteractor {
     constructor(engine, { logBook, initialGameState }, saveHandler) {
         this._saveHandler = saveHandler;

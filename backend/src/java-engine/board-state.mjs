@@ -12,6 +12,7 @@ import Players from "../../../common/state/players/players.mjs";
 import { Position } from "../../../common/state/board/position.mjs";
 import { Resource } from "../../../common/state/resource.mjs";
 import { Council } from "../../../common/state/players/council.mjs";
+import { raw } from "express";
 
 
 // User keys that should be treated as resources
@@ -33,16 +34,15 @@ export function gameStateFromRawState(rawGameState) {
         newBoard.setFloorTile(new FloorTile(space.type, position));
     });
 
-    const gameState = new GameState(
+    let gameState = new GameState(
         new Players(Object.values(playersByName)),
         board,
         new Council(rawGameState.council.coffer),
     );
 
-    return {
-        day: rawGameState.day,
-        gameState
-    };
+    gameState.__day = rawGameState.day;
+
+    return gameState;
 }
 
 
@@ -137,10 +137,10 @@ function findUsersOnGameBoard(rawGameState, playersByName) {
 }
 
 
-export function gameStateToRawState(day, gameState) {
+export function gameStateToRawState(gameState) {
     return {
         type: "state",
-        day,
+        day: gameState.__day || 0,
         board: buildRawBoard(gameState.board),
         council: buildCouncil(gameState.players, gameState.council.coffer),
     };
@@ -173,6 +173,14 @@ function buildRawBoard(board) {
 
             for(const resource of entity.resources) {
                 rawEntity[resource.name] = resource.value;
+            }
+
+            if(rawEntity.type == "tank") {
+                for(const requiredResource of resourceKeys["tank"]) {
+                    if(rawEntity[requiredResource] === undefined) {
+                        rawEntity[requiredResource] = 0;
+                    }
+                }
             }
 
             serializedUnitBoard[y].push(rawEntity);
