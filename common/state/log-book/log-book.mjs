@@ -48,9 +48,12 @@ export class LogBook {
         return this._entries[entryId];
     }
 
-    addEntry(rawEntry) {
+    makeEntryFromRaw(rawEntry) {
         const day = rawEntry.day || this.getMaxDay();
-        const entry = new LogEntry(day, rawEntry, this._entries.length, this._versionConfig);
+        return new LogEntry(day, rawEntry, this._entries.length, this._versionConfig);
+    }
+
+    addEntry(entry) {
         this._entries.push(entry);
         return entry.id;
     }
