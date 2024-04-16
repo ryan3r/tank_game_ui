@@ -186,6 +186,6 @@ class TankGameEngine {
     }
 }
 
-export function getEngine() {
+export function createEngine() {
     return new TankGameEngine(TANK_GAME_ENGINE_COMMAND);
 }

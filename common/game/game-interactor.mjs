@@ -11,6 +11,10 @@ export class GameInteractor {
         this.loaded = this._processActions();
     }
 
+    getLogBook() {
+        return this._logBook;
+    }
+
     _processActions() {
         // Wait for any pending action processing
         this._ready = this._ready.then(() => this._processActionsLogic());
@@ -118,13 +122,3 @@ export class GameInteractor {
     //     delete this._actionTemplate.council;
     // }
 }
-
-// let gamePromises = loadGamesFromFolder(process.env.TANK_GAMES_FOLDER);
-
-// export async function getGame(name) {
-//     return await (await gamePromises)[name];
-// }
-
-// export async function getGameNames() {
-//     return Object.keys(await gamePromises);
-// }

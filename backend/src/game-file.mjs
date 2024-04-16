@@ -3,8 +3,9 @@ import path from "node:path";
 import { LogBook } from "../../common/state/log-book/log-book.mjs";
 import { readJson, writeJson } from "./utils.mjs";
 import { logger } from "./logging.mjs";
-import { gameStateFromRawState } from "./engine-interop/board-state.mjs";
+import { gameStateFromRawState } from "./java-engine/board-state.mjs";
 import { GameState } from "../../common/state/game-state.mjs";
+import { GameInteractor } from "../../common/game/game-interactor.mjs";
 
 export const FILE_FORMAT_VERSION = 2;
 export const MINIMUM_SUPPORTED_FILE_FORMAT_VERSION = 1;
@@ -70,7 +71,7 @@ export async function save(filePath, {logBook, initialGameState}) {
     });
 }
 
-export async function loadGamesFromFolder(dir, gameConfig) {
+export async function loadGamesFromFolder(dir, gameConfig, createEngine) {
     let games = {};
 
     for(const gameFile of await fs.readdir(dir)) {
@@ -79,7 +80,10 @@ export async function loadGamesFromFolder(dir, gameConfig) {
 
         logger.info(`Loading ${name} from ${filePath}`);
         try {
-            games[name] = await load(filePath, gameConfig);
+            const saveHandler = data => save(filePath, data);
+            const engine = createEngine();
+
+            games[name] = new GameInteractor(engine, await load(filePath, gameConfig), saveHandler);
         }
         catch(err) {
             logger.warn({
@@ -88,6 +92,9 @@ export async function loadGamesFromFolder(dir, gameConfig) {
             });
         }
     }
+
+    // Wait for all of the games to finish loading
+    await Promise.all(Object.values(games).map(game => game.loaded));
 
     return games;
 }

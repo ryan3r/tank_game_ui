@@ -6,7 +6,7 @@ import { LogEntry } from "../../../common/state/log-book/entry.mjs";
 const GAME_VERSION = 3;
 
 
-class MockEngine {
+export class MockEngine {
     constructor() {
         this._returnIdx = 1;
         this.operations = [];

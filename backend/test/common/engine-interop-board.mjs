@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import assert from "node:assert";
-import { gameStateFromRawState, gameStateToRawState } from "../../src/engine-interop/board-state.mjs";
+import { gameStateFromRawState, gameStateToRawState } from "../../src/java-engine/board-state.mjs";
 
 const tankGameJarState = JSON.parse(fs.readFileSync("test/common/jar-game-state.json", "utf8"));
 

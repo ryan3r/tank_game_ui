@@ -4,6 +4,7 @@ import { Config } from "../../../common/state/config/config.mjs";
 import path from "node:path";
 import fs from"node:fs";
 import crypto from "node:crypto";
+import { MockEngine } from "../common/game-interactor.mjs";
 
 const TEST_FILES = "test/backend/test-files";
 const sampleFileBaseName = `tank_game_v3_format_v${FILE_FORMAT_VERSION}`;
@@ -19,10 +20,14 @@ const emptyConfig = new Config({
     gameVersionConfigs: {},
 });
 
-function validateSampleFile({logBook, initialGameState}) {
-    // Sanity check a few properties to make sure we loaded the data
+function validateLogBook(logBook) {
     assert.equal(logBook.getMaxDay(), 16);
     assert.equal(logBook.getEntry(77).type, "shoot");
+}
+
+function validateSampleFile({logBook, initialGameState}) {
+    // Sanity check a few properties to make sure we loaded the data
+    validateLogBook(logBook)
     assert.equal(initialGameState.board.width, 11);
     assert.equal(initialGameState.board.height, 11);
     assert.deepEqual(initialGameState.players.getPlayerByName("Steve").name, "Steve");
@@ -79,10 +84,14 @@ describe("GameFile", () => {
     });
 
     it("can load all of the games in a folder", async () => {
+        const mockEngineFactory = () => new MockEngine();
+
         // This test logs load errors to the console as warnings.  You may want to set the LOG_LEVEL to info
         // in the package.json if you want to debug this test.
-        const games = await loadGamesFromFolder(TEST_FILES, gameConfig);
-        validateSampleFile(games[sampleFileBaseName]);
+        const games = await loadGamesFromFolder(TEST_FILES, gameConfig, mockEngineFactory);
+        const game = games[sampleFileBaseName];
+
+        validateLogBook(game.getLogBook());
 
         // Files from previous versions should be loaded
         for(let version = MINIMUM_SUPPORTED_FILE_FORMAT_VERSION; version < FILE_FORMAT_VERSION; ++version) {
