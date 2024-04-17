@@ -3,7 +3,7 @@ import fs from "node:fs";
 import { logger } from "./logging.mjs"
 import path from "node:path";
 import { makeHttpLogger } from "./logging.mjs";
-import { loadGamesFromFolder } from "./game-file.mjs";
+import { GameManager } from "./game-file.mjs";
 import { Config } from "../../common/state/config/config.mjs";
 import { createEngine } from "./java-engine/engine-interface.mjs";
 
@@ -27,42 +27,37 @@ try {
 catch(err) {}
 
 function checkGame(req, res) {
-    if(!games) {
+    const {loaded, error, interactor} = gameManager.getGame(req.params.gameName);
+
+    if(error) {
         res.json({
-            error: "Tank Game UI is still starting",
+            error: `Failed to load game: ${error}`,
         });
-    }
-
-    const game = games[req.params.gameName];
-
-    if(!game) {
-        logger.info(`Could not find game ${req.params.gameName}`)
-        res.json({
-            error: "Game not found"
-        });
-    }
-
-    return game;
-}
-
-// Load the games
-let config = new Config({ gameVersionConfigs: {} });
-let games;
-loadGamesFromFolder(process.env.TANK_GAMES_FOLDER, config, createEngine)
-    .then(loadedGames => games = loadedGames)
-    .catch(() => process.exit(1));
-
-
-app.get("/api/games", async (req, res) => {
-    if(games === undefined) {
-        res.json({
-            error: "Tank Game UI is still starting",
-        });
-
         return;
     }
 
-    res.json(Object.keys(games));
+    if(!loaded) {
+        res.json({
+            error: "Game is still loading"
+        });
+        return;
+    }
+
+    return interactor;
+}
+
+// Load the games
+let config = new Config({
+    gameVersionConfigs: {},
+    backend: {
+        gamesFolder: process.env.TANK_GAMES_FOLDER,
+    },
+});
+let gameManager = new GameManager(config, createEngine);
+
+
+app.get("/api/games", async (req, res) => {
+    res.json(gameManager.getAllGames());
 });
 
 app.get("/api/game/:gameName/", (req, res) => {

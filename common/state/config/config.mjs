@@ -1,8 +1,9 @@
 import { GameVersionConfig } from "./game-version.mjs";
 
 export class Config {
-    constructor({ gameVersionConfigs }) {
+    constructor({ gameVersionConfigs, backend }) {
         this._gameVersionConfigs = gameVersionConfigs;
+        this._backend = backend;
 
         for(const version of this.getSupportedGameVersions()) {
             this._gameVersionConfigs[version] = new GameVersionConfig(gameVersionConfigs[version])
@@ -29,5 +30,9 @@ export class Config {
 
     getSupportedGameVersions() {
         return Object.keys(this._gameVersionConfigs);
+    }
+
+    getGamesFolder() {
+        return this._backend?.gamesFolder;
     }
 }

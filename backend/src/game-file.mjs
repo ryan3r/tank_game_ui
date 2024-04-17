@@ -6,6 +6,7 @@ import { logger } from "./logging.mjs";
 import { gameStateFromRawState } from "./java-engine/board-state.mjs";
 import { GameState } from "../../common/state/game-state.mjs";
 import { GameInteractor } from "../../common/game/game-interactor.mjs";
+import { throws } from "node:assert";
 
 export const FILE_FORMAT_VERSION = 2;
 export const MINIMUM_SUPPORTED_FILE_FORMAT_VERSION = 1;
@@ -71,29 +72,67 @@ export async function save(filePath, {logBook, initialGameState}) {
     });
 }
 
-export async function loadGamesFromFolder(dir, gameConfig, createEngine) {
-    let games = {};
-
-    for(const gameFile of await fs.readdir(dir)) {
-        const filePath = path.join(dir, gameFile);
-        const {name} = path.parse(gameFile);
-
-        logger.info(`Loading ${name} from ${filePath}`);
-        try {
-            const saveHandler = data => save(filePath, data);
-            const engine = createEngine();
-
-            const game = new GameInteractor(engine, await load(filePath, gameConfig), saveHandler);
-            await game.loaded;
-            games[name] = game;
-        }
-        catch(err) {
-            logger.warn({
-                msg: `Failed to load ${name} from ${filePath} (skipping)`,
-                err,
-            });
-        }
+export class GameManager {
+    constructor(gameConfig, createEngine) {
+        this.gameConfig = gameConfig;
+        this._createEngine = createEngine;
+        this.loaded = this._loadGamesFromFolder();
     }
 
-    return games;
+    async _loadGamesFromFolder() {
+        this._gamePromises = {};
+        this._games = {};
+
+        const dir = this.gameConfig.getGamesFolder();
+        for(const gameFile of await fs.readdir(dir)) {
+            const filePath = path.join(dir, gameFile);
+            const {name} = path.parse(gameFile);
+
+            logger.info(`Loading ${name} from ${filePath}`);
+            const saveHandler = data => save(filePath, data);
+
+            this._gamePromises[name] = load(filePath, this.gameConfig).then(async file => {
+                const interactor = new GameInteractor(this._createEngine(), file, saveHandler);
+                await interactor.loaded;
+
+                this._games[name] = {
+                    loaded: true,
+                    interactor,
+                };
+            });
+
+            this._gamePromises[name].catch(err => {
+                logger.warn({
+                    msg: `An error occured while loading ${name} from ${filePath}`,
+                    err,
+                });
+
+                this._games[name] = {
+                    loaded: false,
+                    error: err.message,
+                };
+            });
+        }
+
+        Object.keys(this._gamePromises).forEach(name => {
+            this._games[name] = {
+                loaded: false,
+            };
+        });
+    }
+
+    getGamePromise(name) {
+        return this._gamePromises[name];
+    }
+
+    getGame(name) {
+        return this._games[name] || {
+            loaded: false,
+            error: `${name} is not a valid game`,
+        };
+    }
+
+    getAllGames() {
+        return Object.keys(this._games) || [];
+    }
 }

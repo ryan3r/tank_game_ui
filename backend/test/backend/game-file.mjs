@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { FILE_FORMAT_VERSION, MINIMUM_SUPPORTED_FILE_FORMAT_VERSION, load, loadGamesFromFolder, save } from "../../src/game-file.mjs";
+import { FILE_FORMAT_VERSION, GameManager, MINIMUM_SUPPORTED_FILE_FORMAT_VERSION, load, save } from "../../src/game-file.mjs";
 import { Config } from "../../../common/state/config/config.mjs";
 import path from "node:path";
 import fs from"node:fs";
@@ -13,6 +13,9 @@ const sampleFilePath = path.join(TEST_FILES, `${sampleFileBaseName}.json`);
 const gameConfig = new Config({
     gameVersionConfigs: {
         3: {},
+    },
+    backend: {
+        gamesFolder: TEST_FILES,
     },
 });
 
@@ -88,17 +91,30 @@ describe("GameFile", () => {
 
         // This test logs load errors to the console as warnings.  You may want to set the LOG_LEVEL to info
         // in the package.json if you want to debug this test.
-        const games = await loadGamesFromFolder(TEST_FILES, gameConfig, mockEngineFactory);
-        const game = games[sampleFileBaseName];
+        const gameManager = new GameManager(gameConfig, mockEngineFactory);
+
+        await gameManager.loaded;
+
+        // Wait for all the games to load and swallow the load errors
+        await Promise.all(
+            gameManager.getAllGames()
+                .map(name => gameManager.getGamePromise(name).catch(() => {}))
+        );
+
+        const game = gameManager.getGame(sampleFileBaseName).interactor;
 
         validateLogBook(game.getLogBook());
 
         // Files from previous versions should be loaded
         for(let version = MINIMUM_SUPPORTED_FILE_FORMAT_VERSION; version < FILE_FORMAT_VERSION; ++version) {
-            assert.ok(games[`tank_game_v3_format_v${version}`]);
+            assert.ok(gameManager.getGame(`tank_game_v3_format_v${version}`).loaded);
         }
 
         // The invalid file should not be loaded
-        assert.equal(games["bad_file"], undefined);
+        assert.equal(gameManager.getGame("bad_file").error, "Cannot read properties of undefined (reading 'game')");
+        assert.ok(!gameManager.getGame("bad_file").loaded);
+
+        // Invalid games should return an error
+        assert.equal(gameManager.getGame("unknown_file").error, "unknown_file is not a valid game");
     });
 });
