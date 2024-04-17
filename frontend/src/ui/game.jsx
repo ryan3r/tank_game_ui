@@ -5,7 +5,7 @@ import { LogEntrySelector } from "./game_state/log_entry_selector.jsx"
 import { SubmitTurn } from "./game_state/submit_turn.jsx";
 import { UserList } from "./game_state/user_list.jsx";
 import { LogBook } from "./game_state/log_book.jsx";
-import { useGameStateManager } from "../api/turn-state-manager.js";
+import { useGameStateManager } from "../api/game-state-manager.js";
 
 
 export function Game({ game, setGame, debug }) {
