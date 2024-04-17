@@ -175,7 +175,10 @@ class TankGameEngine {
     }
 
     async setGameVersion(version) {
-        // TODO: Implement with updated engine
+        await this._sendRequestAndWait({
+            type: "version",
+            version
+        });
     }
 }
 
