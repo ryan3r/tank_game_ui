@@ -26,20 +26,19 @@ export function Game({ game, setGame, debug }) {
                 debug={debug}
                 logBook={gameInfo?.logBook}
                 setGame={setGame}
-                gameInfo={gameInfo}
                 gameStateManager={gameStateManager}></LogEntrySelector>
-            {/* <div className="app-side-by-side centered">
+            <div className="app-side-by-side centered">
                 <div>
-                    <LogBook gameInfo={gameInfo} currentTurn={gameStateManager.entryId} changeTurn={gameStateManager.playerSetEntry}></LogBook>
+                    <LogBook logBook={gameInfo?.logBook} currentEntryId={gameStateManager.entryId} changeEntryId={gameStateManager.playerSetEntry}></LogBook>
                 </div>
-                <div className="app-side-by-side-main">
+                {/* <div className="app-side-by-side-main">
                     <GameBoard board={gameStateManager.gameState?.board}></GameBoard>
                 </div>
                 <div>
                     <p>Coffer: {gameStateManager.gameState?.council?.coffer}</p>
                     <UserList gameState={gameStateManager.gameState}></UserList>
-                </div>
-            </div> */}
+                </div> */}
+            </div>
             {/* <div className="centered">
                 <div>
                     <SubmitTurn

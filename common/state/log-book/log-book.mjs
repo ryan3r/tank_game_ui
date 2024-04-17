@@ -86,4 +86,10 @@ export class LogBook {
 
         return this.getEntry(lastId);
     }
+
+    *[Symbol.iterator]() {
+        for(let i = this.getFirstEntryId(); i <= this.getLastEntryId(); ++i) {
+            yield this.getEntry(i);
+        }
+    }
 }
