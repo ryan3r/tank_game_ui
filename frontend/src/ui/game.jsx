@@ -31,13 +31,13 @@ export function Game({ game, setGame, debug }) {
                 <div>
                     <LogBook logBook={gameInfo?.logBook} currentEntryId={gameStateManager.entryId} changeEntryId={gameStateManager.playerSetEntry}></LogBook>
                 </div>
-                {/* <div className="app-side-by-side-main">
+                <div className="app-side-by-side-main">
                     <GameBoard board={gameStateManager.gameState?.board}></GameBoard>
                 </div>
                 <div>
                     <p>Coffer: {gameStateManager.gameState?.council?.coffer}</p>
                     <UserList gameState={gameStateManager.gameState}></UserList>
-                </div> */}
+                </div>
             </div>
             {/* <div className="centered">
                 <div>

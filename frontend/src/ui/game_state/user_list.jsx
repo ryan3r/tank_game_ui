@@ -14,16 +14,16 @@ function capitalize(text) {
 }
 
 
-export function UserList({ turnState }) {
-    if(!turnState) {
+export function UserList({ gameState }) {
+    if(!gameState) {
         return "Loading...";
     }
 
     return (
         <div className="user-list">
-            {turnState.players.getAllPlayerTypes().map(playerType => {
+            {gameState.players.getAllPlayerTypes().map(playerType => {
                 return (
-                    <Section name={playerType} users={turnState.players.getPlayersByType(playerType)}></Section>
+                    <Section name={playerType} users={gameState.players.getPlayersByType(playerType)}></Section>
                 );
             })}
         </div>
