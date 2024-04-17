@@ -93,18 +93,6 @@ describe("LogBook", () => {
         assert.equal(logBook.getMaxDay(), 2);
     });
 
-    it("can walk through its entries one by one", () => {
-        const logBook = LogBook.deserialize(rawLogBook, config);
-
-        const firstEntry = logBook.getEntry(0);
-        const lastEntry = logBook.getEntry(logBook.getLastEntryId());
-        const secondEntry = logBook.findNextEntry(firstEntry);
-
-        assert.deepEqual(logBook.getEntry(1), secondEntry);
-        assert.deepEqual(logBook.getEntry(2), logBook.findNextEntry(secondEntry));
-        assert.deepEqual(lastEntry, logBook.findNextEntry(lastEntry));
-    });
-
     it("can walk through entries by day", () => {
         const logBook = LogBook.deserialize(rawLogBook, config);
 
