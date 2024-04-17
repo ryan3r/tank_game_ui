@@ -51,6 +51,8 @@ export class GameInteractor {
     }
 
     async _sendPreviousState(currentStateIndex) {
+        await this._engine.setGameVersion(this._logBook.gameVersion);
+
         const previousStateIndex = currentStateIndex - 1;
 
         // Send our previous state to the engine

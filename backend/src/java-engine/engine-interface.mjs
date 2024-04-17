@@ -173,6 +173,10 @@ class TankGameEngine {
 
         return this.getBoardState();
     }
+
+    async setGameVersion(version) {
+        // TODO: Implement with updated engine
+    }
 }
 
 export function createEngine() {
