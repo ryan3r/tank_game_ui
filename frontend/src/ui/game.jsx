@@ -39,22 +39,22 @@ export function Game({ game, setGame, debug }) {
                     <UserList gameState={gameStateManager.gameState}></UserList>
                 </div>
             </div>
-            {/* <div className="centered">
+            <div className="centered">
                 <div>
-                    <SubmitTurn
+                    {/* <SubmitTurn
                         game={game}
                         isLastTurn={turnStateManager.isLastTurn}
                         turnState={turnStateManager.turnState}
                         refreshGameInfo={refreshGameInfo}
-                        debug={debug}></SubmitTurn>
+                        debug={debug}></SubmitTurn> */}
                     {debug ? <details>
                         <summary>Current board state (JSON)</summary>
-                        <pre>{JSON.stringify(turnStateManager?.turnState, null, 4)}</pre>
+                        <pre>{gameStateManager?.gameState && JSON.stringify(gameStateManager?.gameState.serialize(), null, 4)}</pre>
                     </details> : undefined}
                 </div>
-            </div> */}
+            </div>
             <footer>
-                <i>{APP_VERSION} - {gameInfo?.engine}</i>
+                <i>{APP_VERSION}</i>
             </footer>
         </>
     );

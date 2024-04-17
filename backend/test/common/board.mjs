@@ -8,7 +8,7 @@ import { FloorTile } from "../../../common/state/board/floor-tile.mjs";
 let board = new Board(7, 5);
 
 const tank1 = new Entity("tank", new Position(0, 0), new ResourceHolder());
-const destroyedTank = new Entity("destroyed-tank", new Position(2, 3), new ResourceHolder());
+const destroyedTank = new Entity("dead-tank", new Position(2, 3), new ResourceHolder());
 const tank2 = new Entity("tank", new Position(6, 4), new ResourceHolder());
 const baloon = new Entity("baloon", new Position(1, 1), new ResourceHolder());
 
@@ -43,7 +43,7 @@ describe("Board", () => {
 
     it("can find all entities of a given type", () => {
         assert.deepEqual(board.getEntitiesOfType(["tank"]), [tank1, tank2]);
-        assert.deepEqual(board.getEntitiesOfType(["destroyed-tank"]), [destroyedTank]);
+        assert.deepEqual(board.getEntitiesOfType(["dead-tank"]), [destroyedTank]);
         assert.deepEqual(board.getEntitiesOfType(["tank", "baloon"]), [tank1, baloon, tank2]);
         assert.equal(board.getEntitiesOfType(["any"]).length, board.width * board.height);
     });

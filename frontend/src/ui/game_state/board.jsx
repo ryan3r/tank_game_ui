@@ -66,7 +66,7 @@ function Space({ space, floorTile, disabled, onClick, selected }) {
     let entity = null;
 
     // Try to place an entity in this space
-    if(type == "tank" || type == "destroyed-tank") {
+    if(type == "tank" || type == "dead-tank") {
         entity = <Tank tank={space} floorTile={floorTile}></Tank>;
     }
     else if(type == "wall") {

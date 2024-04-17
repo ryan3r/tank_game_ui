@@ -18,7 +18,7 @@ import { raw } from "express";
 // User keys that should be treated as resources
 const resourceKeys = {
     "tank": new Set(["health", "actions", "range", "gold", "bounty"]),
-    "destroyed-tank": new Set(["health"]),
+    "dead-tank": new Set(["health"]),
     "wall": new Set(["health"]),
 };
 
@@ -47,7 +47,7 @@ export function gameStateFromRawState(rawGameState) {
 
 
 function entityFromBoard(rawEntity, position, playersByName) {
-    const type = rawEntity.type == "tank" && rawEntity.dead ? "destroyed-tank" : rawEntity.type;
+    const type = rawEntity.type == "tank" && rawEntity.dead ? "dead-tank" : rawEntity.type;
 
     // Resources are stored as properties directly on the rawEntity extract them
     const resources = Object.keys(rawEntity)
@@ -160,11 +160,11 @@ function buildRawBoard(board) {
             const floorBoard = board.getFloorTileAt(position);
 
             let rawEntity = {
-                type: entity.type == "destroyed-tank" ? "tank" : entity.type,
+                type: entity.type == "dead-tank" ? "tank" : entity.type,
             };
 
             if(entity.type.includes("tank")) {
-                rawEntity.dead = entity.type == "destroyed-tank";
+                rawEntity.dead = entity.type == "dead-tank";
             }
 
             if(entity.player?.name) {
