@@ -1,5 +1,5 @@
 import { useCallback } from "preact/hooks";
-import { useGameList } from "../api/game";
+import { useGameList } from "../api/fetcher";
 
 export function GameSelector({ setGame }) {
     const [games, _] = useGameList();

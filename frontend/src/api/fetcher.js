@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useState } from "preact/hooks";
+import { LogBook } from "../../../common/state/log-book/log-book.mjs";
+import { Config } from "../../../common/state/config/config.mjs";
 
 const FETCH_FREQUENCY = 2; // seconds
 const GAME_URL_EXPR = /^\/game\/([^/]+)$/g;
@@ -82,17 +84,21 @@ export const useGameList = makeReactDataFetchHelper({
 
 export const useGameInfo = makeReactDataFetchHelper({
     shouldSendRequest: game => !!game,
-    url: game => `/api/game/${game}/header`,
-    parse: data => ({
-        ...data,
-        turnMap: new TurnMap(data.turnMap),
-    }),
+    url: game => `/api/game/${game}/`,
+    parse: data => {
+        const config = Config.deserialize(data.config);
+
+        return {
+            logBook: LogBook.deserialize(data.logBook, config),
+            config,
+        };
+    },
     frequency: FETCH_FREQUENCY,
 });
 
-export const useTurn = makeReactDataFetchHelper({
-    shouldSendRequest: (game, turnId) => game && turnId !== undefined,
-    url: (game, turnId) => `/api/game/${game}/turn/${turnId}`
+export const useGameState = makeReactDataFetchHelper({
+    shouldSendRequest: (game, entryId) => game && entryId !== undefined,
+    url: (game, entryId) => `/api/game/${game}/turn/${entryId}`
 });
 
 export const useActionTemplate = makeReactDataFetchHelper({

@@ -1,79 +1,79 @@
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
-import { useTurn } from "./game";
-import { turnFromRawState } from "../../../../common/java-engine/board-state.mjs";
+import { useGameState } from "./fetcher";
+import { GameState } from "../../../common/state/game-state.mjs";
 
 
 const TURN_SWITCH_FREQENCY = 700;  // 0.7 seconds in ms
 
 
-export function useTurnStateManager(turnMap, game) {
-    const [turn, setTurn] = useState();
-    const [trackingLastTurn, setTrackingLastTurn] = useState();
+export function useGameStateManager(logBook, game) {
+    const [entryId, setEntryId] = useState();
+    const [trackingLastEntry, setTrackingLastEntry] = useState();
     const [playback, setPlayback] = useState(false);
-    const [state, __] = useTurn(game, turn);
+    const [state, __] = useGameState(game, entryId);
 
-    // Change the current turn and track the last turn if we set it to that
-    const setTurnAndTrackLastTurn = useCallback((newTurn) => {
-        setTurn(newTurn);
+    // Change the current entry and track the latest entry if we set it to that
+    const setEntryIdAndTrackLastEntry = useCallback((newEntryId) => {
+        setEntryId(newEntryId);
 
-        // If the user moves to the latest turn stay on the latest turn
-        setTrackingLastTurn(newTurn >= turnMap.getLastTurn());
-    }, [setTrackingLastTurn, setTurn, turnMap]);
+        // If the user moves to the latest entry stay on the latest entry
+        setTrackingLastEntry(newEntryId >= logBook.getLastEntryId());
+    }, [setTrackingLastEntry, setEntryId, logBook]);
 
 
-    // If turn hasn't been set jump to the last turn
-    if(turnMap && turn === undefined) {
-        setTurnAndTrackLastTurn(turnMap.getLastTurn());
+    // If entry hasn't been set jump to the latest entry
+    if(logBook && entryId === undefined) {
+        setEntryIdAndTrackLastEntry(logBook.getLastEntryId());
     }
 
 
     useEffect(() => {
         // Not playing nothing to do
-        if(!playback || !turnMap) return () => {};
+        if(!playback || !logBook) return () => {};
 
         // Hit the end stop playing
-        if(turn == turnMap.getLastTurn()) {
+        if(entryId == logBook.getLastEntryId()) {
             setPlayback(false);
             return () => {};
         }
 
         const handle = setTimeout(() => {
-            setTurnAndTrackLastTurn(turnMap.findNextTurn(turn));
+            setEntryIdAndTrackLastEntry(Math.min(entryId + 1, logBook.getLastEntryId()));
         }, TURN_SWITCH_FREQENCY);
 
         return () => clearTimeout(handle);
-    }, [turnMap, turn, setTurnAndTrackLastTurn, playback]);
+    }, [logBook, entryId, setEntryIdAndTrackLastEntry, playback]);
 
     const togglePlayback = useCallback(() => {
         setPlayback(!playback);
     }, [playback, setPlayback]);
 
 
-    // If we're following the last turn and a new turn gets added change to that one
+    // If we're following the last entry and a new entry gets added change to that one
     useEffect(() => {
-        if(trackingLastTurn && turnMap) {
-            setTurn(turnMap.getLastTurn());
+        if(trackingLastEntry && logBook) {
+            setEntryId(logBook.getLastEntryId());
         }
-    }, [turnMap, trackingLastTurn, setTurn]);
+    }, [logBook, trackingLastEntry, setEntryId]);
 
 
-    const isLastTurn = turnMap ? turn >= turnMap.getLastTurn() : false;
+    const isLatestEntry = logBook ? entryId >= logBook.getLastEntryId() : false;
 
 
-    const playerSetTurn = newTurn => {
-        setTurnAndTrackLastTurn(newTurn);
-        // If the user changes the turn stop playback
+    const playerSetEntry = newEntryId => {
+        setEntryIdAndTrackLastEntry(newEntryId);
+        // If the user changes the entry stop playback
         setPlayback(false);
     };
 
-    const turnState = useMemo(() => state ? turnFromRawState(state.error, state.gameState) : undefined, [state]);
+    const gameState = useMemo(() => state ? GameState.deserialize(state) : undefined, [state]);
 
     return {
-        turnState,
-        turnId: turn,
-        isLastTurn,
+        gameState,
+        entryId,
+        isLatestEntry,
         isPlayingBack: playback,
         togglePlayback,
-        playerSetTurn,
+        playerSetEntry,
     };
 }

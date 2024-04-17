@@ -65,11 +65,14 @@ app.get("/api/games", async (req, res) => {
     res.json(Object.keys(games));
 });
 
-app.get("/api/game/:gameName/log-book", (req, res) => {
+app.get("/api/game/:gameName/", (req, res) => {
     const game = checkGame(req, res);
     if(!game) return;
 
-    res.json(game.getLogBook().serialize());
+    res.json({
+        logBook: game.getLogBook().serialize(),
+        config: config.serialize(),
+    });
 });
 
 app.get("/api/game/:gameName/turn/:turnId", (req, res) => {

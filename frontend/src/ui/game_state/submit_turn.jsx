@@ -1,4 +1,4 @@
-import { submitTurn } from "../../api/game";
+import { submitTurn } from "../../api/fetcher";
 import { usePossibleActions } from "../../api/possible-actions";
 import { targetSelectionState } from "../../api/space-selecting-state";
 import "./submit_turn.css";

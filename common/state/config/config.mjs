@@ -9,6 +9,16 @@ export class Config {
         }
     }
 
+    static deserialize(rawConfig) {
+        return new Config(rawConfig);
+    }
+
+    serialize() {
+        return {
+            gameVersionConfigs: this._gameVersionConfigs,
+        }
+    }
+
     isGameVersionSupported(version) {
         return !!this.getGameVersion(version);
     }

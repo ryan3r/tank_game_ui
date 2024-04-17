@@ -1,6 +1,6 @@
 import "./index.css";
 import { render } from "preact";
-import { useGame } from "./api/game.js";
+import { useGame } from "./api/fetcher.js";
 import { GameSelector } from "./ui/game_selector.jsx";
 import { Game } from "./ui/game.jsx";
 import { useDebugMode } from "./debug_mode.js";

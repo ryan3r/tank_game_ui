@@ -103,9 +103,6 @@ describe("LogBook", () => {
         assert.deepEqual(logBook.getEntry(1), secondEntry);
         assert.deepEqual(logBook.getEntry(2), logBook.findNextEntry(secondEntry));
         assert.deepEqual(lastEntry, logBook.findNextEntry(lastEntry));
-
-        assert.deepEqual(logBook.getEntry(0), logBook.findPreviousEntry(secondEntry));
-        assert.deepEqual(firstEntry, logBook.findPreviousEntry(firstEntry));
     });
 
     it("can walk through entries by day", () => {
@@ -120,10 +117,6 @@ describe("LogBook", () => {
         assert.equal(firstEntrySecondDay.type, "start_of_day");
         assert.equal(firstEntryFirstDay.day, 1);
         assert.equal(firstEntrySecondDay.day, 2);
-
-        assert.equal(logBook.findFirstEntryOfNextDay(firstEntryFirstDay), firstEntrySecondDay);
-        assert.equal(logBook.findFirstEntryOfPreviousDay(firstEntrySecondDay), firstEntryFirstDay);
-        assert.equal(logBook.findFirstEntryOfPreviousDay(secondEntrySecondDay), firstEntryFirstDay);
 
         assert.equal(logBook.getFirstEntryOfDay(1), firstEntryFirstDay);
         assert.equal(logBook.getFirstEntryOfDay(2), firstEntrySecondDay);

@@ -1,11 +1,11 @@
 import { GameBoard } from "./game_state/board.jsx";
 import { useCallback, useState } from "preact/hooks";
-import { useGameInfo } from "../api/game.js";
-import { TurnSelector } from "./game_state/turn_selector.jsx"
+import { useGameInfo } from "../api/fetcher.js";
+import { LogEntrySelector } from "./game_state/log_entry_selector.jsx"
 import { SubmitTurn } from "./game_state/submit_turn.jsx";
 import { UserList } from "./game_state/user_list.jsx";
 import { LogBook } from "./game_state/log_book.jsx";
-import { useTurnStateManager } from "../api/turn-state-manager.js";
+import { useGameStateManager } from "../api/turn-state-manager.js";
 
 
 export function Game({ game, setGame, debug }) {
@@ -18,36 +18,30 @@ export function Game({ game, setGame, debug }) {
         setGameInfoTrigger(!gameInfoTrigger);
     }, [gameInfoTrigger, setGameInfoTrigger]);
 
-    const turnStateManager = useTurnStateManager(gameInfo?.turnMap, game);
-
-    const errorMessage = (!turnStateManager.turnState || turnStateManager.turnState.valid) ? null : (
-        <div className="app-turn-invalid">
-            {turnStateManager.turnState.error}
-        </div>
-    );
+    const gameStateManager = useGameStateManager(gameInfo?.logBook, game);
 
     return (
         <>
-            <TurnSelector
+            <LogEntrySelector
                 debug={debug}
+                logBook={gameInfo?.logBook}
                 setGame={setGame}
                 gameInfo={gameInfo}
-                turnStateManager={turnStateManager}></TurnSelector>
-            <div className="app-side-by-side centered">
+                gameStateManager={gameStateManager}></LogEntrySelector>
+            {/* <div className="app-side-by-side centered">
                 <div>
-                    <LogBook gameInfo={gameInfo} currentTurn={turnStateManager.turnId} changeTurn={turnStateManager.playerSetTurn}></LogBook>
+                    <LogBook gameInfo={gameInfo} currentTurn={gameStateManager.entryId} changeTurn={gameStateManager.playerSetEntry}></LogBook>
                 </div>
                 <div className="app-side-by-side-main">
-                    <GameBoard gameState={turnStateManager.turnState?.board}></GameBoard>
+                    <GameBoard board={gameStateManager.gameState?.board}></GameBoard>
                 </div>
                 <div>
-                    <p>Coffer: {turnStateManager.turnState?.council?.coffer}</p>
-                    <UserList turnState={turnStateManager.turnState}></UserList>
+                    <p>Coffer: {gameStateManager.gameState?.council?.coffer}</p>
+                    <UserList gameState={gameStateManager.gameState}></UserList>
                 </div>
-            </div>
-            <div className="centered">
+            </div> */}
+            {/* <div className="centered">
                 <div>
-                    {errorMessage}
                     <SubmitTurn
                         game={game}
                         isLastTurn={turnStateManager.isLastTurn}
@@ -59,7 +53,7 @@ export function Game({ game, setGame, debug }) {
                         <pre>{JSON.stringify(turnStateManager?.turnState, null, 4)}</pre>
                     </details> : undefined}
                 </div>
-            </div>
+            </div> */}
             <footer>
                 <i>{APP_VERSION} - {gameInfo?.engine}</i>
             </footer>

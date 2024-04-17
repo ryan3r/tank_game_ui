@@ -74,27 +74,16 @@ export class LogBook {
         return this._maxDay;
     }
 
-    findNextEntry(currentEntry) {
-        const nextId = Math.min(currentEntry.id + 1, this.getLastEntryId());
-        return this.getEntry(nextId);
-    }
-
-    findPreviousEntry(currentEntry) {
-        const previousId = Math.max(currentEntry.id - 1, this.getFirstEntryId());
-        return this.getEntry(previousId);
-    }
-
-    findFirstEntryOfNextDay(entry) {
-        const newDay = Math.min(entry.day + 1, this.getMaxDay());
-        return this.getFirstEntryOfDay(newDay);
-    }
-
-    findFirstEntryOfPreviousDay(entry) {
-        const newDay =  Math.max(entry.day - 1, this.getMinDay());
-        return this.getFirstEntryOfDay(newDay);
-    }
-
     getFirstEntryOfDay(day) {
         return this.getEntry(this._dayMap[day]);
+    }
+
+    getLastEntryOfDay(day) {
+        let lastId = this.getLastEntryId();
+        if(day < this.getMaxDay()) {
+            lastId = this.getFirstEntryOfDay(day + 1).id - 1;
+        }
+
+        return this.getEntry(lastId);
     }
 }
