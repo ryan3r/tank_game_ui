@@ -11,4 +11,8 @@ export class GameVersionConfig {
 
         return new LogEntryFormatter(formatters[logEntryType]);
     }
+
+    serialize() {
+        return this._gameVersionConfig;
+    }
 }

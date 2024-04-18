@@ -47,10 +47,20 @@ export function Game({ game, setGame, debug }) {
                         turnState={turnStateManager.turnState}
                         refreshGameInfo={refreshGameInfo}
                         debug={debug}></SubmitTurn> */}
-                    {debug ? <details>
-                        <summary>Current board state (JSON)</summary>
-                        <pre>{gameStateManager?.gameState && JSON.stringify(gameStateManager?.gameState.serialize(), null, 4)}</pre>
-                    </details> : undefined}
+                    {debug ? <div>
+                        <details>
+                            <summary>Current board state (JSON)</summary>
+                            <pre>{gameStateManager?.gameState && JSON.stringify(gameStateManager?.gameState.serialize(), null, 4)}</pre>
+                        </details>
+                        <details>
+                            <summary>Current logbook (JSON)</summary>
+                            <pre>{gameInfo?.logBook && JSON.stringify(gameInfo?.logBook.serialize(), null, 4)}</pre>
+                        </details>
+                        <details>
+                            <summary>Current config (JSON)</summary>
+                            <pre>{gameInfo?.config && JSON.stringify(gameInfo?.config.serialize(), null, 4)}</pre>
+                        </details>
+                    </div> : undefined}
                 </div>
             </div>
             <footer>

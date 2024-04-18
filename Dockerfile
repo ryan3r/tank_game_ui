@@ -51,7 +51,7 @@ COPY --from=frontend /build/frontend/dist/ /app/www/
 COPY --from=engine /build/tankgame/target/TankGame-*.jar /app/engine/
 
 # Place some sample data in /data so users can try out the app
-COPY example /data
+COPY example/*.json /data/games/
 
 ENV TANK_GAMES_FOLDER=/data
 

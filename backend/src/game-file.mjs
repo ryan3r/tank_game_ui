@@ -6,7 +6,6 @@ import { logger } from "./logging.mjs";
 import { gameStateFromRawState } from "./java-engine/board-state.mjs";
 import { GameState } from "../../common/state/game-state.mjs";
 import { GameInteractor } from "../../common/game/game-interactor.mjs";
-import { throws } from "node:assert";
 
 export const FILE_FORMAT_VERSION = 2;
 export const MINIMUM_SUPPORTED_FILE_FORMAT_VERSION = 1;
@@ -85,12 +84,16 @@ export class GameManager {
 
         const dir = this.gameConfig.getGamesFolder();
         for(const gameFile of await fs.readdir(dir)) {
+            // Only load json files
+            if(!gameFile.endsWith(".json")) continue;
+
             const filePath = path.join(dir, gameFile);
             const {name} = path.parse(gameFile);
 
             logger.info(`Loading ${name} from ${filePath}`);
             const saveHandler = data => save(filePath, data);
 
+            // Load and process the game asyncronously
             this._gamePromises[name] = load(filePath, this.gameConfig).then(async file => {
                 const interactor = new GameInteractor(this._createEngine(), file, saveHandler);
                 await interactor.loaded;
@@ -101,6 +104,7 @@ export class GameManager {
                 };
             });
 
+            // Update the status on error but don't remove the error from the promise
             this._gamePromises[name].catch(err => {
                 logger.warn({
                     msg: `An error occured while loading ${name} from ${filePath}`,
