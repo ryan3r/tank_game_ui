@@ -1,15 +1,17 @@
 import { useMemo } from "preact/hooks";
-import { useActionTemplate } from "./fetcher.js";
+import { useActionTemplate, usePossibleActionFactories } from "./fetcher.js";
 import { Position } from "../../../common/state/board/position.mjs";
 import { LOG_BOOK_FIELD_MAPPINGS, TARGET_TYPE_FOR_ACTION } from "../config.js";
 
 
 export function usePossibleActions(game, turnState, selectedUser) {
-    const [actionTemplate, __] = useActionTemplate(game);
+    const [possibleActionFactories, __] = usePossibleActionFactories(game);
 
-    return useMemo(() => {
-        return buildPossibleActionsForUser(actionTemplate, turnState, selectedUser)
-    }, [actionTemplate, turnState, selectedUser]);
+
+
+    // return useMemo(() => {
+    //     return buildPossibleActionsForUser(actionTemplate, turnState, selectedUser)
+    // }, [actionTemplate, turnState, selectedUser]);
 }
 
 

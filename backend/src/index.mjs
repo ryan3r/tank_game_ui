@@ -18,23 +18,23 @@ function gameAccessor(gameManager, config) {
 
     return (req, res, next) => {
         function getGameIfAvailable() {
-            const {loaded, error, interactor} = gameManager.getGame(req.params.gameName);
+            const {loaded, error, sourceSet, interactor} = gameManager.getGame(req.params.gameName);
 
             if(error) {
                 res.json({
                     error: `Failed to load game: ${error}`,
                 });
-                return;
+                return {valid: false};
             }
 
             if(!loaded) {
                 res.json({
                     error: "Game is still loading"
                 });
-                return;
+                return {valid: false};
             }
 
-            return interactor;
+            return {valid: true, interactor, sourceSet};
         }
 
         req.games = {

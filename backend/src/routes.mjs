@@ -17,29 +17,29 @@ export function defineRoutes(app) {
     });
 
     app.get("/api/game/:gameName/", (req, res) => {
-        const game = req.games.getGameIfAvailable();
-        if(!game) return;
+        const {valid, interactor} = req.games.getGameIfAvailable();
+        if(!valid) return;
 
         res.json({
-            logBook: game.getLogBook().serialize(),
+            logBook: interactor.getLogBook().serialize(),
             config: req.games.config.serialize(),
         });
     });
 
     app.get("/api/game/:gameName/turn/:turnId", (req, res) => {
-        const game = req.games.getGameIfAvailable();
-        if(!game) return;
+        const {valid, interactor} = req.games.getGameIfAvailable();
+        if(!valid) return;
 
-        const state = game.getGameStateById(req.params.turnId);
+        const state = interactor.getGameStateById(req.params.turnId);
         res.json(state && state.serialize());
     });
 
     app.post("/api/game/:gameName/turn", async (req, res) => {
-        const game = req.games.getGameIfAvailable();
-        if(!game) return;
+        const {valid, interactor} = req.games.getGameIfAvailable();
+        if(!valid) return;
 
         try {
-            await game.addLogBookEntry(req.body);
+            await interactor.addLogBookEntry(req.body);
             req.log.info({ msg: "Added log book entry", entry: req.body });
             res.json({ success: true });
         }
@@ -49,11 +49,21 @@ export function defineRoutes(app) {
         }
     });
 
-    app.get("/api/game/:gameName/action-template", async (req, res) => {
-        const game = req.games.getGameIfAvailable();
-        if(!game) return;
+    app.get("/api/game/:gameName/possible-actions/:playerName", async (req, res) => {
+        const {valid, interactor, sourceSet} = req.games.getGameIfAvailable();
+        if(!valid) return;
 
-        res.json(game.getActionTemplate());
+        const logBook = interactor.getLogBook();
+        const lastId = logBook.getLastEntryId();
+
+        const factories = sourceSet.getActionFactoriesForPlayer({
+            playerName: req.params.playerName,
+            logEntry: logBook.getEntry(lastId),
+            gameState: interactor.getGameStateById(lastId),
+            interactor: interactor,
+        });
+
+        res.json(factories.serialize());
     });
 
     app.use(function(req, res) {

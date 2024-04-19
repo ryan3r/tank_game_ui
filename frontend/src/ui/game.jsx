@@ -41,12 +41,12 @@ export function Game({ game, setGame, debug }) {
             </div>
             <div className="centered">
                 <div>
-                    {/* <SubmitTurn
+                    <SubmitTurn
                         game={game}
-                        isLastTurn={turnStateManager.isLastTurn}
-                        turnState={turnStateManager.turnState}
+                        isLastTurn={gameStateManager.isLatestEntry}
                         refreshGameInfo={refreshGameInfo}
-                        debug={debug}></SubmitTurn> */}
+                        debug={debug}
+                        gameState={gameStateManager.gameState}></SubmitTurn>
                     {debug ? <div>
                         <details>
                             <summary>Current board state (JSON)</summary>

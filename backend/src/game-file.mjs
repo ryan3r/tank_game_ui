@@ -6,6 +6,8 @@ import { logger } from "./logging.mjs";
 import { gameStateFromRawState } from "./java-engine/board-state.mjs";
 import { GameState } from "../../common/state/game-state.mjs";
 import { GameInteractor } from "../../common/game/game-interactor.mjs";
+import { PossibleActionSourceSet } from "../../common/state/possible-actions/index.mjs";
+import { StartOfDaySource } from "../../common/state/possible-actions/start-of-day-source.mjs";
 
 export const FILE_FORMAT_VERSION = 2;
 export const MINIMUM_SUPPORTED_FILE_FORMAT_VERSION = 1;
@@ -98,9 +100,14 @@ export class GameManager {
                 const interactor = new GameInteractor(this._createEngine(), file, saveHandler);
                 await interactor.loaded;
 
+                const sourceSet = new PossibleActionSourceSet([
+                    new StartOfDaySource(),
+                ]);
+
                 this._games[name] = {
                     loaded: true,
                     interactor,
+                    sourceSet,
                 };
             });
 

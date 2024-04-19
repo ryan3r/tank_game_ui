@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { LogBook } from "../../../common/state/log-book/log-book.mjs";
 import { Config } from "../../../common/state/config/config.mjs";
+import { NamedFactorySet } from "../../../common/state/possible-actions/index.mjs";
 
 const FETCH_FREQUENCY = 2; // seconds
 const GAME_URL_EXPR = /^\/game\/([^/]+)$/g;
@@ -101,9 +102,10 @@ export const useGameState = makeReactDataFetchHelper({
     url: (game, entryId) => `/api/game/${game}/turn/${entryId}`
 });
 
-export const useActionTemplate = makeReactDataFetchHelper({
-    shouldSendRequest: game => !!game,
-    url: game => `/api/game/${game}/action-template`,
+export const usePossibleActionFactories = makeReactDataFetchHelper({
+    shouldSendRequest: (game, user) => game && user,
+    url: (game, user) => `/api/game/${game}/possible-actions/${user}`,
+    parse: rawActionFactories => NamedFactorySet.deserialize(rawActionFactories),
 });
 
 export async function submitTurn(game, logbookEntry) {
