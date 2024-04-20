@@ -9,8 +9,33 @@ import { GameInteractor } from "../../common/game/game-interactor.mjs";
 import { PossibleActionSourceSet } from "../../common/state/possible-actions/index.mjs";
 import { StartOfDaySource } from "../../common/state/possible-actions/start-of-day-source.mjs";
 
-export const FILE_FORMAT_VERSION = 3;
+export const FILE_FORMAT_VERSION = 4;
 export const MINIMUM_SUPPORTED_FILE_FORMAT_VERSION = 1;
+
+
+function remapLogEntryForV4(rawEntry) {
+    if(rawEntry.action == "move" || rawEntry.action == "shoot") {
+        rawEntry.target = rawEntry.position;
+        delete rawEntry.position;
+    }
+
+    if(rawEntry.action == "donate") {
+        rawEntry.donation = rawEntry.quantity;
+        delete rawEntry.quantity;
+    }
+
+    if(rawEntry.action == "buy_action") {
+        rawEntry.gold = rawEntry.quantity;
+        delete rawEntry.quantity;
+    }
+
+    if(rawEntry.action == "bounty") {
+        rawEntry.bounty = rawEntry.quantity;
+        delete rawEntry.quantity;
+    }
+
+    return rawEntry;
+}
 
 export async function load(filePath, gameConfig) {
     let content = await readJson(filePath);
@@ -45,6 +70,11 @@ export async function load(filePath, gameConfig) {
         };
 
         fileFormatVersion = 3;
+    }
+
+    if(fileFormatVersion == 3) {
+        content.logBook.rawEntries = content.logBook.rawEntries.map(entry => remapLogEntryForV4(entry));
+        fileFormatVersion = 4;
     }
 
     // Make sure we have the config required to load this game.  This
