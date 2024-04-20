@@ -17,6 +17,11 @@ function makeReactDataFetchHelper(options) {
                     return;
                 }
 
+                if(options.resetBeforeFetch) {
+                    setData(undefined);
+                    setError(undefined);
+                }
+
                 let url = options.url;
                 if(typeof options.url === "function") {
                     url = options.url(...args);
@@ -103,6 +108,7 @@ export const useGameState = makeReactDataFetchHelper({
 });
 
 export const usePossibleActionFactories = makeReactDataFetchHelper({
+    resetBeforeFetch: true,
     shouldSendRequest: (game, user) => game && user,
     url: (game, user) => `/api/game/${game}/possible-actions/${user}`,
     parse: rawActionFactories => NamedFactorySet.deserialize(rawActionFactories),
