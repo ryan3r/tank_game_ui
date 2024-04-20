@@ -15,4 +15,9 @@ export class GameVersionConfig {
     serialize() {
         return this._gameVersionConfig;
     }
+
+    getJavaLogBookFieldNameFor(javaName) {
+        const logBookRemap = this._gameVersionConfig.javaEngineNameToLogBook;
+        return logBookRemap && logBookRemap[javaName];
+    }
 }

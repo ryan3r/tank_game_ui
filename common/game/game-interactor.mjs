@@ -42,10 +42,6 @@ export class GameInteractor {
             const state = await this._engine.processAction(logEntry);
             this._gameStates.splice(i, 0, state); // Insert state at i
         }
-
-        // if(!this._actionTemplate) {
-        //     this._parseActionTemplate(await this._engine.getActionTemplate());
-        // }
     }
 
     async _sendPreviousState(currentStateIndex) {
@@ -99,28 +95,4 @@ export class GameInteractor {
 
         return promise;
     }
-
-    // getActionTemplate() {
-    //     return this._actionTemplate;
-    // }
-
-    // _parseActionTemplate(descriptors) {
-    //     this._actionTemplate = {};
-
-    //     for(const descriptor of descriptors) {
-    //         const userType = descriptor.subject.toLowerCase();
-    //         const actionType = descriptor.name;
-
-    //         if(!this._actionTemplate[userType]) {
-    //             this._actionTemplate[userType] = {};
-    //         }
-
-    //         this._actionTemplate[userType][actionType] = descriptor;
-    //     }
-
-    //     // Use our type names
-    //     this._actionTemplate.councilor = this._actionTemplate.council;
-    //     this._actionTemplate.senator = this._actionTemplate.councilor;
-    //     delete this._actionTemplate.council;
-    // }
 }

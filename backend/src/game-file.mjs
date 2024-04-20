@@ -96,20 +96,8 @@ export class GameManager {
             const saveHandler = data => save(filePath, data);
 
             // Load and process the game asyncronously
-            this._gamePromises[name] = load(filePath, this.gameConfig).then(async file => {
-                const interactor = new GameInteractor(this._createEngine(), file, saveHandler);
-                await interactor.loaded;
-
-                const sourceSet = new PossibleActionSourceSet([
-                    new StartOfDaySource(),
-                ]);
-
-                this._games[name] = {
-                    loaded: true,
-                    interactor,
-                    sourceSet,
-                };
-            });
+            this._gamePromises[name] = load(filePath, this.gameConfig)
+                .then(this._initilizeGame.bind(this, name, saveHandler));
 
             // Update the status on error but don't remove the error from the promise
             this._gamePromises[name].catch(err => {
@@ -130,6 +118,32 @@ export class GameManager {
                 loaded: false,
             };
         });
+    }
+
+    async _initilizeGame(name, saveHandler, file) {
+        const engine = this._createEngine();
+        const interactor = new GameInteractor(engine, file, saveHandler);
+        await interactor.loaded;
+
+        let actionSets = [
+            new StartOfDaySource(),
+        ];
+
+        const engineSpecificSource = engine.getEngineSpecificSource &&
+            engine.getEngineSpecificSource();
+
+        if(engineSpecificSource) {
+            actionSets.push(engineSpecificSource);
+        }
+
+        const sourceSet = new PossibleActionSourceSet(actionSets);
+
+        logger.info({ msg: `Loaded ${name}`, games: this._games })
+        this._games[name] = {
+            loaded: true,
+            interactor,
+            sourceSet,
+        };
     }
 
     getGamePromise(name) {

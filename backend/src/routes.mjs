@@ -1,6 +1,7 @@
 import express from "express";
 import fs from "node:fs";
 import path from "node:path";
+import { logger } from "./logging.mjs";
 
 const STATIC_DIR = "../www";
 
@@ -56,11 +57,13 @@ export function defineRoutes(app) {
         const logBook = interactor.getLogBook();
         const lastId = logBook.getLastEntryId();
 
-        const factories = sourceSet.getActionFactoriesForPlayer({
+        const factories = await sourceSet.getActionFactoriesForPlayer({
             playerName: req.params.playerName,
+            logBook,
             logEntry: logBook.getEntry(lastId),
             gameState: interactor.getGameStateById(lastId),
             interactor: interactor,
+            config: req.games.config,
         });
 
         res.json(factories.serialize());

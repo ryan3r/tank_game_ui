@@ -3,6 +3,7 @@ import fs from "node:fs";
 import { logger } from "../logging.mjs"
 import path from "node:path";
 import { gameStateFromRawState, gameStateToRawState } from "./board-state.mjs";
+import { JavaEngineSource } from "../../test/backend/possible-action-source.mjs";
 
 const TANK_GAME_TIMEOUT = 3000; // 3 seconds
 
@@ -154,8 +155,15 @@ class TankGameEngine {
         return gameStateFromRawState(await this._runCommand("display")); // TODO: Use day?
     }
 
-    async getActionTemplate() {
+    async getRules() {
         return (await this._runCommand("rules")).rules;
+    }
+
+    async getPossibleActions(player) {
+        return (await this._sendRequestAndWait({
+            type: "possible_actions",
+            player,
+        })).actions;
     }
 
     setBoardState(state) {
@@ -179,6 +187,10 @@ class TankGameEngine {
             type: "version",
             version
         });
+    }
+
+    getEngineSpecificSource() {
+        return new JavaEngineSource(this);
     }
 }
 

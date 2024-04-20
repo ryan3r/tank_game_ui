@@ -1,6 +1,6 @@
 export class StartOfDaySource {
-    getActionFactoryForPlayer({logEntry}) {
-        return new StartOfDayFactory(logEntry.day + 1);
+    async getActionFactoriesForPlayer({logEntry}) {
+        return [new StartOfDayFactory(logEntry.day + 1)];
     }
 }
 
@@ -10,7 +10,9 @@ export class StartOfDayFactory {
         this._dayToStart = dayToStart;
     }
 
-    static type = "start-of-day";
+    getType() {
+        return "start-of-day";
+    }
 
     static deserialize(rawStartOfDayFactory) {
         return new StartOfDayFactory(rawStartOfDayFactory.dayToStart);
@@ -38,6 +40,6 @@ export class StartOfDayFactory {
     }
 
     toString() {
-        return "Start of Day";
+        return `Start day ${this._dayToStart}`;
     }
 }

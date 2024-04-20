@@ -182,11 +182,9 @@ function SelectPosition({ spec, value, setValue }) {
         return () => targetSelectionState.setSelectedTargetCallback(undefined);
     }, [setValue]);
 
-    const targetTypeMsg = spec.targetTypes.length == 1 && spec.targetTypes[0] == "any" ? "location" : spec.targetTypes.join(" ");
-
     const message = value ?
         `${value} (select a different space to change)` :
-        `Select a ${targetTypeMsg} on the board`;
+        `Select a location on the board`;
 
     return (
         <span>{message}</span>

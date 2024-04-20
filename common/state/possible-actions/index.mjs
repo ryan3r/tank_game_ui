@@ -1,18 +1,21 @@
+import { GenericPossibleAction } from "./generic-possible-action.mjs";
 import { StartOfDayFactory } from "./start-of-day-source.mjs";
 
 let registry = {};
 
 function register(Type) {
-    registry[Type.type] = Type;
+    registry[Type.prototype.getType()] = Type;
 }
 
 
 export class NamedFactorySet extends Array {
     serialize() {
-        return this.map(factory => ({
-            type: factory.type,
-            ...factory.serialize()
-        }));
+        return this.map(factory => {
+            return({
+                type: factory.getType(),
+                ...factory.serialize()
+            })
+        });
     }
 
     static deserialize(factories) {
@@ -35,12 +38,12 @@ export class PossibleActionSourceSet {
         this._sources = sources;
     }
 
-    getActionFactoriesForPlayer(params) {
+    async getActionFactoriesForPlayer(params) {
         let factorySet = new NamedFactorySet();
 
         for(const source of this._sources) {
-            const factory = source.getActionFactoryForPlayer(params);
-            if(factory) factorySet.push(factory);
+            const factories = await source.getActionFactoriesForPlayer(params);
+            for(const factory of factories) factorySet.push(factory);
         }
 
         return factorySet;
@@ -48,4 +51,6 @@ export class PossibleActionSourceSet {
 }
 
 
+// Register our action types so we can deserialize them
 register(StartOfDayFactory);
+register(GenericPossibleAction);
