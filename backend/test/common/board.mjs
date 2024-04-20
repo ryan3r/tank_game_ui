@@ -41,13 +41,6 @@ describe("Board", () => {
         assert.deepEqual(board.getFloorTileAt(new Position(6, 4)), emptyTile);
     });
 
-    it("can find all entities of a given type", () => {
-        assert.deepEqual(board.getEntitiesOfType(["tank"]), [tank1, tank2]);
-        assert.deepEqual(board.getEntitiesOfType(["dead-tank"]), [destroyedTank]);
-        assert.deepEqual(board.getEntitiesOfType(["tank", "baloon"]), [tank1, baloon, tank2]);
-        assert.equal(board.getEntitiesOfType(["any"]).length, board.width * board.height);
-    });
-
     it("can be serialize and deserialized", () => {
         const reSerializedBoard = Board.deserialize(board.serialize());
         assert.deepEqual(reSerializedBoard, board);

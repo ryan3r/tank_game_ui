@@ -70,8 +70,7 @@ describe("GameFile", () => {
         });
     }
 
-    // TODO: Disabled until file format v3 is done
-    xit("loading and saving a file recreates the original file", async () => {
+    it("loading and saving a file recreates the original file", async () => {
         const tempFile = path.join(TEST_FILES, `tank_game_temp_test_file-load-save.json`);
 
         await save(tempFile, await load(sampleFilePath, gameConfig));
@@ -111,7 +110,7 @@ describe("GameFile", () => {
         }
 
         // The invalid file should not be loaded
-        assert.equal(gameManager.getGame("bad_file").error, "Cannot read properties of undefined (reading 'game')");
+        assert.equal(gameManager.getGame("bad_file").error, "Cannot read properties of undefined (reading 'gameVersion')");
         assert.ok(!gameManager.getGame("bad_file").loaded);
 
         // Invalid games should return an error

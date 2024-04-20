@@ -9,7 +9,7 @@ import { GameInteractor } from "../../common/game/game-interactor.mjs";
 import { PossibleActionSourceSet } from "../../common/state/possible-actions/index.mjs";
 import { StartOfDaySource } from "../../common/state/possible-actions/start-of-day-source.mjs";
 
-export const FILE_FORMAT_VERSION = 2;
+export const FILE_FORMAT_VERSION = 3;
 export const MINIMUM_SUPPORTED_FILE_FORMAT_VERSION = 1;
 
 export async function load(filePath, gameConfig) {
@@ -49,9 +49,9 @@ export async function load(filePath, gameConfig) {
 
     // Make sure we have the config required to load this game.  This
     // does not check if the engine supports this game version.
-    if(!gameConfig.isGameVersionSupported(content.versions.game)) {
+    if(!gameConfig.isGameVersionSupported(content.logBook.gameVersion)) {
         logger.warn({
-            msg: `Tank Game UI is not configured for game version ${content.versions.game}.  You may experience strage behavior.`,
+            msg: `Tank Game UI is not configured for game version ${content.logBook.gameVersion}.  You may experience strage behavior.`,
             supportedVersions: gameConfig.getSupportedGameVersions(),
         });
     }

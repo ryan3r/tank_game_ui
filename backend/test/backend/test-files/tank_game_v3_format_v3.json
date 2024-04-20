@@ -1,7 +1,7 @@
 {
     "fileFormatVersion": 3,
     "logBook": {
-        "gameVersion": "version3",
+        "gameVersion": "3",
         "rawEntries": [
             {
                 "type": "action",
@@ -2559,7 +2559,7 @@
                 "I1": {
                     "type": "tank",
                     "resources": {
-                        "gold": 5,
+                        "gold": 0,
                         "bounty": 0,
                         "health": 3,
                         "range": 2,
@@ -2663,7 +2663,7 @@
                 "K3": {
                     "type": "tank",
                     "resources": {
-                        "gold": 5,
+                        "gold": 0,
                         "bounty": 0,
                         "health": 3,
                         "range": 2,
