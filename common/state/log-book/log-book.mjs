@@ -10,6 +10,7 @@ export class LogBook {
 
     _buildDayMap() {
         this._dayMap = {};
+        this._entriesPerDay = {};
 
         let previousDay = 0;
         for(const entry of this._entries) {
@@ -21,6 +22,12 @@ export class LogBook {
             this._maxDay = entry.day;
 
             previousDay = entry.day;
+
+            if(!this._entriesPerDay[entry.day]) {
+                this._entriesPerDay[entry.day] = [];
+            }
+
+            this._entriesPerDay[entry.day].push(entry);
         }
     }
 
@@ -91,5 +98,13 @@ export class LogBook {
         for(let i = this.getFirstEntryId(); i <= this.getLastEntryId(); ++i) {
             yield this.getEntry(i);
         }
+    }
+
+    getEntriesOnDay(day) {
+        return this._entriesPerDay[day];
+    }
+
+    getAllDays() {
+        return Object.keys(this._entriesPerDay);
     }
 }

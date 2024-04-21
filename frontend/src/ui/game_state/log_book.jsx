@@ -6,25 +6,15 @@ export function LogBook({ logBook, changeEntryId, currentEntryId }) {
         return <p>Loading...</p>;
     }
 
-    const actionsByDay = useMemo(() => {
-        let actionsByDay = {};
-
-        for(const logEntry of logBook) {
-            if(!actionsByDay[logEntry.day]) {
-                actionsByDay[logEntry.day] = [];
-            }
-
-            actionsByDay[logEntry.day].push(logEntry);
-        }
-
-        return actionsByDay;
-    }, [logBook]);
-
     return (
         <div className="log-book">
-            {Object.keys(actionsByDay).map(day => {
+            {logBook.getAllDays().map(day => {
                 return (
-                    <DaySection day={day} logEntries={actionsByDay[day]} changeEntryId={changeEntryId} currentEntryId={currentEntryId}></DaySection>
+                    <DaySection
+                        day={day}
+                        logEntries={logBook.getEntriesOnDay(day)}
+                        changeEntryId={changeEntryId}
+                        currentEntryId={currentEntryId}></DaySection>
                 );
             })}
         </div>
