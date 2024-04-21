@@ -1,5 +1,6 @@
 import { submitTurn, usePossibleActionFactories } from "../../api/fetcher";
 import { targetSelectionState } from "../../api/space-selecting-state";
+import { ErrorMessage } from "../error_message.jsx";
 import "./submit_turn.css";
 import { useCallback, useEffect, useState } from "preact/hooks";
 
@@ -8,8 +9,12 @@ export function SubmitTurn({ isLastTurn, gameState, refreshGameInfo, game, debug
     const [selectedUser, setSelectedUser] = useState();
     const [currentFactory, setCurrentFactory] = useState();
     const [actionSpecific, setActionSpecific] = useState({});
-    const [actionFactories, _] = usePossibleActionFactories(game, selectedUser, entryId);
+    const [actionFactories, error] = usePossibleActionFactories(game, selectedUser, entryId);
     const [status, setStatus] = useState();
+
+    if(error) {
+        return <ErrorMessage error={error}></ErrorMessage>
+    }
 
     if(status) {
         return <p>{status}</p>;

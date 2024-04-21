@@ -50,7 +50,7 @@ function useAutoTurnAdvance(logBook, entryId, setEntryIdAndTrackLastEntry) {
 export function useGameStateManager(logBook, game) {
     const [entryId, setEntryId] = useState();
     const [trackingLastEntry, setTrackingLastEntry] = useState();
-    const [state, __] = useGameState(game, entryId);
+    const [state, error] = useGameState(game, entryId);
 
     // Change the current entry and track the latest entry if we set it to that
     const setEntryIdAndTrackLastEntry = useCallback((newEntryId) => {
@@ -99,5 +99,6 @@ export function useGameStateManager(logBook, game) {
         isPlayingBack: playback,
         togglePlayback,
         playerSetEntry,
+        error,
     };
 }

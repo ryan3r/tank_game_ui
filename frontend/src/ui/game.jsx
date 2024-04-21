@@ -6,6 +6,7 @@ import { SubmitTurn } from "./game_state/submit_turn.jsx";
 import { UserList } from "./game_state/user_list.jsx";
 import { LogBook } from "./game_state/log_book.jsx";
 import { useGameStateManager } from "../api/game-state-manager.js";
+import { ErrorMessage } from "./error_message.jsx";
 
 
 export function Game({ game, setGame, debug }) {
@@ -13,12 +14,16 @@ export function Game({ game, setGame, debug }) {
     // so we create this state that game info depends on so when change it game info
     // gets refreshed
     const [gameInfoTrigger, setGameInfoTrigger] = useState();
-    const [gameInfo, _] = useGameInfo(game, gameInfoTrigger);
+    const [gameInfo, error] = useGameInfo(game, gameInfoTrigger);
     const refreshGameInfo = useCallback(() => {
         setGameInfoTrigger(!gameInfoTrigger);
     }, [gameInfoTrigger, setGameInfoTrigger]);
 
     const gameStateManager = useGameStateManager(gameInfo?.logBook, game);
+
+    if(error || gameStateManager.error) {
+        return <ErrorMessage error={error || gameStateManager.error}></ErrorMessage>
+    }
 
     return (
         <>
