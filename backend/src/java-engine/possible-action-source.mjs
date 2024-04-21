@@ -1,13 +1,6 @@
 import { Position } from "../../../common/state/board/position.mjs";
 import { GenericPossibleAction } from "../../../common/state/possible-actions/generic-possible-action.mjs";
 
-// Remove _ and capitalize names
-function prettyifyName(name) {
-    return name.split(/_|\s+/)
-        .map(word => word.length > 0 ? (word[0].toUpperCase() + word.slice(1)) : "")
-        .join(" ");
-}
-
 export class JavaEngineSource {
     constructor(engine) {
         this._engine = engine;
@@ -39,7 +32,6 @@ export class JavaEngineSource {
             return new GenericPossibleAction({
                 subject,
                 actionName: actionName,
-                displayName: prettyifyName(actionName),
                 fieldSpecs: this._buildFieldSpecs(possibleAction.fields),
             });
         });

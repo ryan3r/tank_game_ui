@@ -1,7 +1,8 @@
+import { prettyifyName } from "../utils.mjs";
+
 export class GenericPossibleAction {
-    constructor({ subject, actionName, displayName, fieldSpecs }) {
+    constructor({ subject, actionName, fieldSpecs }) {
         this._actionName = actionName;
-        this._displayName = displayName || actionName;
         this._subject = subject;
         this._fieldSpecs = fieldSpecs;
     }
@@ -18,7 +19,6 @@ export class GenericPossibleAction {
         return {
             actionName: this._actionName,
             fieldSpecs: this._fieldSpecs,
-            displayName: this._displayName,
             subject: this._subject,
         };
     }
@@ -45,6 +45,6 @@ export class GenericPossibleAction {
     }
 
     toString() {
-        return this._displayName;
+        return prettyifyName(this._actionName);
     }
 }
