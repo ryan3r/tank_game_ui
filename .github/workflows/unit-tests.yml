@@ -2,9 +2,6 @@ name: Unit tests
 
 on:
   push:
-    paths:
-      - '**.mjs'
-      - 'backend/**'
   pull_request:
     types: [opened, reopened]
 
