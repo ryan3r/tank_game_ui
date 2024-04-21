@@ -3,17 +3,12 @@ import { targetSelectionState } from "../../api/space-selecting-state";
 import "./submit_turn.css";
 import { useCallback, useEffect, useState } from "preact/hooks";
 
-function capitalize(string) {
-    return string.length === 0 ? "" : string[0].toUpperCase() + string.slice(1);
-}
-
-
-export function SubmitTurn({ isLastTurn, gameState, refreshGameInfo, game, debug }) {
+export function SubmitTurn({ isLastTurn, gameState, refreshGameInfo, game, debug, entryId }) {
     const usernames = gameState ? (gameState.players.getAllPlayers().map(user => user.name)) : [];
     const [selectedUser, setSelectedUser] = useState();
     const [currentFactory, setCurrentFactory] = useState();
     const [actionSpecific, setActionSpecific] = useState({});
-    const [actionFactories, _] = usePossibleActionFactories(game, selectedUser);
+    const [actionFactories, _] = usePossibleActionFactories(game, selectedUser, entryId);
     const [status, setStatus] = useState();
 
     if(status) {
@@ -134,7 +129,7 @@ function SubmissionForm({ factory, values, setValues }) {
 function LabelElement({ name, children }) {
     return (
         <label className="submit-turn-field" key={name}>
-            <b>{capitalize(name)}</b>
+            <b>{name}</b>
             {children}
         </label>
     );

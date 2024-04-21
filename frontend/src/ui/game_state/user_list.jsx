@@ -1,3 +1,4 @@
+import { prettyifyName } from "../../../../common/state/utils.mjs";
 import "./user_list.css";
 
 // Display friendly names for the user types
@@ -6,12 +7,6 @@ export const userTypeToHeaders = {
     senate: "Senators",
 };
 
-
-function capitalize(text) {
-    if(text.length == 0) return "";
-
-    return text[0].toUpperCase() + text.slice(1);
-}
 
 
 export function UserList({ gameState }) {
@@ -50,7 +45,7 @@ function Section({ name, users }) {
         content = (
             <table className="user-list-table">
                 <tr>
-                    {tableHeader.map(name => <th>{capitalize(name)}</th>)}
+                    {tableHeader.map(name => <th>{prettyifyName(name)}</th>)}
                 </tr>
                 {users.map(user => (
                     <UserInfo user={user} tableHeader={tableHeader}></UserInfo>
@@ -59,7 +54,7 @@ function Section({ name, users }) {
         );
     }
 
-    const displayName = userTypeToHeaders[name] || (capitalize(name) + "s");
+    const displayName = userTypeToHeaders[name] || (prettyifyName(name) + "s");
 
     return (
         <>

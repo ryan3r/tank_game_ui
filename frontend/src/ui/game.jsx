@@ -46,7 +46,8 @@ export function Game({ game, setGame, debug }) {
                         isLastTurn={gameStateManager.isLatestEntry}
                         refreshGameInfo={refreshGameInfo}
                         debug={debug}
-                        gameState={gameStateManager.gameState}></SubmitTurn>
+                        gameState={gameStateManager.gameState}
+                        entryId={gameStateManager.entryId}></SubmitTurn>
                     {debug ? <div>
                         <details>
                             <summary>Current board state (JSON)</summary>

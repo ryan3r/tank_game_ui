@@ -1,5 +1,6 @@
 import { Position } from "../../../common/state/board/position.mjs";
 import { GenericPossibleAction } from "../../../common/state/possible-actions/generic-possible-action.mjs";
+import { prettyifyName } from "../../../common/state/utils.mjs";
 
 export class JavaEngineSource {
     constructor(engine) {
