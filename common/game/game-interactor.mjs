@@ -95,4 +95,8 @@ export class GameInteractor {
 
         return promise;
     }
+
+    shutdown() {
+        return this._engine.shutdown();
+    }
 }

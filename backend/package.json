@@ -5,6 +5,7 @@
     "main": "index.js",
     "scripts": {
         "test": "LOG_LEVEL=error mocha --reporter-option maxDiffSize=0 --recursive test/",
+        "integration-test": "TANK_GAME_UI_CONFIG=../example/tank-game-ui.yaml LOG_LEVEL=error mocha --reporter-option maxDiffSize=0 --recursive integration-test",
         "develop": "LOG_LEVEL=debug TANK_GAME_UI_CONFIG=../example/tank-game-ui.yaml npm start",
         "start": "node src/index.mjs | pino-pretty"
     },
