@@ -22,14 +22,17 @@ async function loadRawConfig(configPath) {
     }
 }
 
-export async function loadConfig(createEngine) {
+export async function loadConfig() {
     const configPath = process.env.TANK_GAME_UI_CONFIG || "tank-game-ui.yaml";
 
-    const config = new Config(
+    return new Config(
         { path: DEFAULT_CONFIG, config: await parseYaml(DEFAULT_CONFIG) },
         { path: configPath, config: await loadRawConfig(configPath) },
     );
+}
 
+export async function loadConfigAndGames(createEngine) {
+    const config = await loadConfig(createEngine);
     const gameManager = new GameManager(config, createEngine);
     return { config, gameManager };
 }

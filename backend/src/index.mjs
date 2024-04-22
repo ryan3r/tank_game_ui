@@ -1,7 +1,7 @@
 import express from "express";
 import { logger } from "./logging.mjs"
 import { makeHttpLogger } from "./logging.mjs";
-import { loadConfig } from "./config-loader.mjs";
+import { loadConfigAndGames } from "./config-loader.mjs";
 import { defineRoutes } from "./routes.mjs";
 import { createEngine } from "./java-engine/engine-interface.mjs";
 
@@ -49,7 +49,7 @@ function gameAccessor(gameManager, config) {
 
 
 (async () => {
-    let { config, gameManager } = await loadConfig(createEngine);
+    let { config, gameManager } = await loadConfigAndGames(createEngine);
 
     app.use(gameAccessor(gameManager, config));
 
