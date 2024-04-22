@@ -24,7 +24,8 @@ export function defineTestsForEngine(createEngine) {
         });
     }
 
-    const TEST_GAME_PATH = "../example/tank_game_v3.json";
+    const TEST_GAME_NAME = "possible_actions_v3";
+    const TEST_GAME_PATH = `../example/tank_game_v3.json`;
 
     defTest("can process the entire example folder", async () => {
         let { gameManager } = await loadConfigAndGames(createEngine);
@@ -73,6 +74,68 @@ export function defineTestsForEngine(createEngine) {
                 fullEngine.shutdown(),
                 incrementalEngine.shutdown(),
             ]);
+        }
+    });
+
+    defTest("can provide a list of possible actions", async () => {
+        let { gameManager, config } = await loadConfigAndGames(createEngine);
+        try {
+            await gameManager.loaded;
+
+            const {sourceSet, interactor} = await gameManager.getGamePromise(TEST_GAME_NAME);
+
+            const logBook = interactor.getLogBook();
+            const lastId = logBook.getLastEntryId();
+
+            const players = interactor.getGameStateById(lastId).players.getAllPlayers();
+            if(players.length === 0) {
+                throw new Error("Expected at least on player");
+            }
+
+            let submittedAction = false;
+            for(const player of players) {
+                const factories = await sourceSet.getActionFactoriesForPlayer({
+                    playerName: player.name,
+                    logBook,
+                    logEntry: logBook.getEntry(lastId),
+                    gameState: interactor.getGameStateById(lastId),
+                    interactor: interactor,
+                    config,
+                });
+
+                for(const factory of factories) {
+                    const spec = factory.getParameterSpec();
+                    const canNotEnumerate = spec.find(field => !field.options?.length);
+
+                    // This option has so unbounded component to it we can't easily sent it back
+                    if(canNotEnumerate) continue;
+
+                    let actionParameters = {};
+
+                    for(const field of spec) {
+                        actionParameters[field.logBookField] = field.options[0];
+                    }
+
+                    if(!factory.areParemetersValid(actionParameters)) {
+                        throw new Error(`Failed to fill parameters for ${factory} (parameters = ${actionParameters})`)
+                    }
+
+                    const entry = factory.buildRawEntry(actionParameters);
+
+                    // It's possible that a possible action could fail due to players not having
+                    // enough resouces so we can rettry until one passes.  We just care that
+                    // it can generate at least one valid action
+                    assert.ok(await interactor.canProcessAction(entry), `Processing ${JSON.stringify(entry, null, 4)}`);
+
+                    // Make sure we submit at least one action
+                    submittedAction = true;
+                }
+            }
+
+            assert.ok(submittedAction);
+        }
+        finally {
+            await gameManager.shutdown();
         }
     });
 }

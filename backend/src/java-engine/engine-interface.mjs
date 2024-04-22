@@ -189,6 +189,20 @@ class TankGameEngine {
     getEngineSpecificSource() {
         return new JavaEngineSource(this);
     }
+
+    async canProcessAction(action) {
+        try {
+            await this._sendRequestAndWait({
+                type: "action",
+                ...action.serialize(),
+            });
+
+            return true;
+        }
+        catch(err) {
+            return false;
+        }
+    }
 }
 
 export function createEngine() {

@@ -5,7 +5,10 @@ import fs from "node:fs";
 
 // Remove the old log file
 if(process.env.LOG_FILE) {
-    fs.unlinkSync(process.env.LOG_FILE);
+    try {
+        fs.unlinkSync(process.env.LOG_FILE);
+    }
+    catch(err){}
 }
 
 export const logger = pino(

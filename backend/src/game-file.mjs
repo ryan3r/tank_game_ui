@@ -171,7 +171,6 @@ export class GameManager {
 
         const sourceSet = new PossibleActionSourceSet(actionSets);
 
-        logger.info({ msg: `Loaded ${name}`, games: this._games })
         this._games[name] = {
             loaded: true,
             interactor,
