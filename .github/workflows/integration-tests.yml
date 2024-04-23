@@ -1,7 +1,6 @@
 name: Integration tests
 
 on:
-  push:
   pull_request:
     types: [opened, reopened]
 
@@ -22,5 +21,7 @@ jobs:
           cache: 'maven'
           distribution: 'temurin'
       - run: ./scripts/build-java-engine build
+      - run: npm ci
+        working-directory: backend/
       - run: npm run integration-test
         working-directory: backend/
