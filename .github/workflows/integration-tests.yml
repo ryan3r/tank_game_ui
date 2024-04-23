@@ -14,15 +14,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-      - run: ./scripts/build-java-engine checkout
+      - name: Checkout java engine
+        run: ./scripts/build-java-engine checkout
       - name: Use JDK
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           cache: 'maven'
           distribution: 'temurin'
-      - run: ./scripts/build-java-engine build engine
-      - run: npm ci
+      - name: Build java engine
+        run: ./scripts/build-java-engine build engine
+      - name: Install backend dependencies
+        run: npm ci
         working-directory: backend/
-      - run: npm run integration-test
+      - name: Run integration tests
+        run: npm run integration-test
         working-directory: backend/
