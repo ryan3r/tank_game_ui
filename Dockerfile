@@ -19,7 +19,7 @@ RUN apt-get update && \
 
 # Build tank game engine to be included with the default image
 COPY scripts/build-java-engine /build/
-RUN --mount=type=cache,target=/root/.m2 /build/build-java-engine
+RUN --mount=type=cache,target=/root/.m2 /build/build-java-engine all
 
 FROM node:20-alpine
 
