@@ -19,6 +19,7 @@ jobs:
         with:
           java-version: '21'
           cache: 'maven'
+          distribution: 'temurin'
       - run: ./scripts/build-java-engine
       - run: npm run integration-test
         working-directory: backend/
