@@ -1,5 +1,10 @@
 {
     "fileFormatVersion": 4,
+    "openHours": {
+        "dayOfWeek": ["M", "wednesday", "r", "f"],
+        "startTime": "10:00",
+        "endTime": "15:00"
+    },
     "logBook": {
         "gameVersion": "version3",
         "rawEntries": [
