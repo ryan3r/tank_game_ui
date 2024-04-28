@@ -18,7 +18,7 @@
     width: var(--tank-game-cell-size);
     height: var(--tank-game-cell-size);
     flex-direction: column;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .board-space-entity {
@@ -46,4 +46,9 @@
 
 .board-space-selected {
     background: red;
+}
+
+.board-space-details-popup {
+    position: absolute;
+    background: pink;
 }

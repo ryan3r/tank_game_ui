@@ -1,6 +1,11 @@
+import { useCallback, useRef, useState } from "preact/hooks";
 import "./tank.css";
+import { Popup } from "../../generic/popup.jsx";
 
-export function Tank({ tank }) {
+export function Tank({ tank, clickHandlerSet }) {
+    const cardRef = useRef();
+    const [opened, setOpened] = useState(false);
+
     let tankStats;
     if(tank.type == "dead-tank") {
         tankStats = (
@@ -20,12 +25,31 @@ export function Tank({ tank }) {
         );
     }
 
+    const close = useCallback(() => setOpened(false), [setOpened]);
+
     return (
-        <div className="board-space-entity">
-            <div className="board-space-tank-title board-space-centered">
-                <div className="board-space-tank-title-inner">{tank.player.name}</div>
+        <>
+            <div className="board-space-entity" ref={cardRef} onClick={() => clickHandlerSet || setOpened(o => !o)}>
+                <div className="board-space-tank-title board-space-centered">
+                    <div className="board-space-tank-title-inner">{tank.player.name}</div>
+                </div>
+                {tankStats}
             </div>
-            {tankStats}
-        </div>
+            <Popup opened={opened} anchorRef={cardRef} onClose={close}>
+                <div style={{ padding: "5px" }}>
+                    <table>
+                        <tr>
+                            <th>Resource</th>
+                            <th>Current</th>
+                        </tr>
+                        {Array.from(tank.resources).map(resource => {
+                            return (
+                                <tr><td>{resource.name}</td><td>{resource.value}</td></tr>
+                            );
+                        })}
+                    </table>
+                </div>
+            </Popup>
+        </>
     );
 }

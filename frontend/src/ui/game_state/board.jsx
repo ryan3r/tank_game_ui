@@ -3,6 +3,8 @@ import { targetSelectionState } from "../../api/space-selecting-state";
 import { Position } from "../../../../common/state/board/position.mjs";
 import { Tank } from "./board_tiles/tank.jsx";
 import { Wall } from "./board_tiles/wall.jsx";
+import { useCallback, useRef, useState } from "preact/hooks";
+import { Popup } from "../generic/popup.jsx";
 
 export function GameBoard({ board, emptyMessage = "No board data supplied" }) {
     if(!board) return <p>{emptyMessage}</p>;
@@ -67,7 +69,7 @@ function Space({ space, floorTile, disabled, onClick, selected }) {
 
     // Try to place an entity in this space
     if(type == "tank" || type == "dead-tank") {
-        entity = <Tank tank={space} floorTile={floorTile}></Tank>;
+        entity = <Tank tank={space} floorTile={floorTile} clickHandlerSet={!!onClick}></Tank>;
     }
     else if(type == "wall") {
         entity = <Wall wall={space} floorTile={floorTile}></Wall>;
@@ -101,6 +103,8 @@ function Tile({ className = "", children, floorTile, disabled, onClick, selected
     }
 
     return (
-        <div className={`board-space board-space-centered ${className}`} onClick={onClick}>{children}</div>
+        <>
+            <div className={`board-space board-space-centered ${className}`} onClick={onClick}>{children}</div>
+        </>
     );
 }
