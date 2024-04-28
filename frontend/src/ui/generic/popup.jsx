@@ -87,7 +87,9 @@ export function Popup({ opened, anchorRef, children, onClose }) {
 
     return (
         <div style={position} className="popup" onClick={e => e.stopPropagation()} ref={updateOwnSize}>
-            {children}
+            <div className="popup-body">
+                {children}
+            </div>
         </div>
     );
 }

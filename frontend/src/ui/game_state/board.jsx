@@ -68,14 +68,8 @@ function Space({ space, floorTile, disabled, onClick, selected }) {
     let entity = null;
 
     // Try to place an entity in this space
-    if(type == "tank" || type == "dead-tank") {
-        entity = <Tank tank={space} floorTile={floorTile} clickHandlerSet={!!onClick}></Tank>;
-    }
-    else if(type == "wall") {
-        entity = <Wall wall={space} floorTile={floorTile}></Wall>;
-    }
-    else if(type != "empty") {
-        throw new Error(`Failed to render entity of type ${type}`);
+    if(type != "empty") {
+        entity = <Tank entity={space} clickHandlerSet={!!onClick}></Tank>;
     }
 
     return (

@@ -1,54 +1,61 @@
 import { useCallback, useRef, useState } from "preact/hooks";
 import "./tank.css";
 import { Popup } from "../../generic/popup.jsx";
+import { prettyifyName } from "../../../../../common/state/utils.mjs";
 
-export function Tank({ tank, clickHandlerSet }) {
+const COLOR_MAPPING = {
+    "tank": "yellow",
+    "dead-tank": "brown",
+};
+
+
+function EntityDetails({ entity }) {
+    const title = prettyifyName(entity.player?.name || entity.type);
+
+    return (
+        <>
+            <div className="entity-details-title-wrapper">
+                <h2>{title}</h2>
+                {entity.player ? <i className="entity-details-title-type">{prettyifyName(entity.type)}</i> : undefined}
+            </div>
+            <table>
+                {Array.from(entity.resources).map(resource => {
+                    return (
+                        <tr>
+                            <td>{prettyifyName(resource.name)}</td>
+                            <td>{resource.max === undefined ? resource.value : `${resource.value} / ${resource.max}`}</td>
+                        </tr>
+                    );
+                })}
+            </table>
+        </>
+    )
+}
+
+export function Tank({ entity, clickHandlerSet }) {
     const cardRef = useRef();
     const [opened, setOpened] = useState(false);
 
-    let tankStats;
-    if(tank.type == "dead-tank") {
-        tankStats = (
-            <div className={`board-space-centered board-space-tank-dead board-space-wall-${tank.resources.health.value}`}>
-                {tank.resources.health.value}
-            </div>
-        );
-    }
-    else {
-        tankStats = (
-            <div className="board-space-tank-stats">
-                <div className="board-space-tank-lives board-space-centered">{tank.resources.health.value}</div>
-                <div className="board-space-tank-range board-space-centered">{tank.resources.range.value}</div>
-                <div className="board-space-tank-gold board-space-centered">{tank.resources.gold.value}</div>
-                <div className="board-space-tank-actions board-space-centered">{tank.resources.actions.value}</div>
-            </div>
-        );
-    }
-
     const close = useCallback(() => setOpened(false), [setOpened]);
+
+    const label = entity.player && (
+        <div className="board-space-tank-title board-space-centered">
+            <div className="board-space-tank-title-inner">{prettyifyName(entity.player?.name || "")}</div>
+        </div>
+    );
+
+    const color = COLOR_MAPPING[entity.type];
 
     return (
         <>
             <div className="board-space-entity" ref={cardRef} onClick={() => clickHandlerSet || setOpened(o => !o)}>
-                <div className="board-space-tank-title board-space-centered">
-                    <div className="board-space-tank-title-inner">{tank.player.name}</div>
+                {label}
+                <div className={`board-space-centered board-space-resource-featured board-space-wall-${entity.resources?.health?.value} ${label ? "" : "board-space-no-label"}`} style={{ background: color }}>
+                    {entity.resources?.health?.value}
                 </div>
-                {tankStats}
             </div>
             <Popup opened={opened} anchorRef={cardRef} onClose={close}>
-                <div style={{ padding: "5px" }}>
-                    <table>
-                        <tr>
-                            <th>Resource</th>
-                            <th>Current</th>
-                        </tr>
-                        {Array.from(tank.resources).map(resource => {
-                            return (
-                                <tr><td>{resource.name}</td><td>{resource.value}</td></tr>
-                            );
-                        })}
-                    </table>
-                </div>
+                <EntityDetails entity={entity}></EntityDetails>
             </Popup>
         </>
     );
