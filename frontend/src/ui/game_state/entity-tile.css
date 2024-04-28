@@ -1,11 +1,11 @@
 
-.board-space-tank-title {
+.board-space-entity-title {
     height: 33%;
     width: 100%;
     background: var(--tank-game-bg);
 }
 
-.board-space-tank-title-inner {
+.board-space-entity-title-inner {
     width: 100%;
     overflow: hidden;
     white-space: nowrap;

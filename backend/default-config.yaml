@@ -18,3 +18,23 @@ gameVersionConfigs:
         bounty: "{subject} placed a {bounty} gold bounty on {target}"
         stimulus: "{subject} granted a stimulus of 1 action to {target}"
         grant_life: "{subject} granted 1 life to {target}"
+
+      entityDescriptors:
+        tank:
+          featuredAttribute: health
+          color:
+            "1": "#070"
+            "2": "#0a0"
+            "$else": "#0e0"
+        "dead-tank":
+          featuredAttribute: health
+          color:
+            "1": "#700"
+            "2": "#a00"
+            "$else": "#e00"
+        wall:
+          featuredAttribute: health
+          color:
+            "1": "#077"
+            "2": "#0aa"
+            "$else": "#0ee"

@@ -16,8 +16,9 @@ export class GameVersionConfig {
         return this._gameVersionConfig;
     }
 
-    getJavaLogBookFieldNameFor(javaName) {
-        const logBookRemap = this._gameVersionConfig.javaEngineNameToLogBook;
-        return logBookRemap && logBookRemap[javaName];
+    getEntityDescriptor(type) {
+        let {entityDescriptors} = this._gameVersionConfig;
+
+        return entityDescriptors && entityDescriptors[type];
     }
 }

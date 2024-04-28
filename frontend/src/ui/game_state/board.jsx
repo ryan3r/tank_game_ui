@@ -1,17 +1,15 @@
 import "./board.css";
 import { targetSelectionState } from "../../api/space-selecting-state";
 import { Position } from "../../../../common/state/board/position.mjs";
-import { Tank } from "./board_tiles/tank.jsx";
-import { Wall } from "./board_tiles/wall.jsx";
-import { useCallback, useRef, useState } from "preact/hooks";
-import { Popup } from "../generic/popup.jsx";
+import { EntityTile } from "./entity-tile.jsx";
 
-export function GameBoard({ board, emptyMessage = "No board data supplied" }) {
+
+export function GameBoard({ board, config, emptyMessage = "No board data supplied" }) {
     if(!board) return <p>{emptyMessage}</p>;
 
     try {
         return (
-            <GameBoardView width={board.width} board={board}></GameBoardView>
+            <GameBoardView width={board.width} board={board} config={config}></GameBoardView>
         );
     }
     catch(err) {
@@ -21,7 +19,7 @@ export function GameBoard({ board, emptyMessage = "No board data supplied" }) {
     }
 }
 
-export function GameBoardView({ board }) {
+export function GameBoardView({ board, config }) {
     const possibleTargets = targetSelectionState.usePossibleTargets();
     let selectedTarget = targetSelectionState.useSelectedTarget();
     selectedTarget = selectedTarget && Position.fromHumanReadable(selectedTarget);
@@ -47,11 +45,12 @@ export function GameBoardView({ board }) {
 
             renderedRow.push(
                 <Space
-                    space={board.getEntityAt(position)}
+                    entity={board.getEntityAt(position)}
                     floorTile={board.getFloorTileAt(position)}
                     onClick={onClick}
                     disabled={disabled}
-                    selected={selectedTarget && selectedTarget.x == x && selectedTarget.y == y}></Space>
+                    selected={selectedTarget && selectedTarget.x == x && selectedTarget.y == y}
+                    config={config}></Space>
             );
         }
 
@@ -63,18 +62,17 @@ export function GameBoardView({ board }) {
     )
 }
 
-function Space({ space, floorTile, disabled, onClick, selected }) {
-    const type = space && space.type;
-    let entity = null;
+function Space({ entity, floorTile, disabled, onClick, selected, config }) {;
+    let tile = null;
 
     // Try to place an entity in this space
-    if(type != "empty") {
-        entity = <Tank entity={space} clickHandlerSet={!!onClick}></Tank>;
+    if(entity && entity.type != "empty") {
+        tile = <EntityTile entity={entity} clickHandlerSet={!!onClick} config={config}></EntityTile>;
     }
 
     return (
         <Tile floorTile={floorTile} disabled={disabled} onClick={onClick} selected={selected}>
-            {entity}
+            {tile}
         </Tile>
     );
 }
