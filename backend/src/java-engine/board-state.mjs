@@ -135,7 +135,7 @@ function findUsersOnGameBoard(rawGameState, playersByName) {
     }
 }
 
-
+// TODO: The following methods are deprecated and should be removed once file format 4 support is dropped
 export function gameStateToRawState(gameState) {
     return {
         type: "state",
