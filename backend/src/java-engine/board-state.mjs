@@ -141,7 +141,7 @@ export function gameStateToRawState(gameState) {
         type: "state",
         day: gameState.__day || 0,
         board: buildRawBoard(gameState.board),
-        council: buildCouncil(gameState.players, gameState.council.coffer),
+        council: buildCouncil(gameState.players, gameState.council.coffer || 0),
     };
 }
 
