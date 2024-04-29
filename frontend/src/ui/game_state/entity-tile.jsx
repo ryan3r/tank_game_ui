@@ -35,7 +35,7 @@ function EntityDetails({ entity }) {
     )
 }
 
-export function EntityTile({ entity, clickHandlerSet, config }) {
+export function EntityTile({ entity, showPopupOnClick, config }) {
     const cardRef = useRef();
     const [opened, setOpened] = useState(false);
 
@@ -60,7 +60,7 @@ export function EntityTile({ entity, clickHandlerSet, config }) {
 
     return (
         <>
-            <div className="board-space-entity" ref={cardRef} onClick={() => clickHandlerSet || setOpened(open => !open)}>
+            <div className="board-space-entity" ref={cardRef} onClick={() => showPopupOnClick && setOpened(open => !open)}>
                 {label}
                 <div className={`board-space-centered board-space-resource-featured ${label ? "" : "board-space-no-label"}`} style={{ background: color }}>
                     {featuredAttribute ?

@@ -67,7 +67,7 @@ function Space({ entity, floorTile, disabled, onClick, selected, config }) {;
 
     // Try to place an entity in this space
     if(entity && entity.type != "empty") {
-        tile = <EntityTile entity={entity} clickHandlerSet={!!onClick} config={config}></EntityTile>;
+        tile = <EntityTile entity={entity} showPopupOnClick={!(onClick || disabled)} config={config}></EntityTile>;
     }
 
     return (
