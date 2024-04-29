@@ -15,6 +15,10 @@ export class MockEngine {
         this._currentDelay = 0;
     }
 
+    getGameStateFromEngineState(state) {
+        return state;
+    }
+
     wereAllDelaysApplied() {
         return this.processingDelays.length == this._currentDelay;
     }

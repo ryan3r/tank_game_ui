@@ -5,7 +5,7 @@ export class GameInteractor {
         this._logBook = logBook;
         this._gameStates = [];
         this._ready = Promise.resolve();
-        this._previousState = initialGameState;
+        this._initialGameState = this._previousState = initialGameState;
 
         // Process any unprocessed log book entries.
         this.loaded = this._processActions();
