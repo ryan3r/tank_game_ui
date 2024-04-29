@@ -41,4 +41,8 @@ export class ResourceHolder {
             yield this[resourceName];
         }
     }
+
+    toString() {
+        return this.value.toString();
+    }
 }

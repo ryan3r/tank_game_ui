@@ -21,28 +21,28 @@ gameVersionConfigs:
 
       entityDescriptors:
         tank:
-          featuredAttribute: health
-          badgeAttribute: actions
+          featuredAttribute: attr:health
+          badgeAttribute: attr:actions
           badgeColor: "#00f"
           badgeTextColor: "#fff"
           indicatorBackground: "#000"
           indicatorDefaultColor: "#fff"
           indicators:
             - symbol: B
-              name: bounty
+              name: attr:bounty
               color: orange
           color:
             "1": "#070"
             "2": "#0a0"
             "$else": "#0e0"
         "dead-tank":
-          featuredAttribute: health
+          featuredAttribute: attr:health
           color:
             "1": "#700"
             "2": "#a00"
             "$else": "#e00"
         wall:
-          featuredAttribute: health
+          featuredAttribute: attr:health
           color:
             "1": "#055"
             "2": "#0aa"

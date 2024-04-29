@@ -18,4 +18,23 @@ export default class Entity {
             resources: this.resources.serialize(),
         }
     }
+
+    get(key) {
+        if(!key) return;
+
+        const parts = key.split(":");
+        if(parts.length !== 2) throw new Error(`Entity.get() expected a type:name but got ${key}`);
+
+        let holder;
+        switch(parts[0]) {
+            case "attr":
+            case "attribute":
+                holder = this.resources;
+                break;
+        }
+
+        if(!holder) throw new Error(`Entity.get() could not find the type ${parts[0]}`);
+
+        return holder[parts[1]];
+    }
 }

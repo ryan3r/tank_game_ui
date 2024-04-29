@@ -37,7 +37,7 @@ function EntityDetails({ entity }) {
 
 
 function getBadgesForEntity(spec, entity) {
-    const badgeAttribute = entity.resources[spec.badgeAttribute];
+    const badgeAttribute = entity.get(spec.badgeAttribute);
 
     const rightBadge = badgeAttribute ? (
         <div className="board-space-entity-badge right-badge" style={{ background: spec.badgeColor, color: spec.badgeTextColor }}>
@@ -47,7 +47,7 @@ function getBadgesForEntity(spec, entity) {
 
     const indicators = (spec.indicators || [])
         // Display indictors for any attributes that are "truthy"
-        .filter(indicator => entity.resources[indicator.name]?.value)
+        .filter(indicator => entity.get(indicator.name)?.value)
         .map(indicator => <span key={indicator.name} style={{ color: indicator.color }}>{indicator.symbol}</span>);
 
     const leftBadge = indicators.length > 0 ? (
@@ -74,8 +74,8 @@ export function EntityTile({ entity, showPopupOnClick, config }) {
     );
 
     const spec = config.getEntityDescriptor(entity.type) || { color: {} };
-    const featuredAttribute = entity.resources[spec.featuredAttribute];
-    const color = spec.color[featuredAttribute?.value] || spec.color.$else;
+    const featuredAttribute = entity.get(spec.featuredAttribute);
+    const color = spec.color[featuredAttribute?.toString()] || spec.color.$else;
 
     const badges = getBadgesForEntity(spec, entity);
 
