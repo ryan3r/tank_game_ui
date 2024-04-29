@@ -1,13 +1,7 @@
 {
     "fileFormatVersion": 5,
     "logBook": {
-        "gameVersion": "version3",
-        "rawEntries": [
-            {
-                "type": "action",
-                "day": 1
-            }
-        ]
+        "gameVersion": "version3"
     },
     "initialGameState": {
         "type": "state",
