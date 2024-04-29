@@ -54,7 +54,6 @@ export class JavaEngineSource {
         return fields.map(field => {
             const commonFields = {
                 name: prettyifyName(field.name),
-                // TODO: Fix this
                 logBookField: field.name,
             };
 

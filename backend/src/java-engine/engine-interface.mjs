@@ -153,7 +153,7 @@ class TankGameEngine {
     }
 
     async getBoardState() {
-        return await this._runCommand("display"); // TODO: Use day?
+        return await this._runCommand("display");
     }
 
     async getRules() {
