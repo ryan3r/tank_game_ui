@@ -35,6 +35,32 @@ function EntityDetails({ entity }) {
     )
 }
 
+
+function getBadgesForEntity(spec, entity) {
+    const badgeAttribute = entity.resources[spec.badgeAttribute];
+
+    const rightBadge = badgeAttribute ? (
+        <div className="board-space-entity-badge right-badge" style={{ background: spec.badgeColor, color: spec.badgeTextColor }}>
+            {badgeAttribute.value}
+        </div>
+    ): undefined;
+
+    const indicators = (spec.indicators || [])
+        // Display indictors for any attributes that are "truthy"
+        .filter(indicator => entity.resources[indicator.name]?.value)
+        .map(indicator => <span key={indicator.name} style={{ color: indicator.color }}>{indicator.symbol}</span>);
+
+    const leftBadge = indicators.length > 0 ? (
+        <div className="board-space-entity-badge left-badge" style={{ background: spec.indicatorBackground, color: spec.indicatorDefaultColor }}>
+            {indicators}
+        </div>
+    ): undefined;
+
+    return leftBadge || rightBadge ?
+        <div className="board-space-entity-badges">{leftBadge}<div className="separator"></div>{rightBadge}</div> : undefined;
+}
+
+
 export function EntityTile({ entity, showPopupOnClick, config }) {
     const cardRef = useRef();
     const [opened, setOpened] = useState(false);
@@ -49,25 +75,18 @@ export function EntityTile({ entity, showPopupOnClick, config }) {
 
     const spec = config.getEntityDescriptor(entity.type) || { color: {} };
     const featuredAttribute = entity.resources[spec.featuredAttribute];
-    const badgeAttribute = entity.resources[spec.badgeAttribute];
     const color = spec.color[featuredAttribute?.value] || spec.color.$else;
 
-    const badge = badgeAttribute ? (
-        <div className="board-space-entity-badge" style={{ background: spec.badgeColor, color: spec.badgeTextColor }}>
-            {badgeAttribute.value}
-        </div>
-    ): undefined;
+    const badges = getBadgesForEntity(spec, entity);
 
     return (
         <>
-            <div className="board-space-entity" ref={cardRef} onClick={() => showPopupOnClick && setOpened(open => !open)}>
+            <div className="board-space-entity" ref={cardRef} onClick={() => showPopupOnClick && setOpened(open => !open)} style={{ background: color }}>
                 {label}
-                <div className={`board-space-centered board-space-resource-featured ${label ? "" : "board-space-no-label"}`} style={{ background: color }}>
-                    {featuredAttribute ?
-                        featuredAttribute.value :
-                        undefined}
+                <div className={`board-space-centered board-space-resource-featured ${label ? "" : "board-space-no-label"}`}>
+                    {featuredAttribute ? featuredAttribute.value : undefined}
                 </div>
-                {badge}
+                {badges}
             </div>
             <Popup opened={opened} anchorRef={cardRef} onClose={close}>
                 <EntityDetails entity={entity}></EntityDetails>

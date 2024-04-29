@@ -23,8 +23,14 @@ gameVersionConfigs:
         tank:
           featuredAttribute: health
           badgeAttribute: actions
-          badgeColor: "#000"
+          badgeColor: "#00f"
           badgeTextColor: "#fff"
+          indicatorBackground: "#000"
+          indicatorDefaultColor: "#fff"
+          indicators:
+            - symbol: B
+              name: bounty
+              color: orange
           color:
             "1": "#070"
             "2": "#0a0"
@@ -38,6 +44,6 @@ gameVersionConfigs:
         wall:
           featuredAttribute: health
           color:
-            "1": "#077"
+            "1": "#055"
             "2": "#0aa"
-            "$else": "#0ee"
+            "$else": "#0ff"

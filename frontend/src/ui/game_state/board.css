@@ -18,14 +18,14 @@
     width: var(--tank-game-cell-size);
     height: var(--tank-game-cell-size);
     flex-direction: column;
-    /* overflow: hidden; */
 }
 
 .board-space-entity {
     width: 90%;
     height: 90%;
     border: 1px solid;
-    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .board-space-floor-gold_mine {
@@ -47,9 +47,4 @@
 
 .board-space-selected {
     background: red;
-}
-
-.board-space-details-popup {
-    position: absolute;
-    background: pink;
 }
