@@ -21,4 +21,10 @@ export class GameVersionConfig {
 
         return entityDescriptors && entityDescriptors[type];
     }
+
+    getFloorTileDescriptor(type) {
+        let {floorTileDescriptors} = this._gameVersionConfig;
+
+        return floorTileDescriptors && floorTileDescriptors[type];
+    }
 }

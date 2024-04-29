@@ -28,10 +28,6 @@
     flex-direction: column;
 }
 
-.board-space-floor-gold_mine {
-    background: var(--tank-game-orange);
-}
-
 .board-space-coordinate {
     background: var(--tank-game-coordinate-bg);
 }

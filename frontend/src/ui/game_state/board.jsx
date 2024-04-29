@@ -71,15 +71,17 @@ function Space({ entity, floorTile, disabled, onClick, selected, config }) {;
     }
 
     return (
-        <Tile floorTile={floorTile} disabled={disabled} onClick={onClick} selected={selected}>
+        <Tile floorTile={floorTile} disabled={disabled} onClick={onClick} selected={selected} config={config}>
             {tile}
         </Tile>
     );
 }
 
-function Tile({ className = "", children, floorTile, disabled, onClick, selected } = {}) {
+function Tile({ className = "", children, floorTile, disabled, onClick, selected, config } = {}) {
+    let style = {};
     if(floorTile) {
-        className += ` board-space-floor-${floorTile.type}`;
+        const spec = config.getFloorTileDescriptor(floorTile.type);
+        if(spec) style.background = spec.color;
     }
 
     if(disabled) {
@@ -96,7 +98,7 @@ function Tile({ className = "", children, floorTile, disabled, onClick, selected
 
     return (
         <>
-            <div className={`board-space board-space-centered ${className}`} onClick={onClick}>{children}</div>
+            <div className={`board-space board-space-centered ${className}`} onClick={onClick} style={style}>{children}</div>
         </>
     );
 }

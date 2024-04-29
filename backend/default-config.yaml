@@ -47,3 +47,7 @@ gameVersionConfigs:
             "1": "#055"
             "2": "#0aa"
             "$else": "#0ff"
+
+      floorTileDescriptors:
+        gold_mine:
+          color: "var(--tank-game-orange)"
