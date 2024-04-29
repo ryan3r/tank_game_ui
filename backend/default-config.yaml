@@ -22,6 +22,9 @@ gameVersionConfigs:
       entityDescriptors:
         tank:
           featuredAttribute: health
+          badgeAttribute: actions
+          badgeColor: "#000"
+          badgeTextColor: "#fff"
           color:
             "1": "#070"
             "2": "#0a0"

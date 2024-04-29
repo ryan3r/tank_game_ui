@@ -49,7 +49,14 @@ export function EntityTile({ entity, clickHandlerSet, config }) {
 
     const spec = config.getEntityDescriptor(entity.type) || { color: {} };
     const featuredAttribute = entity.resources[spec.featuredAttribute];
+    const badgeAttribute = entity.resources[spec.badgeAttribute];
     const color = spec.color[featuredAttribute?.value] || spec.color.$else;
+
+    const badge = badgeAttribute ? (
+        <div className="board-space-entity-badge" style={{ background: spec.badgeColor, color: spec.badgeTextColor }}>
+            {badgeAttribute.value}
+        </div>
+    ): undefined;
 
     return (
         <>
@@ -57,9 +64,10 @@ export function EntityTile({ entity, clickHandlerSet, config }) {
                 {label}
                 <div className={`board-space-centered board-space-resource-featured ${label ? "" : "board-space-no-label"}`} style={{ background: color }}>
                     {featuredAttribute ?
-                        <AttributeValue attribute={featuredAttribute}></AttributeValue> :
-                        prettyifyName(entity.type)}
+                        featuredAttribute.value :
+                        undefined}
                 </div>
+                {badge}
             </div>
             <Popup opened={opened} anchorRef={cardRef} onClose={close}>
                 <EntityDetails entity={entity}></EntityDetails>
