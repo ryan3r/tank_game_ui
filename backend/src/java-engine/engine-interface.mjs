@@ -2,7 +2,7 @@ import { spawn } from "node:child_process";
 import fs from "node:fs";
 import { logger } from "../logging.mjs"
 import path from "node:path";
-import { gameStateFromRawState, gameStateToRawState } from "./board-state.mjs";
+import { gameStateFromRawState } from "./board-state.mjs";
 import { JavaEngineSource } from "./possible-action-source.mjs";
 
 const TANK_GAME_TIMEOUT = 3000; // 3 seconds
