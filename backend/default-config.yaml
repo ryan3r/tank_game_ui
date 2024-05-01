@@ -6,48 +6,54 @@ backend:
   gamesFolder: /data/games/
   port: 3333
 
+defaultGameVersion:
+  logEntryFormatters:
+    start_of_day: "Start of day {day}"
+    move: "{subject} moved to {target}"
+    shoot: "{subject} shot at {target} ({hit})"
+    buy_action: "{subject} traded {gold} gold for actions"
+    donate: "{subject} donated {donation} pre-tax gold to {target}"
+    upgrade_range: "{subject} upgraded their range"
+    bounty: "{subject} placed a {bounty} gold bounty on {target}"
+    stimulus: "{subject} granted a stimulus of 1 action to {target}"
+    grant_life: "{subject} granted 1 life to {target}"
+
+  entityDescriptors:
+    tank:
+      featuredAttribute: attr:health
+      indicatorBackground: "#000"
+      indicatorDefaultColor: "#fff"
+      color:
+        "1": "#070"
+        "2": "#0a0"
+        "$else": "#0e0"
+
+    "dead-tank":
+      featuredAttribute: attr:health
+      color:
+        "1": "#700"
+        "2": "#a00"
+        "$else": "#e00"
+
+    wall:
+      featuredAttribute: attr:health
+      color:
+        "1": "#055"
+        "2": "#0aa"
+        "$else": "#0ff"
+
+  floorTileDescriptors:
+    gold_mine:
+      color: "var(--tank-game-orange)"
+
 gameVersions:
     version3:
-      logEntryFormatters:
-        start_of_day: "Start of day {day}"
-        move: "{subject} moved to {target}"
-        shoot: "{subject} shot at {target} ({hit})"
-        buy_action: "{subject} traded {gold} gold for actions"
-        donate: "{subject} donated {donation} pre-tax gold to {target}"
-        upgrade_range: "{subject} upgraded their range"
-        bounty: "{subject} placed a {bounty} gold bounty on {target}"
-        stimulus: "{subject} granted a stimulus of 1 action to {target}"
-        grant_life: "{subject} granted 1 life to {target}"
-
       entityDescriptors:
         tank:
-          featuredAttribute: attr:health
           badgeAttribute: attr:actions
           badgeColor: "#00f"
           badgeTextColor: "#fff"
-          indicatorBackground: "#000"
-          indicatorDefaultColor: "#fff"
           indicators:
             - symbol: B
               name: attr:bounty
               color: orange
-          color:
-            "1": "#070"
-            "2": "#0a0"
-            "$else": "#0e0"
-        "dead-tank":
-          featuredAttribute: attr:health
-          color:
-            "1": "#700"
-            "2": "#a00"
-            "$else": "#e00"
-        wall:
-          featuredAttribute: attr:health
-          color:
-            "1": "#055"
-            "2": "#0aa"
-            "$else": "#0ff"
-
-      floorTileDescriptors:
-        gold_mine:
-          color: "var(--tank-game-orange)"
