@@ -1,4 +1,4 @@
-export function getCombinedKeys(...objects) {
+export function getCombinedKeys(objects) {
     let keys = [];
     for(const object of objects) {
         if(object) keys = keys.concat(Object.keys(object));
@@ -31,7 +31,7 @@ function deepMergeTwoObjects(objectA, objectB, { currentPath = "", objectsToOver
     }
 
     let combined = {};
-    for(const key of getCombinedKeys(objectA, objectB)) {
+    for(const key of getCombinedKeys([objectA, objectB])) {
         const keyPath = `${currentPath}/${key}`;
 
         if(pathsToIgnore.includes(keyPath)) continue;

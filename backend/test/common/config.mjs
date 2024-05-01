@@ -1,5 +1,6 @@
 import assert from "node:assert";
 import { deepMerge } from "../../../common/state/config/merge.mjs";
+import { mergeConfig } from "../../../common/state/config/config.mjs";
 
 describe("Config", () => {
     it("can merge two objects", () => {
@@ -93,6 +94,66 @@ describe("Config", () => {
             foo: {
                 baz: false,
             }
+        });
+    });
+
+    it("can handle not having values on the default or user config", () => {
+        const basicConfig = { foo: 1, bar: 2 };
+        const expectedConfig = {
+            foo: 1,
+            bar: 2,
+            defaultGameVersion: {},
+            gameVersions: {},
+        };
+
+        assert.deepEqual(mergeConfig(Object.assign({}, basicConfig), undefined), expectedConfig);
+        assert.deepEqual(mergeConfig(undefined, basicConfig), expectedConfig);
+    });
+
+    it("can merges default game version into all game versions", () => {
+        const defaultConfig = {
+            defaultGameVersion: {
+                foo: 1,
+                bar: 1,
+                baz: 1,
+                bop: 1,
+            },
+            gameVersions: {
+                3: {
+                    baz: 3,
+                    bop: 3,
+                },
+            },
+        };
+
+        const userConfig = {
+            defaultGameVersion: {
+                bar: 2,
+                baz: 2,
+                bop: 2,
+            },
+            gameVersions: {
+                3: {
+                    bop: 4,
+                },
+            },
+        };
+
+        assert.deepEqual(mergeConfig(defaultConfig, userConfig), {
+            defaultGameVersion: {
+                foo: 1,
+                bar: 2,
+                baz: 2,
+                bop: 2,
+            },
+            gameVersions: {
+                3: {
+                    foo: 1,
+                    bar: 2,
+                    baz: 3,
+                    bop: 4,
+                },
+            },
         });
     });
 });

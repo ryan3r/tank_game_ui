@@ -6,7 +6,7 @@ backend:
   gamesFolder: /data/games/
   port: 3333
 
-gameVersionConfigs:
+gameVersions:
     version3:
       logEntryFormatters:
         start_of_day: "Start of day {day}"
