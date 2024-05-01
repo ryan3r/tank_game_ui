@@ -73,7 +73,7 @@ export function EntityTile({ entity, showPopupOnClick, config }) {
         </div>
     );
 
-    const spec = config.getEntityDescriptor(entity.type) || { color: {} };
+    const spec = (config && config.getEntityDescriptor(entity.type)) || { color: {} };
     const featuredAttribute = entity.get(spec.featuredAttribute);
     const color = spec.color[featuredAttribute?.toString()] || spec.color.$else;
 

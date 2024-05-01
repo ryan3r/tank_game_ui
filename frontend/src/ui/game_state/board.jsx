@@ -79,7 +79,7 @@ function Space({ entity, floorTile, disabled, onClick, selected, config }) {;
 
 function Tile({ className = "", children, floorTile, disabled, onClick, selected, config } = {}) {
     let style = {};
-    if(floorTile) {
+    if(floorTile && config) {
         const spec = config.getFloorTileDescriptor(floorTile.type);
         if(spec) style.background = spec.color;
     }
