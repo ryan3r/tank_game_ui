@@ -12,10 +12,6 @@ export class GameVersionConfig {
         return new LogEntryFormatter(formatters[logEntryType]);
     }
 
-    serialize() {
-        return this._gameVersionConfig;
-    }
-
     getEntityDescriptor(type) {
         let {entityDescriptors} = this._gameVersionConfig;
 

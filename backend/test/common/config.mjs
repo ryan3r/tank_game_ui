@@ -100,8 +100,10 @@ describe("Config", () => {
     it("can handle not having values on the default or user config", () => {
         const basicConfig = { foo: 1, bar: 2 };
         const expectedConfig = {
-            foo: 1,
-            bar: 2,
+            config: {
+                foo: 1,
+                bar: 2,
+            },
             defaultGameVersion: {},
             gameVersions: {},
         };
@@ -140,6 +142,7 @@ describe("Config", () => {
         };
 
         assert.deepEqual(mergeConfig(defaultConfig, userConfig), {
+            config: {},
             defaultGameVersion: {
                 foo: 1,
                 bar: 2,

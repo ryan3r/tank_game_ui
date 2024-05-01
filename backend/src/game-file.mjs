@@ -41,6 +41,10 @@ export async function load(filePath, gameConfig, saveBack = false) {
     let content = await readJson(filePath);
     let fileFormatVersion = content?.versions?.fileFormat || content.fileFormatVersion;
 
+    if(!fileFormatVersion) {
+        throw new Error("File format version missing not a valid game file");
+    }
+
     if(fileFormatVersion > FILE_FORMAT_VERSION) {
         throw new Error(`File version ${fileFormatVersion} is not supported.  Try a newer Tank Game UI version..`);
     }
@@ -85,6 +89,7 @@ export async function load(filePath, gameConfig, saveBack = false) {
         fileFormatVersion = 5;
     }
 
+    logger.info({ msg: "Pre", content });
     // Make sure we have the config required to load this game.  This
     // does not check if the engine supports this game version.
     if(!gameConfig.isGameVersionSupported(content.logBook.gameVersion)) {
@@ -128,7 +133,7 @@ export class GameManager {
         this._gamePromises = {};
         this._games = {};
 
-        const dir = this.gameConfig.getGamesFolder();
+        const dir = this.gameConfig.getConfig().backend.gamesFolder;
         for(const gameFile of await fs.readdir(dir)) {
             // Only load json files
             if(!gameFile.endsWith(".json")) continue;
