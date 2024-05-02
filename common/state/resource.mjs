@@ -10,10 +10,15 @@ export class Resource {
     }
 
     serialize() {
-        return {
+        let serialized = {
             value: this.value,
-            max: this.max,
         };
+
+        if(this.max !== undefined) {
+            serialized.max = this.max;
+        }
+
+        return serialized;
     }
 
     toString() {
