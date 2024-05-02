@@ -20,6 +20,9 @@ describe("Config", () => {
                     yes: false,
                 }
             },
+            bop: {
+                bink: true,
+            },
         };
 
         const objectB = {
@@ -41,7 +44,8 @@ describe("Config", () => {
         const merged = deepMerge([objectA, objectB], {
             objectsToOverwrite: [
                 "/nonMergedArray",
-                "/foo/bar/dontMerge"
+                "/foo/bar/dontMerge",
+                "/bop",
             ],
         });
 
@@ -62,6 +66,9 @@ describe("Config", () => {
                     yes: true,
                 },
             },
+            bop: {
+                bink: true,
+            },
         });
     });
 
@@ -72,6 +79,11 @@ describe("Config", () => {
             foo: {
                 bar: "ignored",
                 baz: true,
+            },
+            also: {
+                a: { ignored: true },
+                b: { ignored: true },
+                c: { ignored: true },
             }
         };
 
@@ -86,7 +98,8 @@ describe("Config", () => {
         const merged = deepMerge([objectA, objectB], {
             pathsToIgnore: [
                 "/iAm",
-                "/foo/bar"
+                "/foo/bar",
+                /\/also\/.+/
             ],
         });
 
@@ -94,7 +107,8 @@ describe("Config", () => {
             primative: 2,
             foo: {
                 baz: false,
-            }
+            },
+            also: {},
         });
     });
 

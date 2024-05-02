@@ -6,6 +6,8 @@ import { takeAllMatches, takeFirstMatch } from "../../../../common/state/config/
 
 
 function getStyleInfo(choices, entity) {
+    if(!choices) return {};
+
     const info = takeFirstMatch(choices, entity.get.bind(entity));
 
     return {
@@ -45,7 +47,7 @@ function getBadgesForEntity(spec, entity) {
 
     const rightBadge = badgeAttribute ? (
         <div className="board-space-entity-badge right-badge" style={{ background: spec.badgeColor, color: spec.badgeTextColor }}>
-            {badgeAttribute.value}
+            {badgeAttribute}
         </div>
     ): undefined;
 

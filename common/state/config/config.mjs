@@ -1,7 +1,12 @@
 import { GameVersionConfig } from "./game-version.mjs";
 import { deepMerge, getCombinedKeys } from "./merge.mjs";
 
-const GAME_VERSION_MERGE_OPTIONS = {};
+const GAME_VERSION_MERGE_OPTIONS = {
+    objectsToOverwrite: [
+        // The following paths are conditionals and should be not be merged
+        /^\/entityDescriptors\/[^/]+\/(tileColor|indicators)/
+    ]
+};
 
 export function mergeConfig(defaultConfig, userConfig) {
     // Merge everything but the game version config
