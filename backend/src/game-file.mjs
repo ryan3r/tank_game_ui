@@ -41,7 +41,7 @@ export async function load(filePath, gameConfig, saveBack = false) {
     let content = await readJson(filePath);
     let fileFormatVersion = content?.versions?.fileFormat || content.fileFormatVersion;
 
-    if(!fileFormatVersion) {
+    if(fileFormatVersion === undefined) {
         throw new Error("File format version missing not a valid game file");
     }
 
@@ -89,7 +89,6 @@ export async function load(filePath, gameConfig, saveBack = false) {
         fileFormatVersion = 5;
     }
 
-    logger.info({ msg: "Pre", content });
     // Make sure we have the config required to load this game.  This
     // does not check if the engine supports this game version.
     if(!gameConfig.isGameVersionSupported(content.logBook.gameVersion)) {

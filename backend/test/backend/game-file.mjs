@@ -114,7 +114,7 @@ describe("GameFile", () => {
         }
 
         // The invalid file should not be loaded
-        assert.equal(gameManager.getGame("bad_file").error, "Cannot read properties of undefined (reading 'gameVersion')");
+        assert.equal(gameManager.getGame("bad_file").error, "File format version missing not a valid game file");
         assert.ok(!gameManager.getGame("bad_file").loaded);
 
         // Invalid games should return an error
