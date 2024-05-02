@@ -1,6 +1,7 @@
 import assert from "node:assert";
 import { deepMerge } from "../../../common/state/config/merge.mjs";
 import { mergeConfig } from "../../../common/state/config/config.mjs";
+import { evalExpression, takeFirstMatch } from "../../../common/state/config/expressions.mjs";
 
 describe("Config", () => {
     it("can merge two objects", () => {
@@ -158,5 +159,67 @@ describe("Config", () => {
                 },
             },
         });
+    });
+
+    it("can process basic expressions", () => {
+        const getVarValue = name => name.length;
+
+        // ===
+        assert.ok(evalExpression({ var: "foo", eq: 3 }, getVarValue));
+        assert.ok(evalExpression({ var: "foobar", eq: 6 }, getVarValue));
+        assert.ok(!evalExpression({ var: "foobar", eq: 5 }, getVarValue));
+
+        // !==
+        assert.ok(!evalExpression({ var: "foobar", neq: 6 }, getVarValue));
+        assert.ok(evalExpression({ var: "foobar", neq: 5 }, getVarValue));
+
+        // <
+        assert.ok(evalExpression({ var: "foobar", lt: 9 }, getVarValue));
+        assert.ok(evalExpression({ var: "foobar", lt: 7 }, getVarValue));
+        assert.ok(!evalExpression({ var: "foobar", lt: 3 }, getVarValue));
+
+        // >
+        assert.ok(evalExpression({ var: "foobar", gt: 2 }, getVarValue));
+        assert.ok(evalExpression({ var: "foobar", gt: 5 }, getVarValue));
+        assert.ok(!evalExpression({ var: "foobar", gt: 9 }, getVarValue));
+
+        // <=
+        assert.ok(evalExpression({ var: "foobar", le: 9 }, getVarValue));
+        assert.ok(evalExpression({ var: "foobar", le: 6 }, getVarValue));
+        assert.ok(!evalExpression({ var: "foobar", le: 3 }, getVarValue));
+
+        // >=
+        assert.ok(evalExpression({ var: "foobar", ge: 2 }, getVarValue));
+        assert.ok(evalExpression({ var: "foobar", ge: 6 }, getVarValue));
+        assert.ok(!evalExpression({ var: "foobar", ge: 8 }, getVarValue));
+
+        assert.ok(evalExpression(undefined, getVarValue));
+    });
+
+    it("can process basic expressions", () => {
+        const makeVarValue = obj => name => obj[name];
+
+        const choices = [
+            { expr: { var: "a", eq: 3 } },
+            { expr: { var: "a", lt: 3 } },
+            { expr: { var: "b", gt: 5 } },
+            { this: "is a thing" },
+        ];
+
+        assert.deepEqual(
+            takeFirstMatch(choices, makeVarValue({ a: 1, b: 3 })),
+            { expr: { var: "a", lt: 3 } });
+
+        assert.deepEqual(
+            takeFirstMatch(choices, makeVarValue({ a: 3, b: 1 })),
+            { expr: { var: "a", eq: 3 } });
+
+        assert.deepEqual(
+            takeFirstMatch(choices, makeVarValue({ a: 4, b: 6 })),
+            { expr: { var: "b", gt: 5 } });
+
+        assert.deepEqual(
+            takeFirstMatch(choices, makeVarValue({ a: 7, b: 2 })),
+            { this: "is a thing" });
     });
 });

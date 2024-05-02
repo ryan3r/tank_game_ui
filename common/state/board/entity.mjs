@@ -23,7 +23,9 @@ export default class Entity {
         if(!key) return;
 
         const parts = key.split(":");
-        if(parts.length !== 2) throw new Error(`Entity.get() expected a type:name but got ${key}`);
+        if(parts.length < 2 || parts.length > 3 ) {
+            throw new Error(`Entity.get() expected a type:name but got ${key}`);
+        }
 
         let holder;
         switch(parts[0]) {
@@ -35,6 +37,12 @@ export default class Entity {
 
         if(!holder) throw new Error(`Entity.get() could not find the type ${parts[0]}`);
 
-        return holder[parts[1]];
+        let value = holder[parts[1]];
+
+        if(parts.length > 2) {
+            value = value[parts[2]];
+        }
+
+        return value;
     }
 }

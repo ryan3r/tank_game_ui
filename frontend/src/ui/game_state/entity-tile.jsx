@@ -2,12 +2,16 @@ import { useCallback, useRef, useState } from "preact/hooks";
 import "./entity-tile.css";
 import { Popup } from "../generic/popup.jsx";
 import { prettyifyName } from "../../../../common/state/utils.mjs";
+import { takeAllMatches, takeFirstMatch } from "../../../../common/state/config/expressions.mjs";
 
 
-function AttributeValue({ attribute }) {
-    return <>
-        {attribute.max === undefined ? attribute.value : `${attribute.value} / ${attribute.max}`}
-    </>;
+function getStyleInfo(choices, entity) {
+    const info = takeFirstMatch(choices, entity.get.bind(entity));
+
+    return {
+        background: info.background,
+        color: info.textColor,
+    };
 }
 
 
@@ -22,11 +26,11 @@ function EntityDetails({ entity }) {
                 {title != subTitle ? <i className="entity-details-title-type">{subTitle}</i> : undefined}
             </div>
             <table>
-                {Array.from(entity.resources).map(resource => {
+                {Array.from(entity.resources).map(attribute => {
                     return (
                         <tr>
-                            <td>{prettyifyName(resource.name)}</td>
-                            <td><AttributeValue attribute={resource}></AttributeValue></td>
+                            <td>{prettyifyName(attribute.name)}</td>
+                            <td>{attribute.toString()}</td>
                         </tr>
                     );
                 })}
@@ -45,9 +49,7 @@ function getBadgesForEntity(spec, entity) {
         </div>
     ): undefined;
 
-    const indicators = (spec.indicators || [])
-        // Display indictors for any attributes that are "truthy"
-        .filter(indicator => entity.get(indicator.name)?.value)
+    const indicators = takeAllMatches(spec.indicators || [], entity.get.bind(entity))
         .map(indicator => <span key={indicator.name} style={{ color: indicator.color }}>{indicator.symbol}</span>);
 
     const leftBadge = indicators.length > 0 ? (
@@ -75,16 +77,15 @@ export function EntityTile({ entity, showPopupOnClick, config }) {
 
     const spec = (config && config.getEntityDescriptor(entity.type)) || { color: {} };
     const featuredAttribute = entity.get(spec.featuredAttribute);
-    const color = spec.color[featuredAttribute?.toString()] || spec.color.$else;
-
+    const tileStyles = getStyleInfo(spec.tileColor, entity);
     const badges = getBadgesForEntity(spec, entity);
 
     return (
         <>
-            <div className="board-space-entity" ref={cardRef} onClick={() => showPopupOnClick && setOpened(open => !open)} style={{ background: color }}>
+            <div className="board-space-entity" ref={cardRef} onClick={() => showPopupOnClick && setOpened(open => !open)} style={tileStyles}>
                 {label}
                 <div className={`board-space-centered board-space-resource-featured ${label ? "" : "board-space-no-label"}`}>
-                    {featuredAttribute ? featuredAttribute.value : undefined}
+                    {featuredAttribute?.toString?.()}
                 </div>
                 {badges}
             </div>

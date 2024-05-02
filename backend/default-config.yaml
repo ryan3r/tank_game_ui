@@ -23,27 +23,45 @@ defaultGameVersion:
 
   entityDescriptors:
     tank:
-      featuredAttribute: attr:health
+      featuredAttribute: attr:health:value
       indicatorBackground: "#000"
       indicatorDefaultColor: "#fff"
-      color:
-        "1": "#070"
-        "2": "#0a0"
-        "$else": "#0e0"
+      tileColor:
+        - background: "#070"
+          expr:
+            eq: 1
+            var: attr:health:value
+        - background: "#0a0"
+          expr:
+            eq: 2
+            var: attr:health:value
+        - background: "#0e0"
 
     "dead-tank":
-      featuredAttribute: attr:health
-      color:
-        "1": "#700"
-        "2": "#a00"
-        "$else": "#e00"
+      featuredAttribute: attr:health:value
+      tileColor:
+        - background: "#700"
+          expr:
+            eq: 1
+            var: attr:health:value
+        - background: "#a00"
+          expr:
+            eq: 2
+            var: attr:health:value
+        - background: "#e00"
 
     wall:
-      featuredAttribute: attr:health
-      color:
-        "1": "#055"
-        "2": "#0aa"
-        "$else": "#0ff"
+      featuredAttribute: attr:health:value
+      tileColor:
+      - background: "#055"
+        expr:
+          eq: 1
+          var: attr:health:value
+      - background: "#0aa"
+        expr:
+          eq: 2
+          var: attr:health:value
+      - background: "#0ff"
 
   floorTileDescriptors:
     gold_mine:
@@ -53,10 +71,12 @@ gameVersions:
     version3:
       entityDescriptors:
         tank:
-          badgeAttribute: attr:actions
+          badgeAttribute: attr:actions:value
           badgeColor: "#00f"
           badgeTextColor: "#fff"
           indicators:
             - symbol: B
-              name: attr:bounty
+              expr:
+                var: attr:bounty:value
+                gt: 0
               color: orange

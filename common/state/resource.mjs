@@ -1,15 +1,24 @@
 export class Resource {
-    constructor(name, value) {
+    constructor(name, value, max) {
         this.name = name;
         this.value = value;
+        this.max = max;
     }
 
     static deserialize(rawResource, name) {
-        return new Resource(name, rawResource);
+        return new Resource(name, rawResource.value, rawResource.max);
     }
 
     serialize() {
-        return this.value;
+        return {
+            value: this.value,
+            max: this.max,
+        };
+    }
+
+    toString() {
+        return this.max === undefined ?
+            this.value : `${this.value} / ${this.max}`;
     }
 }
 
@@ -40,9 +49,5 @@ export class ResourceHolder {
         for(const resourceName of Object.keys(this)) {
             yield this[resourceName];
         }
-    }
-
-    toString() {
-        return this.value.toString();
     }
 }
