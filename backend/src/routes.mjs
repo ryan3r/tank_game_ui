@@ -28,15 +28,11 @@ export function defineRoutes(app) {
     });
 
     app.get("/api/game/:gameName/turn/:turnId", (req, res) => {
-        logger.info("Start handler");
         const {valid, interactor} = req.games.getGameIfAvailable();
-        logger.info({ msg: "Mid handler", valid });
         if(!valid) return;
 
         const state = interactor.getGameStateById(+req.params.turnId);
-        logger.info("Late handler");
         res.json(state && state.serialize());
-        logger.info("Handler done");
     });
 
     app.post("/api/game/:gameName/turn", async (req, res) => {
@@ -54,12 +50,20 @@ export function defineRoutes(app) {
         }
     });
 
-    app.get("/api/game/:gameName/possible-actions/:playerName", async (req, res) => {
+    app.get("/api/game/:gameName/possible-actions/:playerName/:lastTurnId", async (req, res) => {
         const {valid, interactor, sourceSet} = req.games.getGameIfAvailable();
         if(!valid) return;
 
         const logBook = interactor.getLogBook();
         const lastId = logBook.getLastEntryId();
+
+        if((+req.params.lastTurnId) !== lastId) {
+            res.json({
+                error: `Invalid last turn (expected ${lastId} but got ${req.params.lastTurnId})`,
+            });
+
+            return;
+        }
 
         const factories = await sourceSet.getActionFactoriesForPlayer({
             playerName: req.params.playerName,
