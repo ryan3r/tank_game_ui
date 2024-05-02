@@ -13,21 +13,20 @@ export const MINIMUM_SUPPORTED_FILE_FORMAT_VERSION = 5;
 
 export async function load(filePath, gameConfig, saveBack = false) {
     let content = await readJson(filePath);
-    let fileFormatVersion = content?.versions?.fileFormat || content.fileFormatVersion;
 
-    if(fileFormatVersion === undefined) {
+    if(content?.fileFormatVersion === undefined) {
         throw new Error("File format version missing not a valid game file");
     }
 
-    if(fileFormatVersion > FILE_FORMAT_VERSION) {
-        throw new Error(`File version ${fileFormatVersion} is not supported.  Try a newer Tank Game UI version..`);
+    if(content.fileFormatVersion > FILE_FORMAT_VERSION) {
+        throw new Error(`File version ${content.fileFormatVersion} is not supported.  Try a newer Tank Game UI version.`);
     }
 
-    if(fileFormatVersion < MINIMUM_SUPPORTED_FILE_FORMAT_VERSION) {
-        throw new Error(`File version ${fileFormatVersion} is no longer supported.  Try an older Tank Game UI version.`);
+    if(content.fileFormatVersion < MINIMUM_SUPPORTED_FILE_FORMAT_VERSION) {
+        throw new Error(`File version ${content.fileFormatVersion} is no longer supported.  Try an older Tank Game UI version.`);
     }
 
-    const saveUpdatedFile = saveBack && (fileFormatVersion < FILE_FORMAT_VERSION);
+    const saveUpdatedFile = saveBack && (content.fileFormatVersion < FILE_FORMAT_VERSION);
 
     // Make sure we have the config required to load this game.  This
     // does not check if the engine supports this game version.
