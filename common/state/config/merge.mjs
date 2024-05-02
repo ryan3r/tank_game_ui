@@ -22,17 +22,39 @@ export function deepMerge(objects, options) {
     return merged;
 }
 
+function removeIgnoredPaths(object, currentPath, pathsToIgnore) {
+    if(typeof object != "object") return object;
+
+    let clone = Array.isArray(object) ? [] : {};
+
+    for(const key of Object.keys(object)) {
+        const keyPath = `${currentPath}/${key}`;
+
+        if(matchesAnyPaths(pathsToIgnore, keyPath)) continue;
+
+        if(Array.isArray(object)) {
+            clone.push(object[key]);
+        }
+        else {
+            clone[key] = object[key];
+        }
+    }
+
+    return clone;
+}
+
 function deepMergeTwoObjects(objectA, objectB, { currentPath = "", objectsToOverwrite = [], pathsToIgnore = [] } = {}) {
-    if(objectB === undefined && typeof objectA != "object") {
+    objectA = removeIgnoredPaths(objectA, currentPath, pathsToIgnore);
+    objectB = removeIgnoredPaths(objectB, currentPath, pathsToIgnore);
+
+    if(objectB === undefined) {
         return objectA;
     }
 
-    if(objectB !== undefined) {
-        if((typeof objectA != "object" && typeof objectB != "object") ||
-                Array.isArray(objectA) != Array.isArray(objectB) ||
-                matchesAnyPaths(objectsToOverwrite, currentPath)) {
-            return objectB;
-        }
+    if(typeof objectA != "object" || typeof objectA != typeof objectB ||
+            Array.isArray(objectA) != Array.isArray(objectB) ||
+            matchesAnyPaths(objectsToOverwrite, currentPath)) {
+        return objectB;
     }
 
     if(Array.isArray(objectA)) {
@@ -42,8 +64,6 @@ function deepMergeTwoObjects(objectA, objectB, { currentPath = "", objectsToOver
     let combined = {};
     for(const key of getCombinedKeys([objectA, objectB])) {
         const keyPath = `${currentPath}/${key}`;
-
-        if(matchesAnyPaths(pathsToIgnore, keyPath)) continue;
 
         combined[key] = deepMergeTwoObjects(objectA?.[key], objectB?.[key], {
             currentPath: keyPath,
