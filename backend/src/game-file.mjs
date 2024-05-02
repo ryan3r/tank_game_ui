@@ -170,7 +170,8 @@ export class GameManager {
     }
 
     async _initilizeGame(name, saveHandler, file) {
-        const engine = this._createEngine();
+        const config = this.gameConfig.getConfig();
+        const engine = this._createEngine(config?.engineInterface?.timeout);
         const interactor = new GameInteractor(engine, file, saveHandler);
         // Save our interactor incase we get shutdown
         this._interactors.push(interactor);

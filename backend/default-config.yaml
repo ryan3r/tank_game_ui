@@ -1,6 +1,9 @@
 # This file provides sane defaults for tank games config.  The values in this file can be overridden
 # by the yaml file pointed to by TANK_GAME_UI_CONFIG.
 
+engineInterface:
+  timeout: 3 # seconds
+
 backend:
   # Assume this config is being used inside the docker container
   gamesFolder: /data/games/
