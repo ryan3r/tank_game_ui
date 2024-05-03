@@ -1,0 +1,217 @@
+{
+    "fileFormatVersion": 5,
+    "logBook": {
+        "gameVersion": "version3"
+    },
+    "initialGameState": {
+        "type": "state",
+        "day": 0,
+        "board": {
+            "type": "board",
+            "unit_board": [
+                [
+                    {
+                        "name": "Schmude",
+                        "attributes": {
+                            "GOLD": 30,
+                            "DURABILITY": 3,
+                            "ACTIONS": 5,
+                            "DEAD": false,
+                            "BOUNTY": 0,
+                            "RANGE": 2
+                        },
+                        "position": "A1",
+                        "type": "tank"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    }
+                ],
+                [
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    }
+                ],
+                [
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "name": "Lena",
+                        "attributes": {
+                            "GOLD": 0,
+                            "DURABILITY": 3,
+                            "ACTIONS": 0,
+                            "DEAD": false,
+                            "BOUNTY": 0,
+                            "RANGE": 2
+                        },
+                        "position": "B3",
+                        "type": "tank"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    }
+                ],
+                [
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    }
+                ],
+                [
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    }
+                ]
+            ],
+            "floor_board": [
+                [
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    }
+                ],
+                [
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    }
+                ],
+                [
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    }
+                ],
+                [
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    }
+                ],
+                [
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    },
+                    {
+                        "type": "empty"
+                    }
+                ]
+            ]
+        },
+        "council": {
+            "type": "council",
+            "coffer": 60,
+            "council": [
+                "Lena"
+            ],
+            "senate": [
+                "Dan"
+            ]
+        }
+    }
+}
