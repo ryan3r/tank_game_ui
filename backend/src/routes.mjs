@@ -39,13 +39,15 @@ export function defineRoutes(app) {
         const {valid, interactor} = req.games.getGameIfAvailable();
         if(!valid) return;
 
+        const log = req.log || logger;
+
         try {
             await interactor.addLogBookEntry(req.body);
-            req.log.info({ msg: "Added log book entry", entry: req.body });
+            log.info({ msg: "Added log book entry", entry: req.body });
             res.json({ success: true });
         }
         catch(err) {
-            req.log.info({ msg: "Rejected log book entry", entry: req.body });
+            log.info({ msg: "Rejected log book entry", entry: req.body });
             res.json({ success: false, error: err.message });
         }
     });
