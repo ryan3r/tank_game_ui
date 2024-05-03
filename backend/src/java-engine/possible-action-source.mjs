@@ -29,13 +29,20 @@ export class JavaEngineSource {
 
         return possibleActions.map(possibleAction => {
             const actionName = possibleAction.rule || possibleAction.name;
+            const fieldSpecs = this._buildFieldSpecs(possibleAction.fields);
+
+            // There is no way this action could be taken
+            if(!fieldSpecs) return;
 
             return new GenericPossibleAction({
                 subject,
                 actionName: actionName,
-                fieldSpecs: this._buildFieldSpecs(possibleAction.fields),
+                fieldSpecs,
             });
-        });
+        })
+
+        // Remove any actions that can never be taken
+        .filter(possibleAction => possibleAction !== undefined);
     }
 
     _fillInPossibleTanks(possibleActions, gameState) {
@@ -51,11 +58,18 @@ export class JavaEngineSource {
     }
 
     _buildFieldSpecs(fields) {
-        return fields.map(field => {
+        let unSubmitableAction = false;
+        const specs = fields.map(field => {
             const commonFields = {
                 name: prettyifyName(field.name),
                 logBookField: field.name,
             };
+
+            // No possible inputs for this action
+            if(field.range?.length === 0) {
+                unSubmitableAction = true;
+                return undefined;
+            }
 
             // Handle the custom data types
             if(field.data_type == "tank") {
@@ -96,5 +110,7 @@ export class JavaEngineSource {
                 ...commonFields,
             };
         });
+
+        return unSubmitableAction ? undefined : specs;
     }
 }
