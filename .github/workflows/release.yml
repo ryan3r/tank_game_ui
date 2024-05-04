@@ -10,7 +10,13 @@ env:
   IMAGE_NAME: "tankgameorg/ui"
 
 jobs:
+  testing:
+    name: Tests
+    uses: ../testing.yml
+
   build-and-push-image:
+    needs:
+      - testing
     runs-on: ubuntu-latest
     permissions:
       contents: read
