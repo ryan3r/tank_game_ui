@@ -15,8 +15,8 @@ jobs:
     uses: TankGameOrg/ui/.github/workflows/testing.yml@main
 
   build-and-push-image:
-    needs:
-      - testing
+    # needs:
+    #   - testing
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -27,7 +27,7 @@ jobs:
       - name: Get repo version
         id: version
         run: ./scripts/get-version
-      - name: Echo ${{ steps.meta.outputs.labels }}
+      - name: Echo ${{ steps.version.outputs.version }}
         run: echo hi
       # - name: Set up QEMU mutli arch
       #   uses: docker/setup-qemu-action@v3
