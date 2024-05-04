@@ -31,7 +31,7 @@ const emptyTile = new FloorTile("empty", new Position(6, 4));
 describe("Board", () => {
     it("can find the entity at a space", () => {
         assert.deepEqual(board.getEntityAt(new Position(0, 0)), tank1);
-        assert.deepEqual(board.getEntityAt(new Position(2, 0)), destroyedTank);
+        assert.deepEqual(board.getEntityAt(new Position(2, 3)), destroyedTank);
         assert.deepEqual(board.getEntityAt(new Position(3, 2)), empty);
     });
 
