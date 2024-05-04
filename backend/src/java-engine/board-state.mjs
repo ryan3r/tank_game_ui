@@ -35,14 +35,25 @@ export function gameStateFromRawState(rawGameState) {
     let gameState = new GameState(
         new Players(Object.values(playersByName)),
         board,
-        new ResourceHolder([
-            new Resource("coffer", rawGameState.council.coffer),
-        ]),
+        convertCouncil(rawGameState.council),
     );
 
     gameState.__day = rawGameState.day;
 
     return gameState;
+}
+
+
+function convertCouncil(rawCouncil) {
+    let resources = [
+        new Resource("coffer", rawCouncil.coffer),
+    ];
+
+    if(rawCouncil.armistice_vote_cap !== undefined) {
+        resources.push(new Resource("armistice", rawCouncil.armistice_vote_count, rawCouncil.armistice_vote_cap));
+    }
+
+    return new ResourceHolder(resources);
 }
 
 
