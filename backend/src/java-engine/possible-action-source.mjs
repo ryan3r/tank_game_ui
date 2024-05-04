@@ -46,7 +46,8 @@ export class JavaEngineSource {
     }
 
     _fillInPossibleTanks(possibleActions, gameState) {
-        const tankNames = gameState.players.getPlayersByType("tank");
+        const tankNames = gameState.players.getPlayersByType("tank")
+            .concat(gameState.players.getPlayersByType("councilor"));
 
         for(let action of possibleActions) {
             for(let field of action.fields) {
