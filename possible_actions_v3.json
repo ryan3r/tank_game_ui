@@ -1,7 +1,7 @@
 {
     "fileFormatVersion": 5,
     "logBook": {
-        "gameVersion": "version3"
+        "gameVersion": "3"
     },
     "initialGameState": {
         "type": "state",

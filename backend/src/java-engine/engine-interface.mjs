@@ -88,27 +88,40 @@ class TankGameEngine {
                     return;
                 }
 
+                const unparsedData = this._stdout.slice(0, newLineIndex);
+
                 // Parse the data
-                const data = JSON.parse(this._stdout.slice(0, newLineIndex));
+                try {
+                    const data = JSON.parse(unparsedData);
 
-                // Remove the first msg
-                this._stdout = this._stdout.slice(newLineIndex + 1);
+                    // Remove the first msg
+                    this._stdout = this._stdout.slice(newLineIndex + 1);
 
-                this._proc.stdout.off("data", stdoutHandler);
+                    this._proc.stdout.off("data", stdoutHandler);
 
-                logger.debug({
-                    msg: "Recieve data from tank game engine",
-                    response_data: data,
-                });
+                    logger.debug({
+                        msg: "Recieve data from tank game engine",
+                        response_data: data,
+                    });
 
-                clearTimeout(timeoutTimer);
+                    clearTimeout(timeoutTimer);
 
-                if(data.type == "response" && data.error) {
-                    reject(new Error(`EngineError: ${data.response}`));;
-                    return;
+                    if(data.type == "response" && data.error) {
+                        reject(new Error(`EngineError: ${data.response}`));;
+                        return;
+                    }
+
+                    resolve(data);
                 }
+                catch(err) {
+                    logger.error({
+                        msg: "Got bad data from tank game engine",
+                        err,
+                        unparsedData,
+                    });
 
-                resolve(data);
+                    reject(err);
+                }
             };
 
             this._proc.stdout.on("data", stdoutHandler);
@@ -196,20 +209,6 @@ class TankGameEngine {
 
     getEngineSpecificSource() {
         return new JavaEngineSource(this);
-    }
-
-    async canProcessAction(action) {
-        try {
-            await this._sendRequestAndWait({
-                type: "action",
-                ...action.serialize(),
-            });
-
-            return true;
-        }
-        catch(err) {
-            return false;
-        }
     }
 }
 
