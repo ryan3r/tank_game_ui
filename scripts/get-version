@@ -4,6 +4,7 @@ set -e
 version="$(git describe --tags --abbrev=0)"
 
 if [ -n "$GITHUB_OUTPUT" ]; then
+    echo "Saving"
     echo "version=$version" >> "$GITHUB_OUTPUT"
 fi
 
