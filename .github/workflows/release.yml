@@ -27,7 +27,8 @@ jobs:
       - name: Get repo version
         id: version
         run: ./scripts/get-version
-      - run: echo ${{ steps.meta.outputs.labels }}
+      - name: Echo ${{ steps.meta.outputs.labels }}
+        run: echo hi
       # - name: Set up QEMU mutli arch
       #   uses: docker/setup-qemu-action@v3
       # - name: Set up Docker Buildx
