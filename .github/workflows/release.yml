@@ -12,7 +12,7 @@ env:
 jobs:
   testing:
     name: Tests
-    uses: ../testing.yml
+    uses: TankGameOrg/ui/.github/workflows/testing.yml@ci-improvements
 
   build-and-push-image:
     needs:
