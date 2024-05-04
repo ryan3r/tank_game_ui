@@ -23,4 +23,3 @@ if [ -n "$GITHUB_OUTPUT" ]; then
 fi
 
 echo "$build_info"
-echo "What?"
