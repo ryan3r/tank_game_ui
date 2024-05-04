@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+version="$(git describe --tags --abbrev=0)"
+
+if [ -n "$GITHUB_OUTPUT" ]; then
+    echo "version=$version" >> "$GITHUB_OUTPUT"
+fi
+
+echo "$version"
