@@ -47,7 +47,7 @@ export function Game({ game, setGame, debug }) {
                     <GameBoard board={gameStateManager.gameState?.board} config={versionConfig}></GameBoard>
                 </div>
                 <div>
-                    <p>Coffer: {gameStateManager.gameState?.council?.coffer}</p>
+                    <p>Coffer: {gameStateManager.gameState?.council?.coffer?.value}</p>
                     <UserList gameState={gameStateManager.gameState}></UserList>
                 </div>
             </div>
