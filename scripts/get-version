@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-flavor="${1:-unknown}"
+flavor="${1:-${:GITHUB_RUN_NUMBER:-unknown}}"
 
 version="$(git describe --tags --abbrev=0)"
 
@@ -23,6 +23,3 @@ if [ -n "$GITHUB_OUTPUT" ]; then
 fi
 
 echo "$build_info"
-
-echo "--------"
-env
