@@ -1,11 +1,28 @@
 #!/bin/bash
 set -e
 
+flavor="${1:-unknown}"
+
 version="$(git describe --tags --abbrev=0)"
 
-if [ -n "$GITHUB_OUTPUT" ]; then
-    echo "Saving"
-    echo "version=$version" >> "$GITHUB_OUTPUT"
+# Get the current git branch and hash
+git_info=""
+ref_name="$(git rev-parse --abbrev-ref HEAD)"
+if [ "$ref_name" != "HEAD" ]; then
+    git_info="$ref_name @ "
 fi
 
-echo "$version"
+git_info+="$(git rev-parse --short HEAD)"
+
+
+build_info="${version}-${flavor} ${git_info}"
+
+if [ -n "$GITHUB_OUTPUT" ]; then
+    echo "version=$version" >> "$GITHUB_OUTPUT"
+    echo "build_info=$build_info" >> "$GITHUB_OUTPUT"
+fi
+
+echo "$build_info"
+
+echo "--------"
+env
