@@ -85,12 +85,10 @@ export class GameInteractor {
 
         let success = false;
         try {
-            await this._engine.canProcessAction(entry);
+            await this._engine.processAction(entry);
             success = true;
         }
         catch(err) {}
-
-        await this.sendPreviousState();
 
         return success;
     }
