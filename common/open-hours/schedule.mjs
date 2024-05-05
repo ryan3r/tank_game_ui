@@ -48,7 +48,10 @@ function serializeToTimeString(minutes) {
 
     if(hours === 0) hours = 12;
 
-    return `${Math.floor(hours)}:${minutes % 60}${isPm ? "pm" : "am"}`;
+    minutes = minutes % 60;
+    if(minutes < 10) minutes = `0${minutes}`;
+
+    return `${Math.floor(hours)}:${minutes}${isPm ? "pm" : "am"}`;
 }
 
 export function getCurrentTime(now) {

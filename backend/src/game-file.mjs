@@ -55,9 +55,10 @@ export async function load(filePath, gameConfig, saveBack = false) {
     return fileData;
 }
 
-export async function save(filePath, {logBook, initialGameState}) {
+export async function save(filePath, {logBook, initialGameState, openHours}) {
     await writeJson(filePath, {
         fileFormatVersion: FILE_FORMAT_VERSION,
+        openHours: openHours.serialize(),
         logBook: logBook.serialize(),
         initialGameState,
     });
