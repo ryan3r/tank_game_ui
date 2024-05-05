@@ -62,7 +62,7 @@
                     {
                         "type": "tank",
                         "name": "Lena",
-                        "position": "C2",
+                        "position": "B3",
                         "attributes": {
                             "DEAD": true,
                             "DURABILITY": 3,
@@ -81,13 +81,13 @@
                     {
                         "type": "tank",
                         "name": "Josh",
-                        "position": "C5",
+                        "position": "E3",
                         "attributes": {
                             "DEAD": false,
                             "DURABILITY": 3,
                             "ACTIONS": 5,
                             "RANGE": 0,
-                            "GOLD": 0,
+                            "GOLD": 15,
                             "BOUNTY": 0
                         }
                     }

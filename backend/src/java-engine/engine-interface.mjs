@@ -49,7 +49,7 @@ class TankGameEngine {
         this._proc.stderr.on("data", buffer => {
             logger.info({
                 msg: "Tank game engine stderr",
-                output: buffer.toString("utf-8"),
+                output: buffer.toString("utf-8").split(/\r?\n\t?/),
             });
         });
 
@@ -125,7 +125,7 @@ class TankGameEngine {
                     logger.error({
                         msg: "Got bad data from tank game engine",
                         err,
-                        unparsedData,
+                        unparsedData: unparsedData.split(/\r?\n\t?/),
                     });
 
                     reject(err);
@@ -140,7 +140,7 @@ class TankGameEngine {
                 if(this._proc) this._proc.kill();
                 logger.error({
                     msg: "Tank game engine took too long to respond with valid json",
-                    stdout: this._stdout,
+                    stdout: this._stdout.split(/\r?\n\t?/),
                     timeout: this._timeout,
                 });
                 reject(new Error("Tank game engine took too long to respond with valid json"))
