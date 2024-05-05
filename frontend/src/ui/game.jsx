@@ -38,7 +38,8 @@ export function Game({ game, setGame, debug }) {
         gameMessage = <div className="success message">{gameStateManager?.gameState?.winner} is victorious!</div>;
     }
 
-    if(!gameMessage && gameInfo?.openHours?.isGameOpen?.() === false /* Don't show anything if undefined */) {
+    const gameIsClosed = gameInfo?.openHours?.isGameOpen?.() === false /* Don't show anything if undefined */;
+    if(!gameMessage && gameIsClosed) {
         gameMessage =(
             <div className="warning message">
                 You are currently outside of this game's scheduled hours.  Action submission is disabled.
@@ -68,13 +69,13 @@ export function Game({ game, setGame, debug }) {
             </div>
             <div className="centered">
                 <div>
-                    <SubmitTurn
+                    {gameIsClosed ? undefined : <SubmitTurn
                         game={game}
                         isLastTurn={gameStateManager.isLatestEntry}
                         refreshGameInfo={refreshGameInfo}
                         debug={debug}
                         gameState={gameStateManager.gameState}
-                        entryId={gameStateManager.entryId}></SubmitTurn>
+                        entryId={gameStateManager.entryId}></SubmitTurn>}
                     {debug ? <div>
                         <details>
                             <summary>Current board state (JSON)</summary>
