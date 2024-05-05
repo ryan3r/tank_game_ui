@@ -1,3 +1,5 @@
+import { prettyifyName } from "../state/utils.mjs";
+
 // Mappings from human readable days of the week to js integers
 const DAY_OF_WEEK_SHORTHAND = {
     monday: 1,
@@ -25,11 +27,33 @@ function parseTimeString(timeString) {
         throw new Error(`Unable to parse time string ${timeString}`);
     }
 
-    return ((+match[1]) * 60) + (+match[2]);
+    let hour = +match[1]
+    if(hour === 12) hour = 0;
+
+    if(match[3]?.toLocaleLowerCase?.() == "pm") {
+        hour += 12;
+    }
+
+    return (hour * 60) + (+match[2]);
 }
 
 function serializeToTimeString(minutes) {
-    return `${Math.floor(minutes / 60)}:${minutes % 60}`;
+    let hours = minutes / 60;
+    let isPm = false;
+
+    if(hours >= 12) {
+        hours -= 12;
+        isPm = true;
+    }
+
+    if(hours === 0) hours = 12;
+
+    return `${Math.floor(hours)}:${minutes % 60}${isPm ? "pm" : "am"}`;
+}
+
+export function getCurrentTime(now) {
+    if(!now) now = new Date();
+    return serializeToTimeString((now.getHours() * 60) + now.getMinutes())
 }
 
 
@@ -45,7 +69,14 @@ export class Schedule {
 
     static deserialize(rawSchedule) {
         return new Schedule(
-            rawSchedule.daysOfWeek.map(day => DAY_OF_WEEK_SHORTHAND[day]),
+            rawSchedule.daysOfWeek.map(day => {
+                const dayValue = DAY_OF_WEEK_SHORTHAND[day.toLocaleLowerCase()];
+                if(dayValue === undefined) {
+                    throw new Error(`Invalid day of the week: ${dayValue}`);
+                }
+
+                return dayValue;
+            }),
             parseTimeString(rawSchedule.startTime),
             parseTimeString(rawSchedule.endTime),
         );
@@ -53,11 +84,9 @@ export class Schedule {
 
     serialize() {
         return {
-            daysOfWeek: this._daysOfWeek.map(day => {
-                return Object.keys(DAY_OF_WEEK_SHORTHAND).find(dayName => DAY_OF_WEEK_SHORTHAND[dayName] == day);
-            }),
-            startTime: serializeToTimeString(this._startMinutes),
-            endTime: serializeToTimeString(this._endMinutes),
+            daysOfWeek: this.daysOfWeek,
+            startTime: this.startTime,
+            endTime: this.endTime,
         };
     }
 
@@ -71,5 +100,22 @@ export class Schedule {
 
         const currentMinutes = (now.getHours() * 60) + now.getMinutes();
         return this._startMinutes <= currentMinutes && currentMinutes < this._endMinutes;
+    }
+
+    get daysOfWeek() {
+        return this._daysOfWeek.map(day => {
+            return  prettyifyName(
+                Object.keys(DAY_OF_WEEK_SHORTHAND)
+                    .find(dayName => DAY_OF_WEEK_SHORTHAND[dayName] == day)
+            );
+        });
+    }
+
+    get startTime() {
+        return serializeToTimeString(this._startMinutes);
+    }
+
+    get endTime() {
+        return serializeToTimeString(this._endMinutes);
     }
 }

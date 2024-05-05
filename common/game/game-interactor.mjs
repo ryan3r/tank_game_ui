@@ -56,6 +56,10 @@ export class GameInteractor {
         return this._gameStates[id];
     }
 
+    getOpenHours() {
+        return this._openHours;
+    }
+
     isGameOpen() {
         return this._openHours !== undefined ?
             this._openHours.isGameOpen() : true;

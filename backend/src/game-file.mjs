@@ -40,9 +40,7 @@ export async function load(filePath, gameConfig, saveBack = false) {
 
     const logBook = LogBook.deserialize(content.logBook, gameConfig);
     const openHours = content.openHours ?
-        OpenHours.deserialize(content.openHours) : undefined;
-
-    logger.info({ msg: "Open hours", openHours });
+        OpenHours.deserialize(content.openHours) : new OpenHours([]);
 
     const fileData = {
         openHours,

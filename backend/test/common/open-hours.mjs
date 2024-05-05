@@ -42,15 +42,41 @@ describe("Schedule", () => {
 });
 
 describe("OpenHours", () => {
-    it("can check if any of it's schedules are open", () => {
-        const mockClosedSchedule = { isGameOpen() { return false; } }
-        const mockOpenIfTrueSchedule = { isGameOpen(date) { return !!date; } }
+    const mockClosedSchedule = { isGameOpen() { return false; } };
+    const mockOpenIfTrueSchedule = {
+        isGameOpen(date) { return !date; }
+    };
 
+    it("can check if any of it's schedules are open", () => {
         const closedHours = new OpenHours([mockClosedSchedule, mockClosedSchedule]);
         const maybeOpenHours = new OpenHours([mockClosedSchedule, mockOpenIfTrueSchedule, mockClosedSchedule]);
 
         assert.ok(!closedHours.isGameOpen(), "Closed hours are closed");
-        assert.ok(!maybeOpenHours.isGameOpen(), "Maybe open hours are closed without date");
-        assert.ok(maybeOpenHours.isGameOpen(new Date()), "Maybe open hours are open with date");
+        assert.ok(!maybeOpenHours.isGameOpen(new Date()), "Maybe open hours are closed with date");
+        assert.ok(maybeOpenHours.isGameOpen(), "Maybe open hours are open without date");
+    });
+
+    it("can resolve values on the server side", () => {
+        const maybeOpenHours = new OpenHours([nineToFive]);
+
+        assert.ok(!maybeOpenHours.isGameOpen(friday0501));
+
+        const resolvedMaybeOpenHours = OpenHours.deserialize(maybeOpenHours.serialize({
+            resolved: true,
+            now: monday0217,
+        }));
+
+        assert.ok(resolvedMaybeOpenHours.isGameOpen(friday0501));
+    });
+
+    it("empty open hours is always open", () => {
+        const empty = new OpenHours([]);
+        assert.ok(empty.isGameOpen());
+    });
+
+    it("can be serialized and deserialized to the same thing", () => {
+        const openHours = new OpenHours([nineToFive, noonTo9]);
+        const recreated = OpenHours.deserialize(openHours.serialize());
+        assert.deepEqual(recreated, openHours);
     });
 });
