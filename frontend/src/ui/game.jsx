@@ -41,7 +41,7 @@ export function Game({ game, setGame, debug }) {
     if(!gameMessage && gameInfo?.openHours?.isGameOpen?.() === false /* Don't show anything if undefined */) {
         gameMessage =(
             <div className="warning message">
-                You are currently out side of this game's open hours.  Action submission is disabled.
+                You are currently outside of this game's scheduled hours.  Action submission is disabled.
             </div>
         );
     }
