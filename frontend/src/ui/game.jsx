@@ -1,9 +1,9 @@
 import { GameBoard } from "./game_state/board.jsx";
 import { useCallback, useState } from "preact/hooks";
-import { useGameInfo } from "../api/fetcher.js";
+import { ServerError, useGameInfo } from "../api/fetcher.js";
 import { LogEntrySelector } from "./game_state/log_entry_selector.jsx"
 import { SubmitTurn } from "./game_state/submit_turn.jsx";
-import { UserList } from "./game_state/user_list.jsx";
+import { Council } from "./game_state/council.jsx";
 import { LogBook } from "./game_state/log_book.jsx";
 import { useGameStateManager } from "../api/game-state-manager.js";
 import { ErrorMessage } from "./error_message.jsx";
@@ -21,9 +21,16 @@ export function Game({ game, setGame, debug }) {
 
     const gameStateManager = useGameStateManager(gameInfo?.logBook, game);
 
+    // The backend is still loading the game
+    if(error?.code == "game-loading") {
+        return <p>Loading Game...</p>;
+    }
+
     if(error || gameStateManager.error) {
         return <ErrorMessage error={error || gameStateManager.error}></ErrorMessage>
     }
+
+    const versionConfig = gameInfo?.config?.getGameVersion?.(gameInfo?.logBook?.gameVersion);
 
     return (
         <>
@@ -37,11 +44,14 @@ export function Game({ game, setGame, debug }) {
                     <LogBook logBook={gameInfo?.logBook} currentEntryId={gameStateManager.entryId} changeEntryId={gameStateManager.playerSetEntry}></LogBook>
                 </div>
                 <div className="app-side-by-side-main">
-                    <GameBoard board={gameStateManager.gameState?.board}></GameBoard>
+                    <div>
+                        {gameStateManager?.gameState?.winner !== undefined ?
+                            <div className="success message">{gameStateManager?.gameState?.winner} is victorious!</div> : undefined}
+                    </div>
+                    <GameBoard board={gameStateManager.gameState?.board} config={versionConfig}></GameBoard>
                 </div>
                 <div>
-                    <p>Coffer: {gameStateManager.gameState?.council?.coffer}</p>
-                    <UserList gameState={gameStateManager.gameState}></UserList>
+                    <Council gameState={gameStateManager.gameState} config={versionConfig}></Council>
                 </div>
             </div>
             <div className="centered">

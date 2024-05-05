@@ -1,11 +1,13 @@
+import { PromiseLock } from "../state/utils.mjs";
+
 export class GameInteractor {
     constructor(engine, { logBook, initialGameState }, saveHandler) {
         this._saveHandler = saveHandler;
         this._engine = engine;
         this._logBook = logBook;
-        this._initialGameState = initialGameState;
         this._gameStates = [];
-        this._ready = Promise.resolve();
+        this._lock = new PromiseLock();
+        this._initialGameState = this._previousState = initialGameState;
 
         // Process any unprocessed log book entries.
         this.loaded = this._processActions();
@@ -17,8 +19,7 @@ export class GameInteractor {
 
     _processActions() {
         // Wait for any pending action processing
-        this._ready = this._ready.then(() => this._processActionsLogic());
-        return this._ready;
+        return this._lock.use(() => this._processActionsLogic());
     }
 
     async _processActionsLogic() {
@@ -32,7 +33,7 @@ export class GameInteractor {
             throw new Error(`startIndex (${startIndex}) can't be larger than endIndex (${endIndex})`);
         }
 
-        await this._sendPreviousState(startIndex);
+        await this.sendPreviousState(startIndex);
 
         // Remove any states that might already be there
         this._gameStates.splice(startIndex, (endIndex - startIndex) + 1);
@@ -40,25 +41,14 @@ export class GameInteractor {
         for(let i = startIndex; i <= endIndex; ++i) {
             const logEntry = this._logBook.getEntry(i);
             const state = await this._engine.processAction(logEntry);
-            this._gameStates.splice(i, 0, state); // Insert state at i
+            this._previousState = state;
+            this._gameStates.splice(i, 0, this._engine.getGameStateFromEngineState(state)); // Insert state at i
         }
     }
 
-    async _sendPreviousState(currentStateIndex) {
+    async sendPreviousState() {
         await this._engine.setGameVersion(this._logBook.gameVersion);
-
-        const previousStateIndex = currentStateIndex - 1;
-
-        // Send our previous state to the engine
-        const previousState =  previousStateIndex === -1 ?
-            this._initialGameState :
-            this._gameStates[previousStateIndex];
-
-        if(!previousState) {
-            throw new Error(`Expected a state at index ${previousStateIndex}`);
-        }
-
-        await this._engine.setBoardState(previousState);
+        await this._engine.setBoardState(this._previousState);
     }
 
     getGameStateById(id) {
@@ -70,11 +60,12 @@ export class GameInteractor {
             throw new Error(`Logbook length and states length should be identical (log book = ${this._logBook.getLastEntryId() + 1}, states = ${this._gameStates.length})`);
         }
 
-        await this._sendPreviousState(this._gameStates.length);
+        await this.sendPreviousState();
         const state = await this._engine.processAction(entry);
+        this._previousState = state;
 
         this._logBook.addEntry(entry);
-        this._gameStates.push(state);
+        this._gameStates.push(this._engine.getGameStateFromEngineState(state));
 
         // Save the modified log book if we know were to save it too
         if(this._saveHandler) {
@@ -90,27 +81,28 @@ export class GameInteractor {
             throw new Error(`Logbook length and states length should be identical (log book = ${this._logBook.getLastEntryId() + 1}, states = ${this._gameStates.length})`);
         }
 
-        await this._sendPreviousState(this._gameStates.length);
-        return await this._engine.canProcessAction(entry);
-    }
+        await this.sendPreviousState();
 
-    _handleNewEntry(entry, handlerName) {
-        const promise = this._ready.then(() => {
-            return this[handlerName](this._logBook.makeEntryFromRaw(entry))
-        });
+        let success = false;
+        try {
+            await this._engine.processAction(entry);
+            success = true;
+        }
+        catch(err) {}
 
-        // Swallow the error before setting ready so we don't fail future submissions
-        this._ready = promise.catch(() => {});
-
-        return promise;
+        return success;
     }
 
     addLogBookEntry(entry) {
-        return this._handleNewEntry(entry, "_addLogBookEntry")
+        return this._lock.use(() => {
+            return this._addLogBookEntry(this._logBook.makeEntryFromRaw(entry));
+        });
     }
 
     canProcessAction(entry) {
-        return this._handleNewEntry(entry, "_canProcessAction")
+        return this._lock.use(() => {
+            return this._canProcessAction(this._logBook.makeEntryFromRaw(entry));
+        });
     }
 
     shutdown() {

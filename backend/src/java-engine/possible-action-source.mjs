@@ -1,4 +1,3 @@
-import { Position } from "../../../common/state/board/position.mjs";
 import { GenericPossibleAction } from "../../../common/state/possible-actions/generic-possible-action.mjs";
 import { prettyifyName } from "../../../common/state/utils.mjs";
 
@@ -7,7 +6,7 @@ export class JavaEngineSource {
         this._engine = engine;
     }
 
-    async getActionFactoriesForPlayer({playerName, gameState}) {
+    async getActionFactoriesForPlayer({playerName, gameState, interactor}) {
         const player = gameState.players.getPlayerByName(playerName);
         if(!player) return [];
 
@@ -23,23 +22,31 @@ export class JavaEngineSource {
             this._fillInPossibleTanks(possibleActions, gameState);
         }
         else {
-            await this._engine.setBoardState(gameState);
+            await interactor.sendPreviousState();
             possibleActions = await this._engine.getPossibleActions(playerName);
         }
 
         return possibleActions.map(possibleAction => {
             const actionName = possibleAction.rule || possibleAction.name;
+            const fieldSpecs = this._buildFieldSpecs(possibleAction.fields);
+
+            // There is no way this action could be taken
+            if(!fieldSpecs) return;
 
             return new GenericPossibleAction({
                 subject,
                 actionName: actionName,
-                fieldSpecs: this._buildFieldSpecs(possibleAction.fields),
+                fieldSpecs,
             });
-        });
+        })
+
+        // Remove any actions that can never be taken
+        .filter(possibleAction => possibleAction !== undefined);
     }
 
     _fillInPossibleTanks(possibleActions, gameState) {
-        const tankNames = gameState.players.getPlayersByType("tank");
+        const tankNames = gameState.players.getPlayersByType("tank")
+            .concat(gameState.players.getPlayersByType("councilor"));
 
         for(let action of possibleActions) {
             for(let field of action.fields) {
@@ -51,12 +58,18 @@ export class JavaEngineSource {
     }
 
     _buildFieldSpecs(fields) {
-        return fields.map(field => {
+        let unSubmitableAction = false;
+        const specs = fields.map(field => {
             const commonFields = {
                 name: prettyifyName(field.name),
-                // TODO: Fix this
                 logBookField: field.name,
             };
+
+            // No possible inputs for this action
+            if(field.range?.length === 0) {
+                unSubmitableAction = true;
+                return undefined;
+            }
 
             // Handle the custom data types
             if(field.data_type == "tank") {
@@ -70,7 +83,7 @@ export class JavaEngineSource {
             if(field.data_type == "position") {
                 return {
                     type: "select-position",
-                    options: field.range.map(({x, y}) => new Position(x, y).humanReadable),
+                    options: field.range,
                     ...commonFields,
                 };
             }
@@ -97,5 +110,7 @@ export class JavaEngineSource {
                 ...commonFields,
             };
         });
+
+        return unSubmitableAction ? undefined : specs;
     }
 }

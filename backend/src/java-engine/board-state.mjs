@@ -10,8 +10,7 @@ import { GameState } from "../../../common/state/game-state.mjs";
 import Player from "../../../common/state/players/player.mjs";
 import Players from "../../../common/state/players/players.mjs";
 import { Position } from "../../../common/state/board/position.mjs";
-import { Resource } from "../../../common/state/resource.mjs";
-import { Council } from "../../../common/state/players/council.mjs";
+import { Resource, ResourceHolder } from "../../../common/state/resource.mjs";
 
 
 // User keys that should be treated as resources
@@ -19,6 +18,30 @@ const resourceKeys = {
     "tank": new Set(["health", "actions", "range", "gold", "bounty"]),
     "dead-tank": new Set(["health"]),
     "wall": new Set(["health"]),
+};
+
+// The prefix used for the max value of an attribute
+const MAX_PREFIX = "MAX_";
+
+// Attributes to remove from all entities
+const globalAttributesToDrop = ["dead"];
+
+// Attributes to remove from specific entities
+const attributesToDropByType = {
+    "dead-tank": ["actions", "range", "gold", "bounty"],
+};
+
+// Attributes that have a different name in the board state from what is internally expected
+const attributesToRenameByType = {
+    "wall": {
+        durability: "health",
+    },
+    "tank": {
+        durability: "health",
+    },
+    "dead-tank": {
+        durability: "health",
+    },
 };
 
 
@@ -36,7 +59,9 @@ export function gameStateFromRawState(rawGameState) {
     let gameState = new GameState(
         new Players(Object.values(playersByName)),
         board,
-        new Council(rawGameState.council.coffer),
+        convertCouncil(rawGameState.council),
+        rawGameState.running,
+        rawGameState.winner,
     );
 
     gameState.__day = rawGameState.day;
@@ -44,14 +69,52 @@ export function gameStateFromRawState(rawGameState) {
     return gameState;
 }
 
+function getAttributeName(name, type) {
+    name = name.toLowerCase();
+    return attributesToRenameByType[type]?.[name] || name;
+}
+
+
+function convertCouncil(rawCouncil) {
+    let resources = [
+        new Resource("coffer", rawCouncil.coffer),
+    ];
+
+    if(rawCouncil.armistice_vote_cap !== undefined) {
+        resources.push(new Resource("armistice", rawCouncil.armistice_vote_count, rawCouncil.armistice_vote_cap));
+    }
+
+    return new ResourceHolder(resources);
+}
+
 
 function entityFromBoard(rawEntity, position, playersByName) {
-    const type = rawEntity.type == "tank" && rawEntity.dead ? "dead-tank" : rawEntity.type;
+    let resources;
+    const isDead = (rawEntity.attributes !== undefined) ? rawEntity.attributes.DEAD : rawEntity.dead;
+    const type = rawEntity.type == "tank" && isDead ? "dead-tank" : rawEntity.type;
 
-    // Resources are stored as properties directly on the rawEntity extract them
-    const resources = Object.keys(rawEntity)
-        .filter(name => (resourceKeys[type] || new Set()).has(name))
-        .map(name => new Resource(name, rawEntity[name]));
+    if(rawEntity.attributes) {
+        resources = Object.keys(rawEntity.attributes)
+            .filter(name => !name.startsWith(MAX_PREFIX))
+            .map(name => {
+                return new Resource(
+                    getAttributeName(name, type),
+                    rawEntity.attributes[name],
+                    rawEntity.attributes[`${MAX_PREFIX}${name}`]);
+            });
+    }
+    else {
+        // Resources are stored as properties directly on the rawEntity extract them
+        resources = Object.keys(rawEntity)
+            .filter(name => (resourceKeys[type] || new Set()).has(name))
+            .map(name => new Resource(getAttributeName(name, type), rawEntity[name]));
+    }
+
+    // Remove any attributes we don't want on this entity
+    let attributesToDrop = (attributesToDropByType[type] || []).concat(globalAttributesToDrop);
+    resources = resources.filter(resource => !attributesToDrop.includes(resource.name));
+
+    resources = new ResourceHolder(resources);
 
     const player = playersByName[rawEntity.name];
     let entity = new Entity(type, position, resources);
@@ -132,75 +195,5 @@ function findUsersOnGameBoard(rawGameState, playersByName) {
                 }
             }
         }
-    }
-}
-
-
-export function gameStateToRawState(gameState) {
-    return {
-        type: "state",
-        day: gameState.__day || 0,
-        board: buildRawBoard(gameState.board),
-        council: buildCouncil(gameState.players, gameState.council.coffer),
-    };
-}
-
-function buildRawBoard(board) {
-    let serializedUnitBoard = [];
-    let serializedFloorBoard = [];
-
-    for(let y = 0; y < board.height; ++y) {
-        serializedUnitBoard.push([]);
-        serializedFloorBoard.push([]);
-
-        for(let x = 0; x < board.width; ++x) {
-            const position = new Position(x, y);
-            const entity = board.getEntityAt(position);
-            const floorBoard = board.getFloorTileAt(position);
-
-            let rawEntity = {
-                type: entity.type == "dead-tank" ? "tank" : entity.type,
-            };
-
-            if(entity.type.includes("tank")) {
-                rawEntity.dead = entity.type == "dead-tank";
-            }
-
-            if(entity.player?.name) {
-                rawEntity.name = entity.player?.name;
-            }
-
-            for(const resource of entity.resources) {
-                rawEntity[resource.name] = resource.value;
-            }
-
-            if(rawEntity.type == "tank") {
-                for(const requiredResource of resourceKeys["tank"]) {
-                    if(rawEntity[requiredResource] === undefined) {
-                        rawEntity[requiredResource] = 0;
-                    }
-                }
-            }
-
-            serializedUnitBoard[y].push(rawEntity);
-            serializedFloorBoard[y].push({ type: floorBoard.type });
-        }
-    }
-
-    return {
-        type: "board",
-        unit_board: serializedUnitBoard,
-        floor_board: serializedFloorBoard,
-    };
-}
-
-function buildCouncil(players, coffer) {
-    return {
-        type: "council",
-        coffer,
-        council: (players.getPlayersByType("councilor") || [])
-            .map(player => player.name),
-        senate: (players.getPlayersByType("senator") || [])
-            .map(player => player.name),
     }
 }

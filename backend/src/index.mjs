@@ -9,11 +9,6 @@ import { createEngine } from "./java-engine/engine-interface.mjs";
 const buildInfo = process.env.BUILD_INFO;
 if(buildInfo) logger.info(`Build info: ${buildInfo}`);
 
-const app = express();
-
-app.use(makeHttpLogger());
-app.use(express.json());
-
 // Helper to make interacting with games easier for routes
 function gameAccessor(gameManager, config) {
     return (req, res, next) => {
@@ -29,7 +24,10 @@ function gameAccessor(gameManager, config) {
 
             if(!loaded) {
                 res.json({
-                    error: "Game is still loading"
+                    error: {
+                        message: "Game is still loading",
+                        code: "game-loading",
+                    }
                 });
                 return {valid: false};
             }
@@ -49,13 +47,19 @@ function gameAccessor(gameManager, config) {
 
 
 (async () => {
-    let { config, gameManager } = await loadConfigAndGames(createEngine);
+    let { config, gameManager } = await loadConfigAndGames(createEngine, true /* save updated files */);
+    const {port, disableHttpLogging} = config.getConfig().backend;
 
+    const app = express();
+
+    if(!disableHttpLogging) app.use(makeHttpLogger());
+
+    app.use(express.json());
     app.use(gameAccessor(gameManager, config));
 
     defineRoutes(app);
 
-    app.listen(config.getPort(), () => {
-        logger.info(`Listening on ${config.getPort()}`);
+    app.listen(port, () => {
+        logger.info(`Listening on ${port}`);
     });
 })();

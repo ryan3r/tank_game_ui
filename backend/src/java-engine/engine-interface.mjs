@@ -2,10 +2,11 @@ import { spawn } from "node:child_process";
 import fs from "node:fs";
 import { logger } from "../logging.mjs"
 import path from "node:path";
-import { gameStateFromRawState, gameStateToRawState } from "./board-state.mjs";
+import { gameStateFromRawState } from "./board-state.mjs";
 import { JavaEngineSource } from "./possible-action-source.mjs";
+import { PromiseLock } from "../../../common/state/utils.mjs";
 
-const TANK_GAME_TIMEOUT = 3000; // 3 seconds
+const TANK_GAME_TIMEOUT = 3; // seconds
 
 const ENGINE_SEARCH_DIR = "../engine";
 const TANK_GAME_ENGINE_COMMAND = (function() {
@@ -30,9 +31,11 @@ logger.info(`Tank game engine command: ${TANK_GAME_ENGINE_COMMAND && TANK_GAME_E
 
 
 class TankGameEngine {
-    constructor(command) {
+    constructor(command, timeout) {
         this._command = command;
         this._stdout = "";
+        this._timeout = timeout;
+        this._lock = new PromiseLock();
     }
 
     _startTankGame() {
@@ -46,7 +49,7 @@ class TankGameEngine {
         this._proc.stderr.on("data", buffer => {
             logger.info({
                 msg: "Tank game engine stderr",
-                output: buffer.toString("utf-8"),
+                output: buffer.toString("utf-8").split(/\r?\n\t?/),
             });
         });
 
@@ -60,7 +63,7 @@ class TankGameEngine {
     _sendRequest(request_data) {
         this._startTankGame();
 
-        logger.debug({
+        logger.trace({
             request_data,
             msg: "Send data to tank game engine",
         });
@@ -74,8 +77,14 @@ class TankGameEngine {
     }
 
     _waitForData() {
-        logger.debug("Waiting for response");
-        return new Promise((resolve, reject) => {
+        if(this._isWaitingForData) {
+            throw new Error("Already waiting for data");
+        }
+
+        this._isWaitingForData = true;
+
+        logger.trace("Waiting for response");
+        const promise = new Promise((resolve, reject) => {
             const stdoutHandler = buffer => {
                 this._stdout += buffer.toString("utf-8")
                 parseData();
@@ -87,48 +96,72 @@ class TankGameEngine {
                     return;
                 }
 
+                const unparsedData = this._stdout.slice(0, newLineIndex);
+
                 // Parse the data
-                const data = JSON.parse(this._stdout.slice(0, newLineIndex));
+                try {
+                    const data = JSON.parse(unparsedData);
 
-                // Remove the first msg
-                this._stdout = this._stdout.slice(newLineIndex + 1);
+                    // Remove the first msg
+                    this._stdout = this._stdout.slice(newLineIndex + 1);
 
-                this._proc.stdout.off("data", stdoutHandler);
+                    this._proc.stdout.off("data", stdoutHandler);
 
-                logger.debug({
-                    msg: "Recieve data from tank game engine",
-                    response_data: data,
-                });
+                    logger.trace({
+                        msg: "Recieve data from tank game engine",
+                        response_data: data,
+                    });
 
-                clearTimeout(timeoutTimer);
+                    clearTimeout(timeoutTimer);
 
-                if(data.type == "response" && data.error) {
-                    reject(new Error(`EngineError: ${data.response}`));;
-                    return;
+                    if(data.type == "response" && data.error) {
+                        reject(new Error(`EngineError: ${data.response}`));;
+                        return;
+                    }
+
+                    resolve(data);
                 }
+                catch(err) {
+                    logger.error({
+                        msg: "Got bad data from tank game engine",
+                        err,
+                        unparsedData: unparsedData.split(/\r?\n\t?/),
+                    });
 
-                resolve(data);
+                    reject(err);
+                }
             };
 
             this._proc.stdout.on("data", stdoutHandler);
+
+            const timeoutMs = this._timeout * 1000; // ms to seconds
 
             let timeoutTimer = setTimeout(() => {
                 if(this._proc) this._proc.kill();
                 logger.error({
                     msg: "Tank game engine took too long to respond with valid json",
-                    stdout: this._stdout,
+                    stdout: this._stdout.split(/\r?\n\t?/),
+                    timeout: this._timeout,
                 });
                 reject(new Error("Tank game engine took too long to respond with valid json"))
-            }, TANK_GAME_TIMEOUT);
+            }, timeoutMs);
 
             // Attempt to parse any data waiting in the buffer
             parseData();
         });
+
+        promise.catch(() => {}).then(() => {
+            this._isWaitingForData = false;
+        });
+
+        return promise;
     }
 
     _sendRequestAndWait(request_data) {
-        this._sendRequest(request_data);
-        return this._waitForData();
+        return this._lock.use(() => {
+            this._sendRequest(request_data);
+            return this._waitForData();
+        });
     }
 
     _runCommand(command, data) {
@@ -148,8 +181,12 @@ class TankGameEngine {
         });
     }
 
+    getGameStateFromEngineState(state) {
+        return gameStateFromRawState(state);
+    }
+
     async getBoardState() {
-        return gameStateFromRawState(await this._runCommand("display")); // TODO: Use day?
+        return await this._runCommand("display");
     }
 
     async getRules() {
@@ -166,7 +203,7 @@ class TankGameEngine {
     setBoardState(state) {
         return this._sendRequestAndWait({
             type: "state",
-            ...gameStateToRawState(state), // TODO: Get actual day
+            ...state,
         });
     }
 
@@ -189,24 +226,10 @@ class TankGameEngine {
     getEngineSpecificSource() {
         return new JavaEngineSource(this);
     }
-
-    async canProcessAction(action) {
-        try {
-            await this._sendRequestAndWait({
-                type: "action",
-                ...action.serialize(),
-            });
-
-            return true;
-        }
-        catch(err) {
-            return false;
-        }
-    }
 }
 
-export function createEngine() {
-    return new TankGameEngine(TANK_GAME_ENGINE_COMMAND);
+export function createEngine(timeout = TANK_GAME_TIMEOUT) {
+    return new TankGameEngine(TANK_GAME_ENGINE_COMMAND, timeout);
 }
 
 export function isEngineAvailable() {

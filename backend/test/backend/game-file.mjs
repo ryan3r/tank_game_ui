@@ -11,16 +11,20 @@ const sampleFileBaseName = `tank_game_v3_format_v${FILE_FORMAT_VERSION}`;
 const sampleFilePath = path.join(TEST_FILES, `${sampleFileBaseName}.json`);
 
 const gameConfig = new Config({
-    gameVersionConfigs: {
+    defaultGameVersion: {},
+    gameVersions: {
         3: {},
     },
-    backend: {
-        gamesFolder: TEST_FILES,
+    config: {
+        backend: {
+            gamesFolder: TEST_FILES,
+        },
     },
 });
 
 const emptyConfig = new Config({
-    gameVersionConfigs: {},
+    gameVersions: {},
+    defaultGameVersion: {},
 });
 
 function validateLogBook(logBook) {
@@ -30,10 +34,10 @@ function validateLogBook(logBook) {
 
 function validateSampleFile({logBook, initialGameState}) {
     // Sanity check a few properties to make sure we loaded the data
-    validateLogBook(logBook)
-    assert.equal(initialGameState.board.width, 11);
-    assert.equal(initialGameState.board.height, 11);
-    assert.deepEqual(initialGameState.players.getPlayerByName("Steve").name, "Steve");
+    validateLogBook(logBook);
+    assert.equal(initialGameState.board.unit_board.length, 11);
+    assert.equal(initialGameState.board.unit_board[0].length, 11);
+    assert.deepEqual(initialGameState.council.council, []);
 }
 
 function hashFile(filePath) {
@@ -110,7 +114,7 @@ describe("GameFile", () => {
         }
 
         // The invalid file should not be loaded
-        assert.equal(gameManager.getGame("bad_file").error, "Cannot read properties of undefined (reading 'gameVersion')");
+        assert.equal(gameManager.getGame("bad_file").error, "File format version missing not a valid game file");
         assert.ok(!gameManager.getGame("bad_file").loaded);
 
         // Invalid games should return an error

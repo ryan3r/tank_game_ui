@@ -9,8 +9,20 @@ export function SubmitTurn({ isLastTurn, gameState, refreshGameInfo, game, debug
     const [selectedUser, setSelectedUser] = useState();
     const [currentFactory, setCurrentFactory] = useState();
     const [actionSpecific, setActionSpecific] = useState({});
-    const [actionFactories, error] = usePossibleActionFactories(game, selectedUser, entryId);
+    // Set this to undefined so we don't send a request for anthing other than the last turn
+    const [actionFactories, error] = usePossibleActionFactories(game, selectedUser, isLastTurn && gameState?.running ? entryId : undefined);
     const [status, setStatus] = useState();
+
+    // Game over no more actions to submit
+    if(!gameState?.running) {
+        return;
+    }
+
+    if(!isLastTurn) {
+        return (
+            <p>You can only submit actions on the most recent turn.</p>
+        );
+    }
 
     if(error) {
         return <ErrorMessage error={error}></ErrorMessage>
@@ -18,12 +30,6 @@ export function SubmitTurn({ isLastTurn, gameState, refreshGameInfo, game, debug
 
     if(status) {
         return <p>{status}</p>;
-    }
-
-    if(!isLastTurn) {
-        return (
-            <p>You can only submit actions on the most recent turn.</p>
-        );
     }
 
     // Reset the action type
@@ -145,17 +151,23 @@ function Select({ spec, value, setValue }) {
         setValue(e.target.value == "unset" ? undefined : spec.options[+e.target.value]);
     }, [setValue, spec]);
 
+    const currentIndex = value !== undefined ? spec.options.indexOf(value) : -1;
+
     return (
-        <select onChange={onChange} value={value !== undefined ? spec.options.indexOf(value) : "unset"}>
-            <option value="unset">&lt;unset&gt;</option>
+        <div className="radio-container">
             {spec.options.map((element, index) => {
                 const value = element.toString();
 
                 return (
-                    <option key={index} value={index}>{value}</option>
+                    <div className="radio-button-wrapper">
+                        <label>
+                            <input type="radio" value={index} onChange={onChange} checked={index === currentIndex}/>
+                            {value}
+                        </label>
+                    </div>
                 );
             })}
-        </select>
+        </div>
     );
 }
 

@@ -1,12 +1,14 @@
 import Board from "./board/board.mjs";
-import { Council } from "./players/council.mjs";
 import Players from "./players/players.mjs";
+import { ResourceHolder } from "./resource.mjs";
 
 export class GameState {
-    constructor(players, board, council) {
+    constructor(players, board, councilAttributes, running = true, winner = "") {
         this.players = players;
         this.board = board;
-        this.council = council;
+        this.council = councilAttributes;
+        this.running = running;
+        this.winner = winner?.length > 0 ? winner : undefined;
     }
 
     static deserialize(rawGameState) {
@@ -15,15 +17,24 @@ export class GameState {
         return new GameState(
             Players.deserialize(rawGameState.players, board),
             board,
-            Council.deserialize(rawGameState.council),
+            ResourceHolder.deserialize(rawGameState.council),
+            rawGameState.running,
+            rawGameState.winner,
         );
     }
 
     serialize() {
-        return {
+        let raw = {
             players: this.players.serialize(),
             board: this.board.serialize(),
             council: this.council.serialize(),
+            running: this.running,
+        };
+
+        if(this.winner !== undefined) {
+            raw.winner = this.winner;
         }
+
+        return raw;
     }
 }
