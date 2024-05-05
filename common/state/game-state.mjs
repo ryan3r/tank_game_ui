@@ -24,12 +24,17 @@ export class GameState {
     }
 
     serialize() {
-        return {
+        let raw = {
             players: this.players.serialize(),
             board: this.board.serialize(),
             council: this.council.serialize(),
             running: this.running,
-            winner: this.winner,
+        };
+
+        if(this.winner !== undefined) {
+            raw.winner = this.winner;
         }
+
+        return raw;
     }
 }
