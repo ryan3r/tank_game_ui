@@ -1,10 +1,12 @@
+import { PromiseLock } from "../state/utils.mjs";
+
 export class GameInteractor {
     constructor(engine, { logBook, initialGameState }, saveHandler) {
         this._saveHandler = saveHandler;
         this._engine = engine;
         this._logBook = logBook;
         this._gameStates = [];
-        this._ready = Promise.resolve();
+        this._lock = new PromiseLock();
         this._initialGameState = this._previousState = initialGameState;
 
         // Process any unprocessed log book entries.
@@ -17,8 +19,7 @@ export class GameInteractor {
 
     _processActions() {
         // Wait for any pending action processing
-        this._ready = this._ready.then(() => this._processActionsLogic());
-        return this._ready;
+        return this._lock.use(() => this._processActionsLogic());
     }
 
     async _processActionsLogic() {
@@ -94,23 +95,16 @@ export class GameInteractor {
         return success;
     }
 
-    _handleNewEntry(entry, handlerName) {
-        const promise = this._ready.then(() => {
-            return this[handlerName](this._logBook.makeEntryFromRaw(entry));
-        });
-
-        // Swallow the error before setting ready so we don't fail future submissions
-        this._ready = promise.catch(() => {});
-
-        return promise;
-    }
-
     addLogBookEntry(entry) {
-        return this._handleNewEntry(entry, "_addLogBookEntry");
+        return this._lock.use(() => {
+            return this._addLogBookEntry(this._logBook.makeEntryFromRaw(entry));
+        });
     }
 
     canProcessAction(entry) {
-        return this._handleNewEntry(entry, "_canProcessAction");
+        return this._lock.use(() => {
+            return this._canProcessAction(this._logBook.makeEntryFromRaw(entry));
+        });
     }
 
     shutdown() {

@@ -4,6 +4,7 @@ import { logger } from "../logging.mjs"
 import path from "node:path";
 import { gameStateFromRawState } from "./board-state.mjs";
 import { JavaEngineSource } from "./possible-action-source.mjs";
+import { PromiseLock } from "../../../common/state/utils.mjs";
 
 const TANK_GAME_TIMEOUT = 3; // seconds
 
@@ -34,6 +35,7 @@ class TankGameEngine {
         this._command = command;
         this._stdout = "";
         this._timeout = timeout;
+        this._lock = new PromiseLock();
     }
 
     _startTankGame() {
@@ -75,8 +77,14 @@ class TankGameEngine {
     }
 
     _waitForData() {
+        if(this._isWaitingForData) {
+            throw new Error("Already waiting for data");
+        }
+
+        this._isWaitingForData = true;
+
         logger.trace("Waiting for response");
-        return new Promise((resolve, reject) => {
+        const promise = new Promise((resolve, reject) => {
             const stdoutHandler = buffer => {
                 this._stdout += buffer.toString("utf-8")
                 parseData();
@@ -141,11 +149,19 @@ class TankGameEngine {
             // Attempt to parse any data waiting in the buffer
             parseData();
         });
+
+        promise.catch(() => {}).then(() => {
+            this._isWaitingForData = false;
+        });
+
+        return promise;
     }
 
     _sendRequestAndWait(request_data) {
-        this._sendRequest(request_data);
-        return this._waitForData();
+        return this._lock.use(() => {
+            this._sendRequest(request_data);
+            return this._waitForData();
+        });
     }
 
     _runCommand(command, data) {
