@@ -32,6 +32,16 @@ export function Game({ game, setGame, debug }) {
 
     const versionConfig = gameInfo?.config?.getGameVersion?.(gameInfo?.logBook?.gameVersion);
 
+    let gameMessage;
+    if(gameStateManager?.gameState?.winner !== undefined) {
+        gameMessage = <div className="success message">{gameStateManager?.gameState?.winner} is victorious!</div>;
+    }
+
+    if(!gameMessage && gameInfo?.openHoursInfo?.isOpen === false /* Don't show anything if undefined */) {
+        gameMessage = <div className="warning message">
+            You are currently out side of this game's open hours.  Action submission is disabled.</div>;
+    }
+
     return (
         <>
             <LogEntrySelector
@@ -44,10 +54,7 @@ export function Game({ game, setGame, debug }) {
                     <LogBook logBook={gameInfo?.logBook} currentEntryId={gameStateManager.entryId} changeEntryId={gameStateManager.playerSetEntry}></LogBook>
                 </div>
                 <div className="app-side-by-side-main">
-                    <div>
-                        {gameStateManager?.gameState?.winner !== undefined ?
-                            <div className="success message">{gameStateManager?.gameState?.winner} is victorious!</div> : undefined}
-                    </div>
+                    {gameMessage !== undefined ? <div>{gameMessage}</div> : undefined}
                     <GameBoard board={gameStateManager.gameState?.board} config={versionConfig}></GameBoard>
                 </div>
                 <div>

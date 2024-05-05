@@ -119,6 +119,7 @@ export const useGameInfo = makeReactDataFetchHelper({
         const config = Config.deserialize(data.config);
 
         return {
+            openHoursInfo: data.openHoursInfo,
             logBook: LogBook.deserialize(data.logBook, config),
             config,
         };

@@ -12,11 +12,11 @@ const DAY_OF_WEEK_SHORTHAND = {
     f: 5,
     saturday: 6,
     s: 6,
-    sunday: 7,
-    u: 7,
+    sunday: 0,
+    u: 0,
 };
 
-const TIME_EXPR = /(\d+):(\d+)/;
+const TIME_EXPR = /(\d+):(\d+)(AM|PM|am|pm)?/;
 
 
 function parseTimeString(timeString) {
@@ -25,7 +25,7 @@ function parseTimeString(timeString) {
         throw new Error(`Unable to parse time string ${timeString}`);
     }
 
-    return (match[1] * 60) + match[2];
+    return ((+match[1]) * 60) + (+match[2]);
 }
 
 function serializeToTimeString(minutes) {
@@ -34,15 +34,18 @@ function serializeToTimeString(minutes) {
 
 
 export class Schedule {
-    constructor(dayOfWeek, startMinutes, endMinutes) {
-        this._dayOfWeek = dayOfWeek;
+    constructor(daysOfWeek, startMinutes, endMinutes) {
+        this._daysOfWeek = daysOfWeek;
         this._startMinutes = startMinutes;
         this._endMinutes = endMinutes;
+        if(startMinutes > endMinutes) {
+            throw new Error("Scheduled time cannot be before start time (start = ${serializeToTimeString(this._startMinutes)}, end = ${serializeToTimeString(this._endMinutes)})");
+        }
     }
 
     static deserialize(rawSchedule) {
         return new Schedule(
-            rawSchedule.dayOfWeek.map(day => DAY_OF_WEEK_SHORTHAND[day]),
+            rawSchedule.daysOfWeek.map(day => DAY_OF_WEEK_SHORTHAND[day]),
             parseTimeString(rawSchedule.startTime),
             parseTimeString(rawSchedule.endTime),
         );
@@ -50,7 +53,7 @@ export class Schedule {
 
     serialize() {
         return {
-            dayOfWeek: this._dayOfWeek.map(day => {
+            daysOfWeek: this._daysOfWeek.map(day => {
                 return Object.keys(DAY_OF_WEEK_SHORTHAND).find(dayName => DAY_OF_WEEK_SHORTHAND[dayName] == day);
             }),
             startTime: serializeToTimeString(this._startMinutes),
@@ -62,7 +65,9 @@ export class Schedule {
         if(!now) now = new Date();
 
         // Not a valid date for this schedule
-        if(!this._dayOfWeek.includes(now.getDay())) return false;
+        if(!this._daysOfWeek.includes(now.getDay())) {
+            return false;
+        }
 
         const currentMinutes = (now.getHours() * 60) + now.getMinutes();
         return this._startMinutes <= currentMinutes && currentMinutes < this._endMinutes;

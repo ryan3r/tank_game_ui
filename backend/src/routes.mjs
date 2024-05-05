@@ -22,6 +22,9 @@ export function defineRoutes(app) {
         if(!valid) return;
 
         res.json({
+            openHoursInfo: {
+                isOpen: interactor.isGameOpen(),
+            },
             logBook: interactor.getLogBook().serialize(),
             config: req.games.config.serialize(),
         });
