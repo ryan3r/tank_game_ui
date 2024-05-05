@@ -22,7 +22,12 @@ const tuesday0348 = makeDate(2024, 2, 13, 15, 48);
 const sunday0400 = makeDate(2024, 7, 7, 16, 0);
 const friday0501 = makeDate(2024, 7, 19, 17, 5);
 
-const nineToFive = new Schedule([1, 2, 3, 4, 5], 9 * 60, 17 * 60); // 9am to 5pm week days
+const nineToFive = Schedule.deserialize({ // 9am to 5pm week days
+    daysOfWeek: ["M", "t", "w", "r", "f"], // M tests case insensitivity
+    startTime: "9:00am",
+    endTime: "5:00pm",
+});
+
 const noonTo9 = new Schedule([2, 4, 0], 12 * 60, 21 * 60); // 12pm to 9pm Tu, Th, Su
 
 describe("Schedule", () => {
