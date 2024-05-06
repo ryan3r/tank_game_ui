@@ -1,11 +1,14 @@
 // A suite of tests to make sure we're properly interfacing with the engine
 
 import assert from "node:assert";
+import fs from "node:fs";
 import { GameInteractor } from "../../common/game/game-interactor.mjs";
 import { LogBook } from "../../common/state/log-book/log-book.mjs";
 import { loadConfig, loadConfigAndGames } from "../src/config-loader.mjs";
-import { load } from "../src/game-file.mjs";
+import { load, save } from "../src/game-file.mjs";
 import { logger } from "../src/logging.mjs";
+import { OpenHours } from "../../common/open-hours/index.mjs";
+import { hashFile } from "../src/utils.mjs";
 
 export function defineTestsForEngine(createEngine) {
     function defTest(name, testFunc) {
@@ -26,6 +29,7 @@ export function defineTestsForEngine(createEngine) {
 
     const TEST_GAME_NAME = "possible_actions_v3";
     const TEST_GAME_PATH = `../example/tank_game_v3.json`;
+    const TEST_GAME_RECREATE_PATH = `../example/tank_game_v3-recreate.json`;
 
     defTest("can process the entire example folder", async () => {
         let { gameManager } = await loadConfigAndGames(createEngine);
@@ -54,13 +58,18 @@ export function defineTestsForEngine(createEngine) {
             // Create one instance that starts with the log book full
             // This triggers a set version, set state, and a series of process actions
             logger.debug("[integration-test] Process actions as a group");
-            let fullInteractor = new GameInteractor(fullEngine, { logBook, initialGameState });
+            let fullInteractor = new GameInteractor(fullEngine, { logBook, initialGameState, openHours: new OpenHours([]) });
             await fullInteractor.loaded;
 
             // Create another instance that starts with no log enties and has then added
             // This triggers a set version and then a set state and process action for each entry
             logger.debug("[integration-test] Process individual actions");
-            let incrementalInteractor = new GameInteractor(incrementalEngine, { logBook: emptyLogBook, initialGameState });
+            const saveHandler = (...args) => save(TEST_GAME_RECREATE_PATH, ...args);
+            let incrementalInteractor = new GameInteractor(incrementalEngine, {
+                logBook: emptyLogBook,
+                initialGameState,
+                openHours: new OpenHours([]),
+            }, saveHandler);
 
             for(const entry of logBook) {
                 const entryId = await incrementalInteractor.addLogBookEntry(entry.rawLogEntry);
@@ -72,6 +81,15 @@ export function defineTestsForEngine(createEngine) {
 
             // Make sure the log books are identical
             assert.deepEqual(emptyLogBook, logBook);
+
+            const orig = await hashFile(TEST_GAME_PATH);
+            const recreated = await hashFile(TEST_GAME_RECREATE_PATH);
+
+            assert.equal(orig, recreated);
+
+            // This only deletes the temp file on success so that it can be analyzed on failure.  The temp file
+            // is in the git ignore.
+            fs.unlinkSync(TEST_GAME_RECREATE_PATH);
         }
         finally {
             await Promise.all([
