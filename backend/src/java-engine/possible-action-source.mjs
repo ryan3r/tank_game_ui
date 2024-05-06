@@ -1,5 +1,6 @@
 import { GenericPossibleAction } from "../../../common/state/possible-actions/generic-possible-action.mjs";
 import { prettyifyName } from "../../../common/state/utils.mjs";
+import { logger } from "../logging.mjs";
 
 export class JavaEngineSource {
     constructor(engine) {
@@ -74,8 +75,19 @@ export class JavaEngineSource {
             // Handle the custom data types
             if(field.data_type == "tank") {
                 return {
-                    type: "select",
-                    options: field.range.map(tank => tank.name),
+                    type: "select-position",
+                    options: field.range.map(tank => {
+                        const position = tank.entities?.[0]?.position?.humanReadable || tank.position;
+                        if(typeof position !== "string") {
+                            logger.error({
+                                msg: "Expected a object with position or player",
+                                obj: tank,
+                            });
+                            throw new Error(`Got bad data expected a position but got ${position}`);
+                        }
+
+                        return position;
+                    }),
                     ...commonFields,
                 };
             }
