@@ -69,18 +69,27 @@ export function SubmitTurn({ isLastTurn, gameState, refreshGameInfo, game, debug
     }, [setCurrentFactory, refreshGameInfo, isValid, setStatus, logBookEntry]);
 
     return (
-        <>
-            <h2>New action</h2>
+        <div className="submit-turn-box">
+            <div className="submit-turn-title">
+                <h2>Submit action</h2>
+                <div>
+                <button onClick={() => setSelectedUser(undefined)}>Close</button>
+                </div>
+            </div>
             <div className="submit-turn">
-                <form onSubmit={submitTurnHandler}>
-                    <LabelElement name="User">
-                        <Select spec={{ options: usernames }} value={selectedUser} setValue={setSelectedUser}></Select>
-                    </LabelElement>
-                    <LabelElement name="Action">
-                        <Select spec={{ options: possibleActions }} value={currentFactory} setValue={setCurrentFactory}></Select>
-                    </LabelElement>
-                    <SubmissionForm factory={currentFactory} values={actionSpecific} setValues={setActionSpecific}></SubmissionForm>
-                    <button type="submit" disabled={!isValid}>Submit action</button>
+                <form onSubmit={submitTurnHandler} className="submit-turn-form">
+                    <div className="submit-turn-field-wrapper">
+                        <LabelElement name="User">
+                            <Select spec={{ options: usernames }} value={selectedUser} setValue={setSelectedUser}></Select>
+                        </LabelElement>
+                        {possibleActions?.length > 0 ? <LabelElement name="Action">
+                            <Select spec={{ options: possibleActions }} value={currentFactory} setValue={setCurrentFactory}></Select>
+                        </LabelElement> : undefined}
+                        <SubmissionForm factory={currentFactory} values={actionSpecific} setValues={setActionSpecific}></SubmissionForm>
+                    </div>
+                    <div className="submit-action-button-wrapper">
+                        <button type="submit" disabled={!isValid}>Submit action</button>
+                    </div>
                 </form>
                 {debug ? <div>
                     <details>
@@ -94,7 +103,7 @@ export function SubmitTurn({ isLastTurn, gameState, refreshGameInfo, game, debug
                     </details>
                 </div> : undefined}
             </div>
-        </>
+        </div>
     );
 }
 
@@ -140,7 +149,7 @@ function SubmissionForm({ factory, values, setValues }) {
 function LabelElement({ name, children }) {
     return (
         <label className="submit-turn-field" key={name}>
-            <b>{name}</b>
+            <h3>{name}</h3>
             {children}
         </label>
     );
