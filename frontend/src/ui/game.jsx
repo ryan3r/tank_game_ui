@@ -74,7 +74,7 @@ export function Game({ game, setGame, debug }) {
                 <div className="app-side-by-side centered">
                     <div className="app-side-by-side-main">
                         {gameMessage !== undefined ? <div>{gameMessage}</div> : undefined}
-                        <GameBoard board={gameStateManager.gameState?.board} config={versionConfig}></GameBoard>
+                        <GameBoard board={gameStateManager.gameState?.board} config={versionConfig} debug={debug}></GameBoard>
                     </div>
                     <div>
                         <Council gameState={gameStateManager.gameState} config={versionConfig}></Council>

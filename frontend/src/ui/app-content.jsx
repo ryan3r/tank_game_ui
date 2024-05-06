@@ -4,7 +4,7 @@ export function AppContent({ debugMode, withSidebar, toolbar, children }) {
             {debugMode}
             {toolbar}
             <div className="app-content">
-                <div className="app-content-footer-sibling">{children}</div>
+                {children}
                 <footer>
                     <i>{APP_VERSION}</i>
                 </footer>
