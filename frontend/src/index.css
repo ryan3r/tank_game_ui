@@ -7,16 +7,14 @@
     --tank-game-coordinate-bg: #999;
     --tank-game-bg: #fff;
     --tank-game-cell-size: 60px;
+    --sidebar-width: 350px;
+    --footer-height: 45px;
 }
 
-body {
+html, body {
+    height: 100%;
     margin: 0;
     user-select: none;
-}
-
-footer {
-    padding: 8px 3px;
-    text-align: center;
 }
 
 .app-side-by-side {
@@ -45,7 +43,45 @@ footer {
 }
 
 .app-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.app-content {
+    flex-grow: 1;
     margin: 8px;
+    position: relative; /* Keep the positon absolute footer bounded to this box */
+}
+
+.app-wrapper.with-sidebar {
+    margin-left: var(--sidebar-width);
+}
+
+.app-content-footer-sibling {
+    padding-bottom: var(--footer-height); /* Leave space for the footer */
+}
+
+footer {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 100%;
+    height: var(--footer-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-sidebar {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: var(--sidebar-width);
+    height: 100%;
+    overflow: auto;
+    border-right: 1px solid;
+    background: #fff;
 }
 
 h1, h2, h3 {

@@ -15,8 +15,12 @@ export function Council({ gameState, config }) {
             <AttributeList attributes={gameState.council} excludedAttributes={EXCLUDED_ATTRIBUTES}></AttributeList>
             <div className="user-list">
                 {config.getCouncilPlayerTypes().map(playerType => {
+                    const players = gameState.players.getPlayersByType(playerType);
+
+                    if(players.length === 0) return;
+
                     return (
-                        <Section name={playerType} users={gameState.players.getPlayersByType(playerType)}></Section>
+                        <Section name={playerType} users={players}></Section>
                     );
                 })}
             </div>
