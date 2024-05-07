@@ -135,7 +135,8 @@ export function defineTestsForEngine(createEngine) {
                     let actionParameters = {};
 
                     for(const field of spec) {
-                        actionParameters[field.logBookField] = field.options[0];
+                        const option = field.options[0];
+                        actionParameters[field.logBookField] = option.value || option;
                     }
 
                     if(!factory.areParemetersValid(actionParameters)) {
