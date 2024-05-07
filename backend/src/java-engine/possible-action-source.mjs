@@ -14,18 +14,8 @@ export class JavaEngineSource {
         const isCouncil = ["senator", "councilor"].includes(player.type);
         const subject = playerName;
 
-        let possibleActions;
-        if(isCouncil) {
-            // getPossibleActions returns an error for Senators and tank actions for councilors
-            possibleActions = (await this._engine.getRules())
-                .filter(action => action.subject == "council");
-
-            this._fillInPossibleTanks(possibleActions, gameState);
-        }
-        else {
-            await interactor.sendPreviousState();
-            possibleActions = await this._engine.getPossibleActions(playerName);
-        }
+        await interactor.sendPreviousState();
+        let possibleActions = await this._engine.getPossibleActions(isCouncil ? "Council" : playerName);
 
         return possibleActions.map(possibleAction => {
             const actionName = possibleAction.rule || possibleAction.name;
@@ -43,19 +33,6 @@ export class JavaEngineSource {
 
         // Remove any actions that can never be taken
         .filter(possibleAction => possibleAction !== undefined);
-    }
-
-    _fillInPossibleTanks(possibleActions, gameState) {
-        const tankNames = gameState.players.getPlayersByType("tank")
-            .concat(gameState.players.getPlayersByType("councilor"));
-
-        for(let action of possibleActions) {
-            for(let field of action.fields) {
-                if(field.data_type == "tank") {
-                    field.range = tankNames;
-                }
-            }
-        }
     }
 
     _buildFieldSpecs(fields) {
