@@ -56,11 +56,13 @@ defaultGameVersion:
     wall:
       featuredAttribute: attr:health:value
       tileColor:
-      - background: "#055"
+      - background: "#022"
+        textColor: "#fff"
         expr:
           eq: 1
           var: attr:health:value
-      - background: "#077"
+      - background: "#055"
+        textColor: "#fff"
         expr:
           eq: 2
           var: attr:health:value
