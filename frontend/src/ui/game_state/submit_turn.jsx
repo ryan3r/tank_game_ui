@@ -4,21 +4,31 @@ import { ErrorMessage } from "../error_message.jsx";
 import "./submit_turn.css";
 import { useCallback, useEffect, useState } from "preact/hooks";
 
-export function SubmitTurn({ isLastTurn, gameState, refreshGameInfo, game, debug, entryId }) {
-    const usernames = gameState ? (gameState.players.getAllPlayers().map(user => user.name)) : [];
-    const [selectedUser, setSelectedUser] = useState();
+export function SubmitTurn({ isLatestEntry, canSubmitAction, refreshGameInfo, game, debug, entryId, selectedUser, setSelectedUser }) {
     const [currentFactory, setCurrentFactory] = useState();
     const [actionSpecific, setActionSpecific] = useState({});
     // Set this to undefined so we don't send a request for anthing other than the last turn
-    const [actionFactories, error] = usePossibleActionFactories(game, selectedUser, isLastTurn && gameState?.running ? entryId : undefined);
+    const possibleActionsEntryId = canSubmitAction && isLatestEntry ? entryId : undefined;
+    const [actionFactories, error] = usePossibleActionFactories(game, selectedUser, possibleActionsEntryId);
     const [status, setStatus] = useState();
 
-    // Game over no more actions to submit
-    if(!gameState?.running) {
+    // Reset the action type
+    useEffect(() => {
+        setCurrentFactory(undefined);
+    }, [selectedUser, setCurrentFactory]);
+
+    // Reset any action specific fields if user or action type changes
+    useEffect(() => {
+        setActionSpecific({});
+        targetSelectionState.clearPossibleTargets();
+    }, [selectedUser, currentFactory, setActionSpecific]);
+
+    // Game over no more actions to submit or we haven't picked a user yet
+    if(!canSubmitAction || !selectedUser) {
         return;
     }
 
-    if(!isLastTurn) {
+    if(!isLatestEntry) {
         return (
             <p>You can only submit actions on the most recent turn.</p>
         );
@@ -31,17 +41,6 @@ export function SubmitTurn({ isLastTurn, gameState, refreshGameInfo, game, debug
     if(status) {
         return <p>{status}</p>;
     }
-
-    // Reset the action type
-    useEffect(() => {
-        setCurrentFactory(undefined);
-    }, [selectedUser, setCurrentFactory]);
-
-    // Reset any action specific fields if user or action type changes
-    useEffect(() => {
-        setActionSpecific({});
-        targetSelectionState.clearPossibleTargets();
-    }, [selectedUser, currentFactory, setActionSpecific]);
 
     const possibleActions = actionFactories || [];
 
@@ -71,7 +70,7 @@ export function SubmitTurn({ isLastTurn, gameState, refreshGameInfo, game, debug
     return (
         <div className="submit-turn-box">
             <div className="submit-turn-title">
-                <h2>Submit action</h2>
+                <h2>Submit action as {selectedUser}</h2>
                 <div>
                 <button onClick={() => setSelectedUser(undefined)}>Close</button>
                 </div>
@@ -79,9 +78,6 @@ export function SubmitTurn({ isLastTurn, gameState, refreshGameInfo, game, debug
             <div className="submit-turn">
                 <form onSubmit={submitTurnHandler} className="submit-turn-form">
                     <div className="submit-turn-field-wrapper">
-                        <LabelElement name="User">
-                            <Select spec={{ options: usernames }} value={selectedUser} setValue={setSelectedUser}></Select>
-                        </LabelElement>
                         {possibleActions?.length > 0 ? <LabelElement name="Action">
                             <Select spec={{ options: possibleActions }} value={currentFactory} setValue={setCurrentFactory}></Select>
                         </LabelElement> : undefined}

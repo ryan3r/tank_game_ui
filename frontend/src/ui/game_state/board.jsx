@@ -4,12 +4,12 @@ import { Position } from "../../../../common/state/board/position.mjs";
 import { EntityTile } from "./entity-tile.jsx";
 
 
-export function GameBoard({ board, config, debug, emptyMessage = "No board data supplied" }) {
+export function GameBoard({ board, config, debug, setSelectedUser, canSubmitAction, emptyMessage = "No board data supplied" }) {
     if(!board) return <p>{emptyMessage}</p>;
 
     try {
         return (
-            <GameBoardView width={board.width} board={board} config={config} debug={debug}></GameBoardView>
+            <GameBoardView width={board.width} board={board} config={config} debug={debug} canSubmitAction={canSubmitAction} setSelectedUser={setSelectedUser}></GameBoardView>
         );
     }
     catch(err) {
@@ -19,7 +19,7 @@ export function GameBoard({ board, config, debug, emptyMessage = "No board data 
     }
 }
 
-export function GameBoardView({ board, config, debug }) {
+export function GameBoardView({ board, config, debug, setSelectedUser, canSubmitAction }) {
     const possibleTargets = targetSelectionState.usePossibleTargets();
     let selectedTarget = targetSelectionState.useSelectedTarget();
     selectedTarget = selectedTarget && Position.fromHumanReadable(selectedTarget);
@@ -54,7 +54,9 @@ export function GameBoardView({ board, config, debug }) {
                     onClick={onClick}
                     disabled={disabled}
                     selected={selectedTarget && selectedTarget.x == x && selectedTarget.y == y}
-                    config={config}></Space>
+                    config={config}
+                    canSubmitAction={canSubmitAction}
+                    setSelectedUser={setSelectedUser}></Space>
             );
         }
 
@@ -66,12 +68,17 @@ export function GameBoardView({ board, config, debug }) {
     )
 }
 
-function Space({ entity, floorTile, disabled, onClick, selected, config }) {;
+function Space({ entity, floorTile, disabled, onClick, selected, config, setSelectedUser, canSubmitAction }) {;
     let tile = null;
 
     // Try to place an entity in this space
     if(entity && entity.type != "empty") {
-        tile = <EntityTile entity={entity} showPopupOnClick={!(onClick || disabled)} config={config}></EntityTile>;
+        tile = <EntityTile
+            entity={entity}
+            showPopupOnClick={!(onClick || disabled)}
+            config={config}
+            canSubmitAction={canSubmitAction}
+            setSelectedUser={setSelectedUser}></EntityTile>;
     }
 
     return (

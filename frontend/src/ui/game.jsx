@@ -23,6 +23,15 @@ export function Game({ game, setGame, debug }) {
 
     const gameStateManager = useGameStateManager(gameInfo?.logBook, game);
 
+    // The user that's currently submitting actions
+    const [selectedUser, setSelectedUserDirect] = useState();
+    const canSubmitAction = gameStateManager.gameState?.running;
+
+    const setSelectedUser = user => {
+        setSelectedUserDirect(user);
+        gameStateManager.playerSetEntry(gameInfo?.logBook.getLastEntryId())
+    };
+
     const backToGamesButton = <button onClick={() => setGame(undefined)}>Back to games</button>;
 
     // The backend is still loading the game
@@ -74,10 +83,19 @@ export function Game({ game, setGame, debug }) {
                 <div className="app-side-by-side centered">
                     <div className="app-side-by-side-main">
                         {gameMessage !== undefined ? <div>{gameMessage}</div> : undefined}
-                        <GameBoard board={gameStateManager.gameState?.board} config={versionConfig} debug={debug}></GameBoard>
+                        <GameBoard
+                            board={gameStateManager.gameState?.board}
+                            config={versionConfig}
+                            debug={debug}
+                            canSubmitAction={canSubmitAction}
+                            setSelectedUser={setSelectedUser}></GameBoard>
                     </div>
                     <div>
-                        <Council gameState={gameStateManager.gameState} config={versionConfig}></Council>
+                        <Council
+                            gameState={gameStateManager.gameState}
+                            config={versionConfig}
+                            setSelectedUser={setSelectedUser}
+                            canSubmitAction={canSubmitAction}></Council>
                         <OpenHours openHours={gameInfo?.openHours}></OpenHours>
                     </div>
                 </div>
@@ -85,11 +103,13 @@ export function Game({ game, setGame, debug }) {
                     <div>
                         {gameIsClosed ? undefined : <SubmitTurn
                             game={game}
-                            isLastTurn={gameStateManager.isLatestEntry}
+                            selectedUser={selectedUser}
+                            setSelectedUser={setSelectedUser}
+                            canSubmitAction={canSubmitAction}
                             refreshGameInfo={refreshGameInfo}
                             debug={debug}
-                            gameState={gameStateManager.gameState}
-                            entryId={gameStateManager.entryId}></SubmitTurn>}
+                            entryId={gameStateManager.entryId}
+                            isLatestEntry={gameStateManager?.isLatestEntry}></SubmitTurn>}
                     </div>
                 </div>
             </AppContent>
