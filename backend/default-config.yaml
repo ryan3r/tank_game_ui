@@ -73,6 +73,21 @@ defaultGameVersion:
 
 gameVersions:
     3:
+      manual: /manuals/Tank_Game_Rules_v3.pdf
+      entityDescriptors:
+        tank:
+          badgeAttribute: attr:actions:value
+          badgeColor: "#00f"
+          badgeTextColor: "#fff"
+          indicators:
+            - symbol: B
+              expr:
+                var: attr:bounty:value
+                gt: 0
+              color: orange
+
+    4:
+      manual: /manuals/Tank_Game_Rules_v4.pdf
       entityDescriptors:
         tank:
           badgeAttribute: attr:actions:value
