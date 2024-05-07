@@ -193,8 +193,11 @@ function Input({ spec, type, value, setValue }) {
 
 function SelectPosition({ spec, value, setValue }) {
     useEffect(() => {
-        targetSelectionState.setPossibleTargets(new Set(spec.options));
-        targetSelectionState.setSelectedTargetCallback(setValue);
+        targetSelectionState.setPossibleTargets(new Set(spec.options.map(option => option.position)));
+        targetSelectionState.setSelectedTargetCallback(position => {
+            const option = spec.options.find(option => option.position == position);
+            setValue(option?.value);
+        });
 
         return () => targetSelectionState.setSelectedTargetCallback(undefined);
     }, [setValue]);

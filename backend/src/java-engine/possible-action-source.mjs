@@ -63,7 +63,12 @@ export class JavaEngineSource {
                             throw new Error(`Got bad data expected a position but got ${position}`);
                         }
 
-                        return position;
+                        logger.info({ tank, msg: "Tank is" });
+
+                        return {
+                            position,
+                            value: tank.name,
+                        };
                     }),
                     ...commonFields,
                 };
@@ -72,7 +77,7 @@ export class JavaEngineSource {
             if(field.data_type == "position") {
                 return {
                     type: "select-position",
-                    options: field.range,
+                    options: field.range.map(position => ({ position, value: position })),
                     ...commonFields,
                 };
             }
