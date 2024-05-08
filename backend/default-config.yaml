@@ -33,7 +33,7 @@ defaultGameVersion:
     "dead-tank":
       featuredAttribute: attr:health:value
       tileColor:
-        - background: "url('/assets/Tank.png')"
+        - background: "url('/assets/DeadTank.png')"
           textColor: "#fff"
 
   floorTileDescriptors:
@@ -66,12 +66,12 @@ gameVersions:
             expr:
               eq: 1
               var: attr:health:value
-          - background: "url('/assets/Wall-3.png')"
+          - background: "url('/assets/Wall-2.png')"
             textColor: "#fff"
             expr:
               eq: 2
               var: attr:health:value
-          - background: "url('/assets/Wall-6.png')"
+          - background: "url('/assets/Wall-4.png')"
 
     4:
       manual: /manuals/Tank_Game_Rules_v4.pdf
