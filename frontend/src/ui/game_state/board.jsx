@@ -2,6 +2,9 @@ import "./board.css";
 import { targetSelectionState } from "../../api/space-selecting-state";
 import { Position } from "../../../../common/state/board/position.mjs";
 import { EntityTile } from "./entity-tile.jsx";
+import { useRef, useState } from "preact/hooks";
+import { Popup } from "../generic/popup.jsx";
+import { prettyifyName } from "../../../../common/state/utils.mjs";
 
 
 export function GameBoard({ board, config, setSelectedUser, canSubmitAction, emptyMessage = "No board data supplied" }) {
@@ -85,18 +88,31 @@ function Space({ entity, floorTile, disabled, onClick, selected, config, setSele
 }
 
 function Tile({ className = "", children, floorTile, disabled, onClick, selected, config } = {}) {
+    const [popupOpen, setPopupOpen] = useState(false);
+    const anchorRef = useRef();
+
+    if(onClick) {
+        className += " board-space-selectable";
+    }
+
     let style = {};
-    if(floorTile && config) {
-        const spec = config.getFloorTileDescriptor(floorTile.type);
-        if(spec) style.background = spec.color;
+    if(floorTile) {
+        if(config) {
+            const spec = config.getFloorTileDescriptor(floorTile.type);
+            if(spec) style.background = spec.color;
+        }
+
+        if(!onClick && !disabled && floorTile.type !== "empty" && !children?.length) {
+            onClick = () => setPopupOpen(popupOpen => !popupOpen);
+        }
+        else if(popupOpen) {
+            // We're doing something else with this space hide the popup
+            setPopupOpen(false);
+        }
     }
 
     if(disabled) {
         className += " board-space-disabled";
-    }
-
-    if(onClick) {
-        className += " board-space-selectable";
     }
 
     if(selected) {
@@ -105,7 +121,16 @@ function Tile({ className = "", children, floorTile, disabled, onClick, selected
 
     return (
         <>
-            <div className={`board-space board-space-centered ${className}`} onClick={onClick} style={style}>{children}</div>
+            <div
+                className={`board-space board-space-centered ${className}`}
+                onClick={onClick}
+                style={style}
+                ref={anchorRef}>
+                    {children}
+            </div>
+            <Popup opened={popupOpen} anchorRef={anchorRef} onClose={() => setPopupOpen(false)}>
+                <h2>{prettyifyName(floorTile?.type)}</h2>
+            </Popup>
         </>
     );
 }
