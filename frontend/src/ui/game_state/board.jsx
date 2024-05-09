@@ -4,12 +4,12 @@ import { Position } from "../../../../common/state/board/position.mjs";
 import { EntityTile } from "./entity-tile.jsx";
 
 
-export function GameBoard({ board, config, debug, setSelectedUser, canSubmitAction, emptyMessage = "No board data supplied" }) {
+export function GameBoard({ board, config, setSelectedUser, canSubmitAction, emptyMessage = "No board data supplied" }) {
     if(!board) return <p>{emptyMessage}</p>;
 
     try {
         return (
-            <GameBoardView width={board.width} board={board} config={config} debug={debug} canSubmitAction={canSubmitAction} setSelectedUser={setSelectedUser}></GameBoardView>
+            <GameBoardView width={board.width} board={board} config={config} canSubmitAction={canSubmitAction} setSelectedUser={setSelectedUser}></GameBoardView>
         );
     }
     catch(err) {
@@ -19,7 +19,7 @@ export function GameBoard({ board, config, debug, setSelectedUser, canSubmitActi
     }
 }
 
-export function GameBoardView({ board, config, debug, setSelectedUser, canSubmitAction }) {
+export function GameBoardView({ board, config, setSelectedUser, canSubmitAction }) {
     const possibleTargets = targetSelectionState.usePossibleTargets();
     let selectedTarget = targetSelectionState.useSelectedTarget();
     selectedTarget = selectedTarget && Position.fromHumanReadable(selectedTarget);
@@ -30,14 +30,10 @@ export function GameBoardView({ board, config, debug, setSelectedUser, canSubmit
         letters.push(<Tile className="board-space-coordinate">{letter}</Tile>);
     }
 
-    let renderedBoard = [];
-    if(debug) {
-        renderedBoard.push(<div className="game-board-row">{letters}</div>);
-    }
+    let renderedBoard = [<div className="game-board-row">{letters}</div>];
 
     for(let y = 0; y < board.width; ++y) {
-        let renderedRow = [];
-        if(debug) renderedRow.push(<Tile className="board-space-coordinate">{y + 1}</Tile>);
+        let renderedRow = [<Tile className="board-space-coordinate">{y + 1}</Tile>];
 
         for(let x = 0; x < board.height; ++x) {
             const position = new Position(x, y);
