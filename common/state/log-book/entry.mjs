@@ -24,6 +24,6 @@ export class LogEntry {
     }
 
     getTimestamp() {
-        return new Date(this.rawLogEntry.timestamp);
+        return new Date(this.rawLogEntry.timestamp * 1000);
     }
 }

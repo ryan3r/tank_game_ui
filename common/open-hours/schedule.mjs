@@ -61,10 +61,11 @@ export function getCurrentTime(now) {
 
 
 export class Schedule {
-    constructor(daysOfWeek, startMinutes, endMinutes) {
+    constructor(daysOfWeek, startMinutes, endMinutes, autoStartOfDay) {
         this._daysOfWeek = daysOfWeek;
         this._startMinutes = startMinutes;
         this._endMinutes = endMinutes;
+        this.autoStartOfDay = autoStartOfDay;
         if(startMinutes > endMinutes) {
             throw new Error(`Scheduled time cannot be before start time (start = ${serializeToTimeString(this._startMinutes)}, end = ${serializeToTimeString(this._endMinutes)})`);
         }
@@ -82,6 +83,7 @@ export class Schedule {
             }),
             parseTimeString(rawSchedule.startTime),
             parseTimeString(rawSchedule.endTime),
+            rawSchedule.autoStartOfDay,
         );
     }
 
@@ -90,6 +92,7 @@ export class Schedule {
             daysOfWeek: this.daysOfWeek,
             startTime: this.startTime,
             endTime: this.endTime,
+            autoStartOfDay: this.autoStartOfDay,
         };
     }
 

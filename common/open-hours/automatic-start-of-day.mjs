@@ -39,6 +39,7 @@ export class AutomaticStartOfDay {
     }
 
     start() {
+        this.attemptToStartDay();
         this._setNextTimer();
     }
 

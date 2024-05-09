@@ -70,9 +70,16 @@ export class OpenHours {
     getNextOpenHoursStart(now) {
         let nextStart = Infinity;
         for(const schedule of this.schedules) {
+            // This schedule doesn't support auto start of day
+            if(!schedule.autoStartOfDay) continue;
+
             nextStart = Math.min(nextStart, schedule.getNextOpenHoursStart(now));
         }
 
         return nextStart;
+    }
+
+    hasAutomaticStartOfDay() {
+        return !!this.schedules.find(schedule => schedule.autoStartOfDay);
     }
 }

@@ -44,7 +44,6 @@ export function defineRoutes(app) {
 
         try {
             await interactor.addLogBookEntry(req.body);
-            log.info({ msg: "Added log book entry", entry: req.body });
             res.json({ success: true });
         }
         catch(err) {
