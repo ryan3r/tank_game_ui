@@ -1,6 +1,8 @@
 import assert from "node:assert";
 import { Schedule } from "../../../common/open-hours/schedule.mjs";
 import { OpenHours } from "../../../common/open-hours/index.mjs";
+import { LogBook } from "../../../common/state/log-book/log-book.mjs";
+import { AutomaticStartOfDay } from "../../../common/open-hours/automatic-start-of-day.mjs";
 
 function checkIsOpen(scheduleName, schedule, date, expected) {
     assert.equal(schedule.isGameOpen(date), expected, `is ${scheduleName} game open ${date}`);
@@ -121,5 +123,59 @@ describe("OpenHours", () => {
         checkNextStart(openHours, tuesday0348, makeDate(2024, 2, 14, 9, 0));
         checkNextStart(openHours, sunday0400, makeDate(2024, 7, 8, 9, 0));
         checkNextStart(openHours, friday0501, makeDate(2024, 7, 21, 12, 0));
+    });
+});
+
+const logBook = LogBook.deserialize({
+    gameVersion: "3",
+    rawEntries: [
+        {
+            day: 1,
+        },
+        {
+            action: "move",
+        },
+        {
+            day: 2,
+            timestamp: makeDate(2024, 7, 21, 12, 0).getTime(),
+        },
+        {
+            action: "shoot",
+        },
+        {
+            action: "move",
+        },
+    ],
+});
+
+describe("Automatic start of day", () => {
+    it("can check if a start of day entry has been added today already", () => {
+        const automaticStart = new AutomaticStartOfDay({
+            getLogBook() { return logBook; },
+        });
+
+        assert.ok(automaticStart.hasGameDayBeenStartedToday(makeDate(2024, 7, 21, 2, 0)), "Day has been started on 7/21/2024");
+        assert.ok(!automaticStart.hasGameDayBeenStartedToday(makeDate(2024, 7, 15, 2, 0)), "Day has not been started on 7/15/2024");
+        assert.ok(!automaticStart.hasGameDayBeenStartedToday(makeDate(2024, 3, 21, 2, 0)), "Day has not been started on 3/21/2024");
+        assert.ok(!automaticStart.hasGameDayBeenStartedToday(makeDate(2025, 7, 21, 2, 0)), "Day has not been started on 7/21/2025");
+    });
+
+    it("can add a start of day entry if the day hasn't already started", () => {
+        let addedEntry;
+        const automaticStart = new AutomaticStartOfDay({
+            getLogBook() { return logBook; },
+            addLogBookEntry(entry) { addedEntry = entry; },
+        });
+
+        // Day has already started this won't do anything
+        automaticStart.attemptToStartDay(makeDate(2024, 7, 21, 2, 0));
+        assert.deepEqual(addedEntry, undefined);
+
+        // This will start day 3
+        automaticStart.attemptToStartDay(makeDate(2024, 7, 22, 2, 0));
+        assert.deepEqual(addedEntry, {
+            type: "action",
+            day: 3,
+        });
     });
 });
