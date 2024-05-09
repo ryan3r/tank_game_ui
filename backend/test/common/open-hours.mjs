@@ -37,9 +37,10 @@ const nineToFive = Schedule.deserialize({ // 9am to 5pm week days
     daysOfWeek: ["M", "t", "w", "r", "f"], // M tests case insensitivity
     startTime: "9:00am",
     endTime: "5:00pm",
+    autoStartOfDay: true,
 });
 
-const noonTo9 = new Schedule([2, 4, 0], 12 * 60, 21 * 60); // 12pm to 9pm Tu, Th, Su
+const noonTo9 = new Schedule([2, 4, 0], 12 * 60, 21 * 60, true); // 12pm to 9pm Tu, Th, Su (autostart day)
 
 describe("Schedule", () => {
     it("can determine if a given date/time is part of its schedule", () => {
@@ -137,7 +138,7 @@ const logBook = LogBook.deserialize({
         },
         {
             day: 2,
-            timestamp: makeDate(2024, 7, 21, 12, 0).getTime(),
+            timestamp: makeDate(2024, 7, 21, 12, 0).getTime() / 1000,
         },
         {
             action: "shoot",
@@ -152,6 +153,7 @@ describe("Automatic start of day", () => {
     it("can check if a start of day entry has been added today already", () => {
         const automaticStart = new AutomaticStartOfDay({
             getLogBook() { return logBook; },
+            isGameOpen() { return true; },
         });
 
         assert.ok(automaticStart.hasGameDayBeenStartedToday(makeDate(2024, 7, 21, 2, 0)), "Day has been started on 7/21/2024");
@@ -165,6 +167,7 @@ describe("Automatic start of day", () => {
         const automaticStart = new AutomaticStartOfDay({
             getLogBook() { return logBook; },
             addLogBookEntry(entry) { addedEntry = entry; },
+            isGameOpen() { return true; },
         });
 
         // Day has already started this won't do anything
