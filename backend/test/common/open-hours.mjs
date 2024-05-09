@@ -6,6 +6,11 @@ function checkIsOpen(scheduleName, schedule, date, expected) {
     assert.equal(schedule.isGameOpen(date), expected, `is ${scheduleName} game open ${date}`);
 }
 
+function checkNextStart(schedule, now, expected) {
+    const next = schedule.getNextOpenHoursStart(now);
+    assert.equal(next, expected.getTime(), `Expected ${new Date(next)} (${next}) to be ${expected} (${expected.getTime()})`);
+}
+
 function makeDate(year, month, day, hours, minutes) {
     let date = new Date();
     date.setFullYear(year);
@@ -13,12 +18,16 @@ function makeDate(year, month, day, hours, minutes) {
     date.setDate(day);
     date.setHours(hours);
     date.setMinutes(minutes);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
     return date;
 }
 
 const monday1133 = makeDate(2024, 4, 29, 11, 33);
 const monday0217 = makeDate(2022, 12, 26, 14, 17);
 const tuesday0348 = makeDate(2024, 2, 13, 15, 48);
+const tuesday1159 = makeDate(2024, 2, 13, 11, 58);
+const tuesday1200 = makeDate(2024, 2, 13, 12, 0);
 const sunday0400 = makeDate(2024, 7, 7, 16, 0);
 const friday0501 = makeDate(2024, 7, 19, 17, 5);
 
@@ -40,9 +49,26 @@ describe("Schedule", () => {
 
         checkIsOpen("noonTo9", noonTo9, monday1133, false);
         checkIsOpen("noonTo9", noonTo9, monday0217, false);
+        checkIsOpen("noonTo9", noonTo9, tuesday1200, true);
         checkIsOpen("noonTo9", noonTo9, tuesday0348, true);
         checkIsOpen("noonTo9", noonTo9, sunday0400, true);
         checkIsOpen("noonTo9", noonTo9, friday0501, false);
+    });
+
+    it("can determine it's next start time", () => {
+        checkNextStart(nineToFive, monday1133, makeDate(2024, 4, 30, 9, 0));
+        checkNextStart(nineToFive, monday0217, makeDate(2022, 12, 27, 9, 0));
+        checkNextStart(nineToFive, tuesday0348, makeDate(2024, 2, 14, 9, 0));
+        checkNextStart(nineToFive, sunday0400, makeDate(2024, 7, 8, 9, 0));
+        checkNextStart(nineToFive, friday0501, makeDate(2024, 7, 22, 9, 0));
+
+        checkNextStart(noonTo9, monday1133, makeDate(2024, 4, 30, 12, 0));
+        checkNextStart(noonTo9, monday0217, makeDate(2022, 12, 27, 12, 0));
+        checkNextStart(noonTo9, tuesday1159, tuesday1200);
+        checkNextStart(noonTo9, tuesday1200, makeDate(2024, 2, 15, 12, 0));
+        checkNextStart(noonTo9, tuesday0348, makeDate(2024, 2, 15, 12, 0));
+        checkNextStart(noonTo9, sunday0400, makeDate(2024, 7, 9, 12, 0));
+        checkNextStart(noonTo9, friday0501, makeDate(2024, 7, 21, 12, 0));
     });
 });
 
@@ -83,5 +109,17 @@ describe("OpenHours", () => {
         const openHours = new OpenHours([nineToFive, noonTo9]);
         const recreated = OpenHours.deserialize(openHours.serialize());
         assert.deepEqual(recreated, openHours);
+    });
+
+    it("can find the next start of day out of all of its schedules", () => {
+        const openHours = new OpenHours([nineToFive, noonTo9]);
+
+        checkNextStart(openHours, monday1133, makeDate(2024, 4, 30, 9, 0));
+        checkNextStart(openHours, monday0217, makeDate(2022, 12, 27, 9, 0));
+        checkNextStart(openHours, tuesday1159, tuesday1200);
+        checkNextStart(openHours, tuesday1200, makeDate(2024, 2, 14, 9, 0));
+        checkNextStart(openHours, tuesday0348, makeDate(2024, 2, 14, 9, 0));
+        checkNextStart(openHours, sunday0400, makeDate(2024, 7, 8, 9, 0));
+        checkNextStart(openHours, friday0501, makeDate(2024, 7, 21, 12, 0));
     });
 });

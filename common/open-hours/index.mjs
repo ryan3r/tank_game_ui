@@ -66,4 +66,13 @@ export class OpenHours {
 
         return !!this.schedules.find(schedule => schedule.isGameOpen(now));
     }
+
+    getNextOpenHoursStart(now) {
+        let nextStart = Infinity;
+        for(const schedule of this.schedules) {
+            nextStart = Math.min(nextStart, schedule.getNextOpenHoursStart(now));
+        }
+
+        return nextStart;
+    }
 }

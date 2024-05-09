@@ -121,4 +121,25 @@ export class Schedule {
     get endTime() {
         return serializeToTimeString(this._endMinutes);
     }
+
+    getNextOpenHoursStart(now) {
+        let nextStartDate = new Date(now?.getTime());
+
+        nextStartDate.setHours(Math.floor(this._startMinutes / 60));
+        nextStartDate.setMinutes(this._startMinutes % 60);
+        nextStartDate.setSeconds(0);
+        nextStartDate.setMilliseconds(0);
+
+        // Find the next play day (assumption: it can't be more than 1 week away)
+        for(let dayOffset = 0; dayOffset < 7; ++dayOffset) {
+            nextStartDate.setDate(now.getDate() + dayOffset);
+
+            // We're in the past keep looking
+            if(now.getTime() >= nextStartDate.getTime()) continue;
+
+            if(this._daysOfWeek.includes(nextStartDate.getDay())) break;
+        }
+
+        return nextStartDate.getTime();
+    }
 }
