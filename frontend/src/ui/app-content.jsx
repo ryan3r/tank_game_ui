@@ -1,3 +1,6 @@
+const MAX_RELOAD_FREQUENCY = 24 * 60 * 60 * 1000; // 1 day in ms
+
+
 export function AppContent({ debugMode, withSidebar, toolbar, buildInfo, children }) {
     return (
         <div className={`app-wrapper ${withSidebar ? "with-sidebar" : ""}`}>
@@ -16,6 +19,15 @@ export function AppContent({ debugMode, withSidebar, toolbar, buildInfo, childre
 
 function AutoRestart({ buildInfo }) {
     const isOutDated = buildInfo !== BUILD_INFO;
+
+    if(isOutDated) {
+        // Try autoreloading but don't get stuck in a reload loop
+        const lastReload = localStorage.getItem("lastReload") || 0;
+        if((Date.now() - lastReload) > MAX_RELOAD_FREQUENCY) {
+            localStorage.setItem("lastReload", Date.now());
+            location.reload();
+        }
+    }
 
     const reload = e => {
         e.preventDefault();
