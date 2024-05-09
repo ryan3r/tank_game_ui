@@ -1,3 +1,4 @@
+import { AutomaticStartOfDay } from "../open-hours/automatic-start-of-day.mjs";
 import { PromiseLock } from "../state/utils.mjs";
 
 export class GameInteractor {
@@ -9,6 +10,11 @@ export class GameInteractor {
         this._lock = new PromiseLock();
         this._initialGameState = this._previousState = initialGameState;
         this._openHours = openHours;
+
+        if(openHours.schedules.length > 0) {
+            this._automaticStartOfDay = new AutomaticStartOfDay(this);
+            this._automaticStartOfDay.start();
+        }
 
         // Process any unprocessed log book entries.
         this.loaded = this._processActions();
@@ -127,6 +133,14 @@ export class GameInteractor {
     }
 
     shutdown() {
+        if(this._automaticStartOfDay) {
+            this._automaticStartOfDay.stop();
+        }
+
         return this._engine.shutdown();
+    }
+
+    hasAutomaticStartOfDay() {
+        return !!this._automaticStartOfDay;
     }
 }

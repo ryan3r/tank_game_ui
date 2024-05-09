@@ -1,3 +1,4 @@
+import { logger } from "../../backend/src/logging.mjs";
 import { StartOfDayFactory } from "../state/possible-actions/start-of-day-source.mjs";
 
 // HACK: Cap the amount of time the timer can be set for so we don't get thrown off by day light savings time
@@ -29,6 +30,9 @@ export class AutomaticStartOfDay {
         // We already started the game day on this real day don't do it again
         if(this.hasGameDayBeenStartedToday(now)) return;
 
+        // Game hasn't opened yet don't do anything
+        if(!this._interactor.isGameOpen()) return;
+
         let logBook = this._interactor.getLogBook();
         const factory = new StartOfDayFactory(logBook.getMaxDay() + 1);
         this._interactor.addLogBookEntry(factory.buildRawEntry());
@@ -43,11 +47,18 @@ export class AutomaticStartOfDay {
     }
 
     _setNextTimer() {
-        const nextStartOfDay = Date.now() - this._interactor.getOpenHours().getNextOpenHoursStart();
+        const nextStartOfDay = this._interactor.getOpenHours().getNextOpenHoursStart() - Date.now();
         const duration = Math.min(MAX_TIMER_INTERVAL, nextStartOfDay);
 
-        this._timer = setTimeout(() => {
+        logger.debug({
+            msg: "Set start of day timer",
+            duration,
+            minutes: duration / (60 * 1000), // (ms to minutes)
+        });
 
+        this._timer = setTimeout(() => {
+            this.attemptToStartDay();
+            this._setNextTimer();
         }, duration);
     }
 }

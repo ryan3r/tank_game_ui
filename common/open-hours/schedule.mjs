@@ -123,7 +123,8 @@ export class Schedule {
     }
 
     getNextOpenHoursStart(now) {
-        let nextStartDate = new Date(now?.getTime());
+        if(!now) now = new Date();
+        let nextStartDate = new Date(now.getTime());
 
         nextStartDate.setHours(Math.floor(this._startMinutes / 60));
         nextStartDate.setMinutes(this._startMinutes % 60);
