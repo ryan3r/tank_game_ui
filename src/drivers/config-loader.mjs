@@ -6,7 +6,7 @@ import { Config, mergeConfig } from "../config/config.mjs";
 import { GameManager } from "./game-file.mjs";
 
 const currentSourceFile = (new URL(import.meta.url)).pathname;
-const DEFAULT_CONFIG = path.join(path.dirname(currentSourceFile), "..", "default-config.yaml");
+const DEFAULT_CONFIG = path.join(path.dirname(currentSourceFile), "..", "..", "default-config.yaml");
 
 const parseYaml = async yamlPath => parse(await readFile(yamlPath, "utf-8")) || {};
 

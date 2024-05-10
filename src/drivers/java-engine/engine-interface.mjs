@@ -8,7 +8,7 @@ import { PromiseLock } from "../../utils.mjs";
 
 const TANK_GAME_TIMEOUT = 3; // seconds
 
-const ENGINE_SEARCH_DIR = "../engine";
+const ENGINE_SEARCH_DIR = "engine";
 const TANK_GAME_ENGINE_COMMAND = (function() {
     let command = process.env.TANK_GAME_ENGINE_COMMAND;
 
