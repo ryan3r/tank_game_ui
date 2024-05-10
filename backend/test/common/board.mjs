@@ -2,7 +2,7 @@ import assert from "node:assert";
 import Board from "../../../common/state/board/board.mjs";
 import Entity from "../../../common/state/board/entity.mjs";
 import { Position } from "../../../common/state/board/position.mjs";
-import { ResourceHolder } from "../../../common/state/resource.mjs";
+import { ResourceHolder } from "../../../src/business-logic/resource.mjs";
 import { FloorTile } from "../../../common/state/board/floor-tile.mjs";
 
 let board = new Board(7, 5);

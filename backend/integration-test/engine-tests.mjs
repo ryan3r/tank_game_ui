@@ -4,11 +4,11 @@ import assert from "node:assert";
 import fs from "node:fs";
 import { GameInteractor } from "../../common/game/game-interactor.mjs";
 import { LogBook } from "../../common/state/log-book/log-book.mjs";
-import { loadConfig, loadConfigAndGames } from "../src/config-loader.mjs";
-import { load, save } from "../src/game-file.mjs";
-import { logger } from "../src/logging.mjs";
+import { loadConfig, loadConfigAndGames } from "../../src/drivers/config-loader.mjs";
+import { load, save } from "../../src/drivers/game-file.mjs";
+import { logger } from "../../src/drivers/logging.mjs";
 import { OpenHours } from "../../common/open-hours/index.mjs";
-import { hashFile, writeJson } from "../src/utils.mjs";
+import { hashFile, writeJson } from "../../src/drivers/file-utils.mjs";
 
 export function defineTestsForEngine(createEngine) {
     function defTest(name, testFunc) {
