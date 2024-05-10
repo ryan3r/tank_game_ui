@@ -1,5 +1,5 @@
-import { submitTurn, usePossibleActionFactories } from "../../../frontend/src/api/fetcher.js";
-import { targetSelectionState } from "../../../frontend/src/api/space-selecting-state.js";
+import { submitTurn, usePossibleActionFactories } from "../../drivers/rest/fetcher.js";
+import { targetSelectionState } from "../space-selecting-state.js";
 import { ErrorMessage } from "../error_message.jsx";
 import "./submit_turn.css";
 import { useCallback, useEffect, useState } from "preact/hooks";

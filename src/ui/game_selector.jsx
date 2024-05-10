@@ -1,5 +1,5 @@
 import { useCallback } from "preact/hooks";
-import { useGameList } from "../../frontend/src/api/fetcher.js";
+import { useGameList } from "../drivers/rest/fetcher.js";
 import { ErrorMessage } from "./error_message.jsx";
 import { AppContent } from "./app-content.jsx";
 

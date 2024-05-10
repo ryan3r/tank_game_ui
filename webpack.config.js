@@ -1,7 +1,6 @@
 const path = require("path");
 const childProcess = require("child_process");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const packageJson = require("./package.json");
 const { DefinePlugin } = require("webpack");
 
 // Collect version info
@@ -18,7 +17,7 @@ const version = `TankGameUI ${buildInfo}`;
 module.exports = {
     mode: process.env.NODE_ENV ?? "development",
     devtool: "source-map",
-    entry: "./src/index.jsx",
+    entry: "./src/ui/index.jsx",
     output: {
         path: path.resolve(__dirname, "dist"),
         filename: "tank-game.js",

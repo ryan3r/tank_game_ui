@@ -1,11 +1,11 @@
 import { GameBoard } from "./game_state/board.jsx";
 import { useCallback, useState } from "preact/hooks";
-import { useGameInfo } from "../../frontend/src/api/fetcher.js";
+import { useGameInfo } from "../drivers/rest/fetcher.js";
 import { LogEntrySelector } from "./game_state/log_entry_selector.jsx"
 import { SubmitTurn } from "./game_state/submit_turn.jsx";
 import { Council } from "./game_state/council.jsx";
 import { LogBook } from "./game_state/log_book.jsx";
-import { useGameStateManager } from "../../frontend/src/api/game-state-manager.js";
+import { useGameStateManager } from "../interface-adapters/game-state-manager.js";
 import { ErrorMessage } from "./error_message.jsx";
 import { OpenHours } from "./open-hours.jsx";
 import { AppContent } from "./app-content.jsx";
