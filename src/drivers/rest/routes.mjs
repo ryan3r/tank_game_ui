@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { logger } from "../logging.mjs";
 
-const STATIC_DIR = "../www";
+const STATIC_DIR = "www";
 
 export function defineRoutes(app, buildInfo) {
     try {
