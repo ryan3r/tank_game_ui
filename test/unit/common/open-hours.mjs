@@ -1,8 +1,8 @@
 import assert from "node:assert";
-import { Schedule } from "../../../common/open-hours/schedule.mjs";
-import { OpenHours } from "../../../common/open-hours/index.mjs";
-import { LogBook } from "../../../common/state/log-book/log-book.mjs";
-import { AutomaticStartOfDay } from "../../../common/open-hours/automatic-start-of-day.mjs";
+import { Schedule } from "../../../src/game/open-hours/schedule.mjs";
+import { OpenHours } from "../../../src/game/open-hours/index.mjs";
+import { LogBook } from "../../../src/game/state/log-book/log-book.mjs";
+import { AutomaticStartOfDay } from "../../../src/game/open-hours/automatic-start-of-day.mjs";
 
 function checkIsOpen(scheduleName, schedule, date, expected) {
     assert.equal(schedule.isGameOpen(date), expected, `is ${scheduleName} game open ${date}`);

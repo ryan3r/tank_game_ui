@@ -1,6 +1,6 @@
 import assert from "node:assert";
-import { Config } from "../../../common/state/config/config.mjs";
-import { LogBook } from "../../../common/state/log-book/log-book.mjs";
+import { Config } from "../../../src/config/config.mjs";
+import { LogBook } from "../../../src/game/state/log-book/log-book.mjs";
 
 const GAME_VERSION = 3;
 

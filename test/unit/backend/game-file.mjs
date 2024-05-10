@@ -1,12 +1,12 @@
 import assert from "node:assert";
 import { FILE_FORMAT_VERSION, GameManager, MINIMUM_SUPPORTED_FILE_FORMAT_VERSION, load, save } from "../../../src/drivers/game-file.mjs";
-import { Config } from "../../../common/state/config/config.mjs";
+import { Config } from "../../../src/config/config.mjs";
 import path from "node:path";
 import fs from"node:fs";
 import { MockEngine } from "../common/game-interactor.mjs";
 import { hashFile } from "../../../src/drivers/file-utils.mjs";
 
-const TEST_FILES = "test/backend/test-files";
+const TEST_FILES = "test/unit/backend/test-files";
 const sampleFileBaseName = `tank_game_v3_format_v${FILE_FORMAT_VERSION}`;
 const sampleFilePath = path.join(TEST_FILES, `${sampleFileBaseName}.json`);
 

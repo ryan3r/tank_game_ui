@@ -1,7 +1,7 @@
 import assert from "node:assert";
-import { deepMerge } from "../../../common/state/config/merge.mjs";
-import { mergeConfig } from "../../../common/state/config/config.mjs";
-import { evalExpression, takeFirstMatch } from "../../../common/state/config/expressions.mjs";
+import { deepMerge } from "../../../src/config/merge.mjs";
+import { mergeConfig } from "../../../src/config/config.mjs";
+import { evalExpression, takeFirstMatch } from "../../../src/config/expressions.mjs";
 
 describe("Config", () => {
     it("can merge two objects", () => {

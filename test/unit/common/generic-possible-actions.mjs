@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { GenericPossibleAction } from "../../../common/state/possible-actions/generic-possible-action.mjs";
+import { GenericPossibleAction } from "../../../src/game/possible-actions/generic-possible-action.mjs";
 
 const possibleAction = new GenericPossibleAction({
     subject: "John",

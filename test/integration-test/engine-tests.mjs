@@ -2,13 +2,13 @@
 
 import assert from "node:assert";
 import fs from "node:fs";
-import { GameInteractor } from "../../common/game/game-interactor.mjs";
-import { LogBook } from "../../common/state/log-book/log-book.mjs";
+import { GameInteractor } from "../../src/game/execution/game-interactor.mjs";
+import { LogBook } from "../../src/game/state/log-book/log-book.mjs";
 import { loadConfig, loadConfigAndGames } from "../../src/drivers/config-loader.mjs";
 import { load, save } from "../../src/drivers/game-file.mjs";
 import { logger } from "../../src/drivers/logging.mjs";
-import { OpenHours } from "../../common/open-hours/index.mjs";
-import { hashFile, writeJson } from "../../src/drivers/file-utils.mjs";
+import { OpenHours } from "../../src/game/open-hours/index.mjs";
+import { hashFile } from "../../src/drivers/file-utils.mjs";
 
 export function defineTestsForEngine(createEngine) {
     function defTest(name, testFunc) {
@@ -28,8 +28,8 @@ export function defineTestsForEngine(createEngine) {
     }
 
     const TEST_GAME_NAME = "possible_actions_v3";
-    const TEST_GAME_PATH = `../example/tank_game_v3.json`;
-    const TEST_GAME_RECREATE_PATH = `../example/tank_game_v3-recreate.json`;
+    const TEST_GAME_PATH = `example/tank_game_v3.json`;
+    const TEST_GAME_RECREATE_PATH = `example/tank_game_v3-recreate.json`;
 
     defTest("can process the entire example folder", async () => {
         let { gameManager } = await loadConfigAndGames(createEngine);

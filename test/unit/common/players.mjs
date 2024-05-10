@@ -1,10 +1,10 @@
-import Player from "../../../common/state/players/player.mjs";
+import Player from "../../../src/game/state/players/player.mjs";
 import assert from "node:assert";
-import Players from "../../../common/state/players/players.mjs";
-import Entity from "../../../common/state/board/entity.mjs";
-import { Position } from "../../../common/state/board/position.mjs";
-import { ResourceHolder } from "../../../src/business-logic/resource.mjs";
-import Board from "../../../common/state/board/board.mjs";
+import Players from "../../../src/game/state/players/players.mjs";
+import Entity from "../../../src/game/state/board/entity.mjs";
+import { Position } from "../../../src/game/state/board/position.mjs";
+import { ResourceHolder } from "../../../src/game/state/resource.mjs";
+import Board from "../../../src/game/state/board/board.mjs";
 
 const ty = new Player("Ty", "councilor", []);
 const corey = new Player("Corey", "tank", []);
