@@ -1,9 +1,9 @@
 import assert from "node:assert";
-import Board from "../../../src/game/state/board/board.mjs";
-import Entity from "../../../src/game/state/board/entity.mjs";
-import { Position } from "../../../src/game/state/board/position.mjs";
-import { ResourceHolder } from "../../../src/game/state/resource.mjs";
-import { FloorTile } from "../../../src/game/state/board/floor-tile.mjs";
+import Board from "../../../../../src/game/state/board/board.mjs";
+import Entity from "../../../../../src/game/state/board/entity.mjs";
+import { Position } from "../../../../../src/game/state/board/position.mjs";
+import { ResourceHolder } from "../../../../../src/game/state/resource.mjs";
+import { FloorTile } from "../../../../../src/game/state/board/floor-tile.mjs";
 
 let board = new Board(7, 5);
 

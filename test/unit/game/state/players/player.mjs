@@ -1,7 +1,7 @@
-import Entity from "../../../src/game/state/board/entity.mjs";
-import { Position } from "../../../src/game/state/board/position.mjs";
-import Player from "../../../src/game/state/players/player.mjs";
-import { Resource, ResourceHolder } from "../../../src/game/state/resource.mjs";
+import Entity from "../../../../../src/game/state/board/entity.mjs";
+import { Position } from "../../../../../src/game/state/board/position.mjs";
+import Player from "../../../../../src/game/state/players/player.mjs";
+import { Resource, ResourceHolder } from "../../../../../src/game/state/resource.mjs";
 import assert from "node:assert";
 
 describe("Board", () => {

@@ -1,7 +1,7 @@
 import assert from "node:assert";
-import { LogBook } from "../../../src/game/state/log-book/log-book.mjs";
-import { GameInteractor } from "../../../src/game/execution/game-interactor.mjs";
-import { LogEntry } from "../../../src/game/state/log-book/entry.mjs";
+import { LogBook } from "../../../../src/game/state/log-book/log-book.mjs";
+import { GameInteractor } from "../../../../src/game/execution/game-interactor.mjs";
+import { LogEntry } from "../../../../src/game/state/log-book/entry.mjs";
 
 const GAME_VERSION = 3;
 

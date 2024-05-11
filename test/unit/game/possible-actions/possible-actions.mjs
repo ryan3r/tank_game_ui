@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { NamedFactorySet, buildRegistry } from "../../../src/game/possible-actions/index.mjs";
+import { NamedFactorySet, buildRegistry } from "../../../../src/game/possible-actions/index.mjs";
 
 
 class MockPossibleAction {
