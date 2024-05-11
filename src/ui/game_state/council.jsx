@@ -75,8 +75,8 @@ function ArmisticeClock({ armistice }) {
         <>
             <h3>Armistice Votes</h3>
             <svg height="100" width="100" viewBox="0 0 100 100" className="armistice-clock">
-                <circle cx="50" cy="50" r={radius} strokeDasharray={dashArray} strokeDashoffset={startPosition}/>
-                <text x="50" y="50" dominantBaseline="middle" textAnchor="middle">
+                <circle cx="50" cy="50" r={radius} stroke-dasharray={dashArray} stroke-dashoffset={startPosition}/>
+                <text x="50" y="50" dominant-baseline="middle" text-anchor="middle">
                     {armistice.toString()}
                 </text>
             </svg>

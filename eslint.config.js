@@ -18,6 +18,8 @@ export default [
             "react/no-unescaped-entities": "off",
             "reactHooks/rules-of-hooks": "error",
             "reactHooks/exhaustive-deps": "warn",
+            // Preact uses dashes for properties not camel case
+            "react/no-unknown-property": "off",
         },
         languageOptions: {
             parserOptions: {
