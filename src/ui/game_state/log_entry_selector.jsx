@@ -10,6 +10,16 @@ export function LogEntrySelector({ gameStateManager, logBook, debug, extraButton
         )
     }
 
+    return (
+        <LogEntrySelectorInternal
+            gameStateManager={gameStateManager}
+            logBook={logBook}
+            debug={debug}
+            extraButtonsLeft={extraButtonsLeft}></LogEntrySelectorInternal>
+    )
+}
+
+function LogEntrySelectorInternal({ gameStateManager, logBook, debug, extraButtonsLeft }) {
     const today = logBook.getEntry(gameStateManager.entryId).day;
 
     // Build the day relative header

@@ -24,6 +24,29 @@ export function SubmitTurn({ isLatestEntry, canSubmitAction, refreshGameInfo, ga
         targetSelectionState.clearPossibleTargets();
     }, [selectedUser, currentFactory, setActionSpecific]);
 
+    const logBookEntry = (currentFactory && currentFactory != "unset") && currentFactory.buildRawEntry(actionSpecific);
+    const isValid = currentFactory && currentFactory.areParemetersValid(logBookEntry);
+
+    const submitTurnHandler = useCallback(async e => {
+        e.preventDefault();
+        if(isValid) {
+            targetSelectionState.clearPossibleTargets();
+            setStatus("Submitting action...");
+
+            try {
+                await submitTurn(game, logBookEntry);
+            }
+            catch(err) {
+                alert(`Failed to submit action: ${err.message}`);
+            }
+
+            // Reset the form
+            setCurrentFactory(undefined);
+            refreshGameInfo();
+            setStatus(undefined);
+        }
+    }, [setCurrentFactory, refreshGameInfo, isValid, setStatus, logBookEntry, game]);
+
     // Game over no more actions to submit or we haven't picked a user yet
     if(!canSubmitAction || !selectedUser) {
         return;
@@ -44,29 +67,6 @@ export function SubmitTurn({ isLatestEntry, canSubmitAction, refreshGameInfo, ga
     }
 
     const possibleActions = actionFactories || [];
-
-    const logBookEntry = (currentFactory && currentFactory != "unset") && currentFactory.buildRawEntry(actionSpecific);
-    const isValid = currentFactory && currentFactory.areParemetersValid(logBookEntry);
-
-    const submitTurnHandler = useCallback(async e => {  // eslint-disable-line
-        e.preventDefault();
-        if(isValid) {
-            targetSelectionState.clearPossibleTargets();
-            setStatus("Submitting action...");
-
-            try {
-                await submitTurn(game, logBookEntry);
-            }
-            catch(err) {
-                alert(`Failed to submit action: ${err.message}`);
-            }
-
-            // Reset the form
-            setCurrentFactory(undefined);
-            refreshGameInfo();
-            setStatus(undefined);
-        }
-    }, [setCurrentFactory, refreshGameInfo, isValid, setStatus, logBookEntry, game]);
 
     return (
         <div className="submit-turn-box">
