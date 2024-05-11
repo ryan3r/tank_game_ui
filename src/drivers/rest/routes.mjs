@@ -1,7 +1,7 @@
 import express from "express";
 import fs from "node:fs";
 import path from "node:path";
-import { logger } from "../logging.mjs";
+import { logger } from "#platform/logging.mjs";
 
 const STATIC_DIR = "www";
 

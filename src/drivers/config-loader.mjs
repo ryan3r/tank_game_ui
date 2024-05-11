@@ -1,7 +1,7 @@
 import { parse } from "yaml";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { logger } from "./logging.mjs";
+import { logger } from "#platform/logging.mjs";
 import { Config, mergeConfig } from "../config/config.mjs";
 import { GameManager } from "./game-file.mjs";
 

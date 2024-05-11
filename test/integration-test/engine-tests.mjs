@@ -6,7 +6,7 @@ import { GameInteractor } from "../../src/game/execution/game-interactor.mjs";
 import { LogBook } from "../../src/game/state/log-book/log-book.mjs";
 import { loadConfig, loadConfigAndGames } from "../../src/drivers/config-loader.mjs";
 import { load, save } from "../../src/drivers/game-file.mjs";
-import { logger } from "../../src/drivers/logging.mjs";
+import { logger } from "#platform/logging.mjs";
 import { OpenHours } from "../../src/game/open-hours/index.mjs";
 import { hashFile } from "../../src/drivers/file-utils.mjs";
 

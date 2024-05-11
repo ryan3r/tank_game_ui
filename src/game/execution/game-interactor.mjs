@@ -1,4 +1,4 @@
-import { logger } from "../../drivers/logging.mjs";
+import { logger } from "#platform/logging.mjs";
 import { AutomaticStartOfDay } from "../open-hours/automatic-start-of-day.mjs";
 import { PromiseLock } from "../../utils.mjs";
 

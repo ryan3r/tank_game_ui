@@ -1,6 +1,6 @@
 import { GenericPossibleAction } from "../../game/possible-actions/generic-possible-action.mjs";
 import { prettyifyName } from "../../utils.mjs";
-import { logger } from "../logging.mjs";
+import { logger } from "#platform/logging.mjs";
 
 export class JavaEngineSource {
     constructor(engine) {

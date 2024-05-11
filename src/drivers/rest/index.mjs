@@ -1,6 +1,6 @@
 import express from "express";
-import { logger } from "../logging.mjs"
-import { makeHttpLogger } from "../logging.mjs";
+import { logger } from "#platform/logging.mjs"
+import { makeHttpLogger } from "#platform/logging.mjs";
 import { loadConfigAndGames } from "../config-loader.mjs";
 import { defineRoutes } from "./routes.mjs";
 import { createEngine } from "../java-engine/engine-interface.mjs";

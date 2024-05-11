@@ -1,4 +1,4 @@
-import { logger } from "../../drivers/logging.mjs";
+import { logger } from "#platform/logging.mjs";
 import { StartOfDayFactory } from "../possible-actions/start-of-day-source.mjs";
 
 // HACK: Cap the amount of time the timer can be set for so we don't get thrown off by day light savings time

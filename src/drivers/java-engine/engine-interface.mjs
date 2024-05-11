@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import fs from "node:fs";
-import { logger } from "../logging.mjs"
+import { logger } from "#platform/logging.mjs"
 import path from "node:path";
 import { gameStateFromRawState } from "./board-state.mjs";
 import { JavaEngineSource } from "./possible-action-source.mjs";

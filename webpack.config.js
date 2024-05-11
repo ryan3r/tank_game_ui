@@ -75,7 +75,8 @@ module.exports = {
             "react": "preact/compat",
             "react-dom/test-utils": "preact/test-utils",
             "react-dom": "preact/compat",
-            "react/jsx-runtime": "preact/jsx-runtime"
+            "react/jsx-runtime": "preact/jsx-runtime",
+            "#platform": path.resolve(__dirname, "src/drivers/platforms/web"),
         },
     }
 };

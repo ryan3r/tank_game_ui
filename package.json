@@ -32,5 +32,8 @@
         "webpack-cli": "^5.1.4",
         "webpack-dev-server": "^5.0.4",
         "preact": "^10.21.0"
+    },
+    "imports": {
+        "#platform/*": "./src/drivers/platforms/node/*"
     }
 }

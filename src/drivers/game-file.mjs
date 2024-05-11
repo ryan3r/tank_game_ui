@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { LogBook } from "../game/state/log-book/log-book.mjs";
 import { readJson, writeJson } from "./file-utils.mjs";
-import { logger } from "./logging.mjs";
+import { logger } from "#platform/logging.mjs";
 import { GameInteractor } from "../game/execution/game-interactor.mjs";
 import { PossibleActionSourceSet } from "../game/possible-actions/index.mjs";
 import { StartOfDaySource } from "../game/possible-actions/start-of-day-source.mjs";
