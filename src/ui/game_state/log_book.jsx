@@ -32,7 +32,9 @@ function DaySection({ day, logEntries, currentEntryId, changeEntryId }) {
         <>
             <h3 className="log-book-day-heading">Day {day}</h3>
             {logEntries.map(logEntry => {
-                <LogEntry currentEntryId={currentEntryId} logEntry={logEntry} selectEntry={selectEntry}></LogEntry>
+                return (
+                    <LogEntry currentEntryId={currentEntryId} logEntry={logEntry} selectEntry={selectEntry}></LogEntry>
+                );
             })}
         </>
     );

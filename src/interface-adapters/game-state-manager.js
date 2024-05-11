@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
-import { useGameState } from "../drivers/rest/fetcher";
+import { useGameState } from "../drivers/rest/fetcher.js";
 import { GameState } from "../game/state/game-state.mjs";
 
 
