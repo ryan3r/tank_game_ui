@@ -1,3 +1,4 @@
+/* global console */
 export let logger = {};
 
 function logAdaptor(logFunction, message)  {

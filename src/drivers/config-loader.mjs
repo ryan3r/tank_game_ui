@@ -1,3 +1,4 @@
+/* globals URL, process */
 import { parse } from "yaml";
 import { readFile } from "node:fs/promises";
 import path from "node:path";

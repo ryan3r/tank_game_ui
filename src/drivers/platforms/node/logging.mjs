@@ -1,3 +1,4 @@
+/* globals process */
 import pino from "pino";
 import pinoHttp from "pino-http";
 import pinoPretty from "pino-pretty";
@@ -8,7 +9,7 @@ if(process.env.LOG_FILE) {
     try {
         fs.unlinkSync(process.env.LOG_FILE);
     }
-    catch(err){}
+    catch(err){} // eslint-disable-line no-unused-vars, no-empty
 }
 
 export const logger = pino(

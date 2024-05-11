@@ -3,7 +3,7 @@ import { render } from "preact";
 import { useGame } from "../drivers/rest/fetcher.js";
 import { GameSelector } from "./game_selector.jsx";
 import { Game } from "./game.jsx";
-import { useDebugMode } from "./debug_mode.js";
+import { useDebugMode } from "./debug_mode.jsx";
 
 function App() {
     const [game, setGame] = useGame();

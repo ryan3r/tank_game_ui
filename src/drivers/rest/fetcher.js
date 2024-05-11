@@ -1,3 +1,4 @@
+/* globals window, location, history, fetch */
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { LogBook } from "../../game/state/log-book/log-book.mjs";
 import { Config } from "../../config/config.mjs";
@@ -101,9 +102,9 @@ export function useGame() {
     }, [setGame]);
 
     useEffect(() => {
-        addEventListener("popstate", popStateHandler);
+        window.addEventListener("popstate", popStateHandler);
 
-        return () => removeEventListener("popstate", popStateHandler);
+        return () => window.removeEventListener("popstate", popStateHandler);
     }, [popStateHandler]);
 
     return [game, setGameWrapper];

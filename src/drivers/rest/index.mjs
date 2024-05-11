@@ -1,3 +1,4 @@
+/* globals process */
 import express from "express";
 import { logger } from "#platform/logging.mjs"
 import { makeHttpLogger } from "#platform/logging.mjs";

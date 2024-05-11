@@ -121,7 +121,7 @@ export class GameInteractor {
             await this._engine.processAction(entry);
             success = true;
         }
-        catch(err) {}
+        catch(err) {}  // eslint-disable-line no-unused-vars, no-empty
 
         return success;
     }

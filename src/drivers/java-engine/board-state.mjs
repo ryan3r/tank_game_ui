@@ -135,7 +135,7 @@ function convertBoard(newBoard, board, boardSpaceFactory) {
     }
 
     if(newBoard.height != board.length) {
-        throw new Error(`Board ${boardName} has a length of ${board.length} but previous boards had a length of ${newBoard.height}`);
+        throw new Error(`Board has a length of ${board.length} but previous boards had a length of ${newBoard.height}`);
     }
 
     for(let y = 0; y < board.length; ++y) {

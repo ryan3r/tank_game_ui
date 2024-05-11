@@ -11,7 +11,7 @@ export function defineRoutes(app, buildInfo) {
         app.use(express.static(STATIC_DIR));
         logger.info(`Serving static files from: ${path.resolve(STATIC_DIR)}`);
     }
-    catch(err) {}
+    catch(err) {} // eslint-disable-line no-unused-vars, no-empty
 
     app.get("/api/games", async (req, res) => {
         res.json(req.games.gameManager.getAllGames());
