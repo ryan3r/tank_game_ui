@@ -27,16 +27,16 @@ export function GameBoardView({ board, config, setSelectedUser, canSubmitAction 
     let selectedTarget = targetSelectionState.useSelectedTarget();
     selectedTarget = selectedTarget && Position.fromHumanReadable(selectedTarget);
 
-    let letters = [<Tile className="board-space-coordinate"></Tile>];
+    let letters = [<Tile key="empty-coord" className="board-space-coordinate"></Tile>];
     for(let x = 0; x < board.width; ++x) {
         const letter = new Position(x, 0).humanReadableX;
-        letters.push(<Tile className="board-space-coordinate">{letter}</Tile>);
+        letters.push(<Tile key={`coord-x-${x}`} className="board-space-coordinate">{letter}</Tile>);
     }
 
-    let renderedBoard = [<div className="game-board-row">{letters}</div>];
+    let renderedBoard = [<div key="coords-row" className="game-board-row">{letters}</div>];
 
     for(let y = 0; y < board.width; ++y) {
-        let renderedRow = [<Tile className="board-space-coordinate">{y + 1}</Tile>];
+        let renderedRow = [<Tile key={`coord-y-${y}`} className="board-space-coordinate">{y + 1}</Tile>];
 
         for(let x = 0; x < board.height; ++x) {
             const position = new Position(x, y);
@@ -67,7 +67,7 @@ export function GameBoardView({ board, config, setSelectedUser, canSubmitAction 
     )
 }
 
-function Space({ entity, floorTile, disabled, onClick, selected, config, setSelectedUser, canSubmitAction }) {;
+function Space({ entity, floorTile, disabled, onClick, selected, config, setSelectedUser, canSubmitAction }) {
     let tile = null;
 
     // Try to place an entity in this space

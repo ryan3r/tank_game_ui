@@ -14,7 +14,7 @@ export function OpenHours({ openHours, debug }) {
                 </tr>
                 {openHours.schedules.map(schedule => {
                     return (
-                        <tr>
+                        <tr key={`${schedule.daysOfWeek}-${schedule.startTime}`}>
                             <td>{schedule.daysOfWeek.join(", ")}</td>
                             <td>{schedule.startTime}</td>
                             <td>{schedule.endTime}</td>

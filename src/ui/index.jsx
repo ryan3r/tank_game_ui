@@ -1,3 +1,4 @@
+/* global document */
 import "./index.css";
 import { render } from "preact";
 import { useGame } from "../drivers/rest/fetcher.js";

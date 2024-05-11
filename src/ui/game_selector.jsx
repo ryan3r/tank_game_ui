@@ -6,6 +6,11 @@ import { AppContent } from "./app-content.jsx";
 export function GameSelector({ setGame, debug }) {
     const [games, error] = useGameList();
 
+    const selectGame = useCallback((e, newGame) => {
+        e.preventDefault();
+        setGame(newGame);
+    }, [setGame]);
+
     if(error) {
         return (
             <AppContent debugMode={debug}>
@@ -20,18 +25,13 @@ export function GameSelector({ setGame, debug }) {
         );
     }
 
-    const selectGame = useCallback((e, newGame) => {
-        e.preventDefault();
-        setGame(newGame);
-    }, [setGame]);
-
     return (
         <AppContent debugMode={debug}>
             <h1>Games</h1>
             <ul>
                 {games.map(game => {
                     return (
-                        <li>
+                        <li key={game}>
                             <a href="#" onClick={e => selectGame(e, game)}>{game}</a>
                         </li>
                     );

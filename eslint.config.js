@@ -1,13 +1,30 @@
 import js from "@eslint/js";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRecommended from "eslint-plugin-react/configs/recommended.js";
 
 export default [
     js.configs.recommended,
+    reactRecommended,
     {
-       rules: {
-           "no-unused-vars": "warn",
-           "no-undef": "warn",
-       },
+        files: ['**/*.{js,jsx,mjs}'],
+        plugins: {
+            reactHooks,
+        },
+        rules: {
+            "no-unused-vars": "off",
+            "no-undef": "warn",
+            "react/react-in-jsx-scope": "off",
+            "react/prop-types": "off",
+            "react/no-unescaped-entities": "off",
+            "reactHooks/rules-of-hooks": "error",
+            "reactHooks/exhaustive-deps": "warn",
+        },
         languageOptions: {
+            parserOptions: {
+                ecmaFeatures: {
+                    jsx: true,
+                },
+            },
             globals: {
                 // Mocha
                 describe: "readonly",
@@ -19,6 +36,11 @@ export default [
                 setInterval: "readonly",
                 clearInterval: "readonly",
             }
-        }
+        },
+        settings: {
+            react: {
+              version: 'detect'
+            }
+          }
     }
 ];

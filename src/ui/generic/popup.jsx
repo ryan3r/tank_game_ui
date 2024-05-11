@@ -1,3 +1,4 @@
+/* global window */
 import "./popup.css";
 import { useCallback, useEffect, useState } from "preact/hooks";
 
@@ -64,7 +65,7 @@ export function Popup({ opened, anchorRef, children, onClose }) {
 
             if(onClose) window.removeEventListener("click", onClose);
         }
-    }, [opened, anchorRef, onClose, ownSize]);
+    }, [opened, anchorRef, onClose, ownSize, onResize]);
 
     // Once the popup has been rendered save it's size
     const updateOwnSize = useCallback(element => {

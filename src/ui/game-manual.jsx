@@ -2,9 +2,9 @@ import "./game-manual.css";
 import { useState } from "preact/hooks";
 
 export function GameManual({ manualPath }) {
-    if(!manualPath) return;
-
     const [isManualOpen, setManualOpen] = useState(false);
+
+    if(!manualPath) return;
 
     return (
         <>

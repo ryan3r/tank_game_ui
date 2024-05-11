@@ -1,3 +1,4 @@
+/* globals APP_VERSION, BUILD_INFO, localStorage, location */
 const MAX_RELOAD_FREQUENCY = 24 * 60 * 60 * 1000; // 1 day in ms
 
 

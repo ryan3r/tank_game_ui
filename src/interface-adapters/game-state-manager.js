@@ -14,7 +14,7 @@ function useAutoTurnAdvance(logBook, entryId, setEntryIdAndTrackLastEntry) {
     const setPlaybackWrapper = useCallback((newPlayback) => {
         if(!newPlayback) setLastAutoTurnAdvance(undefined);
         setPlayback(newPlayback);
-    }, [setPlayback]);
+    }, [setPlayback, setLastAutoTurnAdvance]);
 
     useEffect(() => {
         // Not playing nothing to do
@@ -41,7 +41,7 @@ function useAutoTurnAdvance(logBook, entryId, setEntryIdAndTrackLastEntry) {
         }, timeBeforeNextAdvance);
 
         return () => clearTimeout(handle);
-    }, [logBook, entryId, setEntryIdAndTrackLastEntry, playback, lastAutoTurnAdvance, setLastAutoTurnAdvance]);
+    }, [logBook, entryId, setEntryIdAndTrackLastEntry, playback, lastAutoTurnAdvance, setLastAutoTurnAdvance, setPlaybackWrapper]);
 
     return [playback, setPlaybackWrapper];
 }

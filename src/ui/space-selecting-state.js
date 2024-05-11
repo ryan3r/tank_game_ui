@@ -25,9 +25,9 @@ class TargetSelectionState {
     }
 
     usePossibleTargets() {
-        const [value, setValue] = useState(this._possibleTargets);
+        const [value, setValue] = useState(this._possibleTargets); // eslint-disable-line
 
-        useEffect(() => {
+        useEffect(() => {   // eslint-disable-line
             this._possibleTargetsCb = setValue;
 
             return () => this._possibleTargetsCb = undefined;
@@ -37,9 +37,9 @@ class TargetSelectionState {
     }
 
     useSelectedTarget() {
-        const [value, setValue] = useState(this._selectedTarget);
+        const [value, setValue] = useState(this._selectedTarget);  // eslint-disable-line
 
-        useEffect(() => {
+        useEffect(() => {   // eslint-disable-line
             this._selectedTargetCbUse = setValue;
 
             return () => this._selectedTargetCbUse = undefined;

@@ -1,7 +1,7 @@
 /* globals process */
 import { spawn } from "node:child_process";
 import fs from "node:fs";
-import { logger } from "#platform/logging.mjs"
+import { logger } from "#platform/logging.mjs";
 import path from "node:path";
 import { gameStateFromRawState } from "./board-state.mjs";
 import { JavaEngineSource } from "./possible-action-source.mjs";
@@ -116,7 +116,7 @@ class TankGameEngine {
                     clearTimeout(timeoutTimer);
 
                     if(data.type == "response" && data.error) {
-                        reject(new Error(`EngineError: ${data.response}`));;
+                        reject(new Error(`EngineError: ${data.response}`));
                         return;
                     }
 

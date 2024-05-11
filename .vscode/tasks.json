@@ -63,5 +63,20 @@
                 "clear": true
             }
         },
+        {
+            "label": "Eslint",
+            "type": "process",
+            "command": "npm",
+            "args": ["run", "eslint"],
+            "problemMatcher": [],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            }
+        }
     ]
 }

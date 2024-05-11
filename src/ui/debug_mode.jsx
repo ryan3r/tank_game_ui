@@ -1,3 +1,4 @@
+/* globals window */
 import { useCallback, useEffect, useState } from "preact/hooks";
 
 // Key codes for key events
@@ -48,9 +49,9 @@ export function useDebugMode() {
     }, [debugSequenceIndex, setDebugSequenceIndex]);
 
     useEffect(() => {
-        addEventListener("keydown", globalKeyHandler);
+        window.addEventListener("keydown", globalKeyHandler);
 
-        return () => removeEventListener("keydown", globalKeyHandler);
+        return () => window.removeEventListener("keydown", globalKeyHandler);
     }, [globalKeyHandler]);
 
     const exitDebugMode = useCallback(e => {

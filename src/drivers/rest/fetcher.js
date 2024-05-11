@@ -67,7 +67,7 @@ function makeReactDataFetchHelper(options) {
                 setError(err);
                 setData(undefined);
             }
-        }, args.concat([setData, setError]));
+        }, args.concat([setData, setError]));  // eslint-disable-line
 
         useEffect(() => {
             fetchData();

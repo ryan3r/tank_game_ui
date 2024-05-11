@@ -1,3 +1,4 @@
+/* global alert */
 import { submitTurn, usePossibleActionFactories } from "../../drivers/rest/fetcher.js";
 import { targetSelectionState } from "../space-selecting-state.js";
 import { ErrorMessage } from "../error_message.jsx";
@@ -47,7 +48,7 @@ export function SubmitTurn({ isLatestEntry, canSubmitAction, refreshGameInfo, ga
     const logBookEntry = (currentFactory && currentFactory != "unset") && currentFactory.buildRawEntry(actionSpecific);
     const isValid = currentFactory && currentFactory.areParemetersValid(logBookEntry);
 
-    const submitTurnHandler = useCallback(async e => {
+    const submitTurnHandler = useCallback(async e => {  // eslint-disable-line
         e.preventDefault();
         if(isValid) {
             targetSelectionState.clearPossibleTargets();
@@ -65,7 +66,7 @@ export function SubmitTurn({ isLatestEntry, canSubmitAction, refreshGameInfo, ga
             refreshGameInfo();
             setStatus(undefined);
         }
-    }, [setCurrentFactory, refreshGameInfo, isValid, setStatus, logBookEntry]);
+    }, [setCurrentFactory, refreshGameInfo, isValid, setStatus, logBookEntry, game]);
 
     return (
         <div className="submit-turn-box">
@@ -135,7 +136,7 @@ function SubmissionForm({ factory, values, setValues }) {
                     );
                 }
                 else {
-                    return <span style="color: red;">Unknown field type: {fieldSpec.type}</span>;
+                    return <span key={fieldSpec.type} style="color: red;">Unknown field type: {fieldSpec.type}</span>;
                 }
             })}
         </>
@@ -164,7 +165,7 @@ function Select({ spec, value, setValue }) {
                 const value = element.toString();
 
                 return (
-                    <div className="radio-button-wrapper">
+                    <div key={index} className="radio-button-wrapper">
                         <label>
                             <input type="radio" value={index} onChange={onChange} checked={index === currentIndex}/>
                             {value}
@@ -200,7 +201,7 @@ function SelectPosition({ spec, value, setValue }) {
         });
 
         return () => targetSelectionState.setSelectedTargetCallback(undefined);
-    }, [setValue]);
+    }, [setValue, spec.options]);
 
     const message = value ?
         `${value} (select a different space to change)` :

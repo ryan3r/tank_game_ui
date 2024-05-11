@@ -30,7 +30,7 @@ export function LogEntrySelector({ gameStateManager, logBook, debug, extraButton
 
     const isFirstEntryOfDay = dayRelativeEntryId === 1;
 
-    const goToPreviousDay = useCallback(() => {
+    const goToPreviousDay = useCallback(() => {  // eslint-disable-line
         // Jump to the start of today
         let targetDay = today;
 
