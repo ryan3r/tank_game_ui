@@ -46,7 +46,7 @@ jobs:
           distribution: 'temurin'
       - name: Build java engine
         working-directory: engine
-        run: nvm clean compile package
+        run: mvn clean compile package
       - name: Install dependencies
         run: npm ci
       - name: Run integration tests
