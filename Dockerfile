@@ -17,8 +17,8 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Build tank game engine to be included with the default image
-COPY scripts/build-java-engine /build/
-RUN --mount=type=cache,target=/root/.m2 /build/build-java-engine all
+COPY engine /build/
+RUN --mount=type=cache,target=/root/.m2 mvn clean package
 
 FROM node:20-alpine
 
@@ -39,7 +39,7 @@ COPY src /app/src
 COPY default-config.yaml /app/
 COPY public /app/www/
 COPY --from=frontend /build/dist/ /app/www/
-COPY --from=engine /build/engine/target/TankGame-*.jar /app/engine/
+COPY --from=engine /build/target/TankGame-*.jar /app/engine/
 
 # Place some sample data in /data so users can try out the app
 COPY example/*.json /data/games/
