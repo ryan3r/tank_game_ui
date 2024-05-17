@@ -15,12 +15,27 @@ fi
 
 git_info+="$(git rev-parse --short HEAD)"
 
-addtional_tags="${image}:testing"
-if echo "${version}" | grep -P '^v\d+\.\d+\.\d+$' &>/dev/null; then
-    addtional_tags+=",${image}:latest"
+# Grab the major and major.minor versions and use the as tags
+major_minor="$(echo "${version}" | grep -Po '^v\d+\.\d+' || :)"
+major="$(echo "${version}" | grep -Po '^v[1-9][0-9]*' || :)"
+
+if [ -n "${major_minor}" ]; then
+    addtional_tags="${image}:${major_minor}"
 fi
 
-build_info="${version}-${flavor} ${git_info}"
+if [ -n "${major}" ]; then
+    if [ -n "${addtional_tags}" ]; then
+        addtional_tags+=","
+    fi
+
+    addtional_tags+="${image}:${major}"
+fi
+
+# Get the java engine hash
+engine_hash="$(cd engine; git rev-parse --short HEAD)"
+engine_version="$(grep -Po '<version>\K[^<]+' engine/pom.xml  | head -1)"
+
+build_info="UI ${version}-${flavor} ${git_info} - Engine ${engine_version} @ ${engine_hash}"
 
 if [ -n "$GITHUB_OUTPUT" ]; then
     echo "version=$version" >> "$GITHUB_OUTPUT"
