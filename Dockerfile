@@ -25,7 +25,7 @@ FROM node:20-alpine
 WORKDIR /app/
 
 # Install java for the entine
-RUN apk --no-cache --update add openjdk21-jre-headless
+RUN apk --no-cache --update add openjdk21-jre-headless su-exec
 
 # Install backend dependencies
 COPY package*.json /app/
@@ -40,10 +40,12 @@ COPY default-config.yaml /app/
 COPY public /app/www/
 COPY --from=frontend /build/dist/ /app/www/
 COPY --from=engine /build/target/TankGame-*.jar /app/engine/
+COPY entrypoint.sh /entrypoint.sh
 
 # Place some sample data in /data so users can try out the app
 COPY example/*.json /data/games/
 
 ENV TANK_GAMES_FOLDER=/data
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["/usr/local/bin/npm", "start"]
