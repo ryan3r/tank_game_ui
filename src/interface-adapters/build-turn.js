@@ -44,7 +44,7 @@ function updateActionData(state) {
             locationSelector.location :
             state.uiFieldValues[spec.name];
 
-        logBookEntry[spec.logBookField] = spec.translateValue(value);
+        logBookEntry[spec.logEntryField] = spec.translateValue(value);
     }
 
     return {
