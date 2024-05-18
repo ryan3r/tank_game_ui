@@ -7,9 +7,9 @@ import { Wall } from "./shared/wall.js";
 
 class V3WallDescriptor extends Wall {
     wallUrls = {
-        1: "/assets/Wall-1.png",
-        2: "/assets/Wall-2.png",
-        3: "/assets/Wall-4.png",
+        1: "Wall-1",
+        2: "Wall-2",
+        3: "Wall-4",
     };
 }
 

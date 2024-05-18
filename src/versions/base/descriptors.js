@@ -1,5 +1,5 @@
 export function imageBackground(url) {
-    return `url(${url})`;
+    return `url("/assets/${url}.png")`;
 }
 
 export class EntityDescriptor {
@@ -76,9 +76,6 @@ export class TileStyle {
 
 
 export class FloorTileDescriptor {
-    // A map of icon names to urls
-    static iconMap = {};
-
     constructor(floorTile) {
         this.floorTile = floorTile;
     }
@@ -86,16 +83,10 @@ export class FloorTileDescriptor {
     // Get the background to display for this floor tile
     // returns: string
     getBackground() {
-        // If this floor tile has an icon and we know what it is use that
-        const iconUrl = this.floorTile[this.floorTile.icon];
+        // If this floor tile has an icon and use that
+        const icon = this.floorTile.icon;
         if(iconUrl) return imageBackground(iconUrl);
 
         return "#aaa";
-    }
-
-    // Get the map from icons names to asset urls
-    // returns: object mapping strings to strings (url)
-    getIconMap() {
-        return {};
     }
 }

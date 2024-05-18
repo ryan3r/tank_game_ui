@@ -3,7 +3,7 @@ import { EntityDescriptor, TileStyle, imageBackground } from "../base/descriptor
 export class DeadTankDescriptor extends EntityDescriptor {
     getTileStyle() {
         return new TileStyle({
-            background: imageBackground("/assets/DeadTank.png"),
+            background: imageBackground("DeadTank"),
             textColor: "#fff"
         });
     }

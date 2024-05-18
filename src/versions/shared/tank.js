@@ -8,7 +8,7 @@ export class TankDescriptor extends EntityDescriptor {
     getTileStyle() {
         return new TileStyle({
             textColor: "#fff",
-            background: imageBackground("/assets/Tank.png"),
+            background: imageBackground("Tank"),
         });
     }
 
