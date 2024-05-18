@@ -1,7 +1,6 @@
 /* globals window, location, history, fetch */
 import { useCallback, useEffect, useState } from "preact/hooks";
 import { LogBook } from "../../game/state/log-book/log-book.js";
-import { Config } from "../../config/config.js";
 import { NamedFactorySet } from "../../game/possible-actions/index.js";
 import { OpenHours } from "../../game/open-hours/index.js";
 import { GameState } from "../../game/state/game-state.js";

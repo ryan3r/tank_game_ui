@@ -2,7 +2,6 @@ import { useCallback, useRef, useState } from "preact/hooks";
 import "./entity-tile.css";
 import { Popup } from "../generic/popup.jsx";
 import { prettyifyName } from "../../utils.js";
-import { takeAllMatches, takeFirstMatch } from "../../config/expressions.js";
 import { AttributeList } from "./attribute-list.jsx";
 
 
