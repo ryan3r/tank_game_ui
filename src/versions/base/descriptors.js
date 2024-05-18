@@ -85,7 +85,7 @@ export class FloorTileDescriptor {
     getBackground() {
         // If this floor tile has an icon and use that
         const icon = this.floorTile.icon;
-        if(iconUrl) return imageBackground(iconUrl);
+        if(icon) return imageBackground(icon);
 
         return "#aaa";
     }

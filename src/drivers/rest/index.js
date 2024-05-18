@@ -1,6 +1,5 @@
 /* globals process */
 import express from "express";
-import path from "node:path";
 import { createGameManager } from "../game-file.js";
 import { logger } from "#platform/logging.js"
 import { makeHttpLogger } from "#platform/logging.js";

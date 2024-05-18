@@ -1,6 +1,5 @@
 import { GameVersion } from "./base/index.js";
 import { LogEntryFormatter, baseEntryFunctions } from "./base/log-entry-formatter.js";
-import { DeadTankDescriptor } from "./shared/dead-tank.js";
 import { GoldMineDescriptor } from "./shared/gold-mine.js";
 import { TankDescriptor } from "./shared/tank.js";
 import { Wall } from "./shared/wall.js";
@@ -18,7 +17,6 @@ export const rawV3Config = {
     logFormatter: new LogEntryFormatter(baseEntryFunctions),
     entryDescriptors: {
         tank: TankDescriptor,
-        "dead-tank": DeadTankDescriptor,
         wall: V3WallDescriptor,
     },
     floorTileDescriptors: {

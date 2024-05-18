@@ -1,3 +1,4 @@
+/* global process */
 import fs from "node:fs/promises";
 import path from "node:path";
 import { LogBook } from "../game/state/log-book/log-book.js";
