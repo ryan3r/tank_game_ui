@@ -5,12 +5,9 @@ export class LogEntry {
         this.type = rawLogEntry.action || "start_of_day";
         this.rawLogEntry = rawLogEntry;
 
-        const formatter = versionConfig && versionConfig.getLogEntryFormatter(this.type);
-        this.message = `You might want to define a formatter for ${this.type}`;
-
-        if(formatter) {
-            this.message = formatter.format(rawLogEntry);
-        }
+        this.message = versionConfig ?
+            versionConfig.formatLogEntry(this) :
+            `You might want to define a formatter for ${this.type}`;
     }
 
     static deserialize(id, previousDay, rawEntry, versionConfig) {

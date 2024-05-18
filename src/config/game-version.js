@@ -1,4 +1,4 @@
-import { LogEntryFormatter } from "./log-entry-formatter.js";
+import { LogEntryFormatter } from "../versions/base/log-entry-formatter.js";
 
 export class GameVersionConfig {
     constructor(gameVersionConfig) {
