@@ -1,4 +1,5 @@
 import { prettyifyName } from "../../utils.js";
+import { LogFieldSpec } from "./log-field-spec.js";
 
 export class GenericPossibleAction {
     constructor({ subject, actionName, fieldSpecs }) {
@@ -7,25 +8,35 @@ export class GenericPossibleAction {
         this._fieldSpecs = fieldSpecs;
     }
 
+    getActionName() {
+        return this._actionName;
+    }
+
     getType() {
         return "generic-possible-action";
     }
 
     static deserialize(rawGenericPossibleAction) {
-        return new GenericPossibleAction(rawGenericPossibleAction);
+        return new GenericPossibleAction({
+            ...rawGenericPossibleAction,
+            fieldSpecs: rawGenericPossibleAction.fieldSpecs.map(spec => LogFieldSpec.deserialize(spec)),
+        });
     }
 
     serialize() {
         return {
             actionName: this._actionName,
-            fieldSpecs: this._fieldSpecs,
+            fieldSpecs: this._fieldSpecs.map(spec => spec.serialize()),
             subject: this._subject,
         };
     }
 
-    areParemetersValid(actionSpecific) {
-        for(const field of this._fieldSpecs) {
-            if(actionSpecific[field.logBookField] === undefined) return false;
+    isValidEntry(logEntry) {
+        for(const parameters of this.getParameterSpec()) {
+            if(!parameters.isValid(logEntry[parameters.logEntryField])) {
+                console.log("Invalid", parameters, logEntry);
+                return false;
+            }
         }
 
         return true;
@@ -33,15 +44,6 @@ export class GenericPossibleAction {
 
     getParameterSpec() {
         return this._fieldSpecs;
-    }
-
-    buildRawEntry(actionSpecific) {
-        return {
-            type: "action",
-            action: this._actionName,
-            subject: this._subject,
-            ...actionSpecific,
-        };
     }
 
     toString() {

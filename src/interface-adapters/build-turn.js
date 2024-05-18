@@ -36,6 +36,7 @@ function updateActionData(state) {
     // Build the log book entry from the UI values
     let logBookEntry = {
         type: "action",
+        // TODO: subject?
         action: state._currentFactory.getActionName(),
     };
 

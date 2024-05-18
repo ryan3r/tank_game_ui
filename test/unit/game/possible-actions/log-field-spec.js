@@ -1,5 +1,5 @@
 import assert from "node:assert";
-import { LogFieldSpec } from "../../../src/game/possible-actions/log-field-spec.js";
+import { LogFieldSpec } from "../../../../src/game/possible-actions/log-field-spec.js";
 
 const spec = new LogFieldSpec({
     type: "select",
