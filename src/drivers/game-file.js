@@ -159,3 +159,9 @@ export class GameManager {
         return Promise.all(this._interactors.map(interactor => interactor.shutdown()));
     }
 }
+
+export async function createGameManager(createEngine, saveUpdatedFiles) {
+    const gamesFolder = path.join(process.env.TANK_GAMES_FOLDER || ".");
+    const gameManager = new GameManager(gamesFolder, createEngine, { saveBack: saveUpdatedFiles });
+    return gameManager;
+}

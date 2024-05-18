@@ -1,7 +1,7 @@
 /* globals process */
 import express from "express";
 import path from "node:path";
-import { GameManager } from "../game-file.js";
+import { createGameManager } from "../game-file.js";
 import { logger } from "#platform/logging.js"
 import { makeHttpLogger } from "#platform/logging.js";
 import { defineRoutes } from "./routes.js";
@@ -43,12 +43,6 @@ function gameAccessor(gameManager) {
 
         next();
     };
-}
-
-export async function createGameManager(createEngine, saveUpdatedFiles) {
-    const gamesFolder = path.join(process.env.TANK_GAMES_FOLDER || ".");
-    const gameManager = new GameManager(gamesFolder, createEngine, { saveBack: saveUpdatedFiles });
-    return gameManager;
 }
 
 const port = 3333;

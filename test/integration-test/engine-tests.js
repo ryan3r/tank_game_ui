@@ -4,8 +4,7 @@ import assert from "node:assert";
 import fs from "node:fs";
 import { GameInteractor } from "../../src/game/execution/game-interactor.js";
 import { LogBook } from "../../src/game/state/log-book/log-book.js";
-import { createGameManager } from "../../src/drivers/rest/index.js";
-import { load, save } from "../../src/drivers/game-file.js";
+import { load, save, createGameManager } from "../../src/drivers/game-file.js";
 import { logger } from "#platform/logging.js";
 import { OpenHours } from "../../src/game/open-hours/index.js";
 import { hashFile } from "../../src/drivers/file-utils.js";
@@ -36,14 +35,17 @@ export function defineTestsForEngine(createEngine) {
         let gameManager = await createGameManager(createEngine);
         try {
             await gameManager.loaded;
+            logger.info("Load");
 
             await Promise.all(
                 gameManager.getAllGames().map(gameName => {
                     return gameManager.getGamePromise(gameName);
                 })
             );
+            logger.info("Finish");
         }
         finally {
+            logger.info("Bye");
             await gameManager.shutdown();
         }
     });
