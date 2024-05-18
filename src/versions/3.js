@@ -13,7 +13,8 @@ class V3WallDescriptor extends Wall {
     };
 }
 
-export const version3 = new GameVersion({
+// V4 is almost identical to v3 so let it reuse everything
+export const rawV3Config = {
     logFormatter: new LogEntryFormatter(baseEntryFunctions),
     entryDescriptors: {
         tank: TankDescriptor,
@@ -28,4 +29,6 @@ export const version3 = new GameVersion({
         "senator",
     ],
     manualPath: "/manuals/Tank_Game_Rules_v3.pdf",
-});
+};
+
+export const version3 = new GameVersion(rawV3Config);
