@@ -34,7 +34,7 @@ export async function load(filePath, { saveBack = false, makeTimeStamp } = {}) {
     // Make sure we have the config required to load this game.  This
     // does not check if the engine supports this game version.
     if(!getGameVersion(content.logBook.gameVersion)) {
-        logger.warn(`Tank Game UI is not configured for game version ${content.logBook.gameVersion}.  You may experience strage behavior.`);
+        throw new Error(`Game version ${content.logBook.gameVersion} is not supported`);
     }
 
     const logBook = LogBook.deserialize(content.logBook, makeTimeStamp);

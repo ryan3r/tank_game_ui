@@ -35,17 +35,14 @@ export function defineTestsForEngine(createEngine) {
         let gameManager = await createGameManager(createEngine);
         try {
             await gameManager.loaded;
-            logger.info("Load");
 
             await Promise.all(
                 gameManager.getAllGames().map(gameName => {
                     return gameManager.getGamePromise(gameName);
                 })
             );
-            logger.info("Finish");
         }
         finally {
-            logger.info("Bye");
             await gameManager.shutdown();
         }
     });
