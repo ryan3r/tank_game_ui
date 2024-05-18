@@ -7,9 +7,10 @@ const DEFAULT_TIME_INTERVAL = 20 * 60; // 20 minutes
 
 
 export class LogBook {
-    constructor(gameVersion, entries, makeTimeStamp = defaultMakeTimeStamp) {
+    constructor(gameVersion, entries, versionConfig, makeTimeStamp = defaultMakeTimeStamp) {
         this.gameVersion = gameVersion;
         this._entries = entries;
+        this._versionConfig = versionConfig;
         this._makeTimeStamp = makeTimeStamp;
         this._buildDayMap();
     }
