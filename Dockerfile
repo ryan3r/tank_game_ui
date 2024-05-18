@@ -17,15 +17,15 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Build tank game engine to be included with the default image
-COPY scripts/build-java-engine /build/
-RUN --mount=type=cache,target=/root/.m2 /build/build-java-engine all
+COPY engine /build/
+RUN --mount=type=cache,target=/root/.m2 mvn clean package
 
 FROM node:20-alpine
 
 WORKDIR /app/
 
 # Install java for the entine
-RUN apk --no-cache --update add openjdk21-jre-headless
+RUN apk --no-cache --update add openjdk21-jre-headless su-exec
 
 # Install backend dependencies
 COPY package*.json /app/
@@ -36,14 +36,15 @@ ENV BUILD_INFO=${BUILD_INFO}
 
 # Copy everything over to the final image
 COPY src /app/src
-COPY default-config.yaml /app/
 COPY public /app/www/
 COPY --from=frontend /build/dist/ /app/www/
-COPY --from=engine /build/tankgame/target/TankGame-*.jar /app/engine/
+COPY --from=engine /build/target/TankGame-*.jar /app/engine/
+COPY entrypoint.sh /entrypoint.sh
 
 # Place some sample data in /data so users can try out the app
 COPY example/*.json /data/games/
 
-ENV TANK_GAMES_FOLDER=/data
+ENV TANK_GAMES_FOLDER=/data/games/
+ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["/usr/local/bin/npm", "start"]
