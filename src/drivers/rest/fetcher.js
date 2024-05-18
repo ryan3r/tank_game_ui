@@ -119,13 +119,10 @@ export const useGameInfo = makeReactDataFetchHelper({
     shouldSendRequest: game => game !== undefined,
     url: game => `/api/game/${game}/`,
     parse: data => {
-        const config = Config.deserialize(data.config);
-
         return {
             buildInfo: data.buildInfo,
             openHours: OpenHours.deserialize(data.openHours),
-            logBook: LogBook.deserialize(data.logBook, config),
-            config,
+            logBook: LogBook.deserialize(data.logBook),
         };
     },
     frequency: FETCH_FREQUENCY,

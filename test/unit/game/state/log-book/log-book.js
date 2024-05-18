@@ -72,7 +72,7 @@ describe("LogBook", () => {
                 "You might want to define a formatter for move",
             ];
 
-            const logBook = LogBook.deserialize(rawLogBook, config);
+            const logBook = LogBook.deserialize(rawLogBook);
             for(let i = 0; i <= logBook.getLastEntryId(); ++i) {
                 assert.equal(logBook.getEntry(i).message, expectedMessages[i]);
             }
@@ -80,14 +80,14 @@ describe("LogBook", () => {
     });
 
     it("can deserialize and reserialize itself", () => {
-        const logBook = LogBook.deserialize(rawLogBook, config);
+        const logBook = LogBook.deserialize(rawLogBook);
         const serialized = logBook.serialize();
 
         assert.deepEqual(serialized, rawLogBook);
     });
 
     it("can determine its boundaries", () => {
-        const logBook = LogBook.deserialize(rawLogBook, config);
+        const logBook = LogBook.deserialize(rawLogBook);
         assert.equal(logBook.getFirstEntryId(), 0);
         assert.equal(logBook.getLastEntryId(), rawEntries.length - 1);
         assert.equal(logBook.getMinDay(), 1);
@@ -95,7 +95,7 @@ describe("LogBook", () => {
     });
 
     it("can walk through entries by day", () => {
-        const logBook = LogBook.deserialize(rawLogBook, config);
+        const logBook = LogBook.deserialize(rawLogBook);
 
         const firstEntryFirstDay = logBook.getEntry(firstDayIndex);
         const firstEntrySecondDay = logBook.getEntry(secondDayIndex);
@@ -112,7 +112,7 @@ describe("LogBook", () => {
     });
 
     it("can add entries", () => {
-        let logBook = LogBook.deserialize(rawLogBook, config, () => 15);
+        let logBook = LogBook.deserialize(rawLogBook, () => 15);
         const newId = logBook.addEntry(logBook.makeEntryFromRaw({ type: "action", day: 3 }));
 
         assert.deepEqual(logBook.getEntry(newId).serialize(), {

@@ -32,7 +32,7 @@ export function defineTestsForEngine(createEngine) {
     const TEST_GAME_RECREATE_PATH = `example/tank_game_v3-recreate.json`;
 
     defTest("can process the entire example folder", async () => {
-        let { gameManager } = await loadConfigAndGames(createEngine);
+        let gameManager = await loadConfigAndGames(createEngine);
         try {
             await gameManager.loaded;
 
@@ -49,7 +49,7 @@ export function defineTestsForEngine(createEngine) {
 
     defTest("can process actions together and individually", async () => {
         const config = await loadConfig();
-        let { logBook, initialGameState } = await load(TEST_GAME_PATH, config);
+        let { logBook, initialGameState } = await load(TEST_GAME_PATH);
 
         let timeStampEntryId = 0;
         const makeTimeStamp = () => {
@@ -107,7 +107,7 @@ export function defineTestsForEngine(createEngine) {
     });
 
     defTest("can provide a list of possible actions", async () => {
-        let { gameManager, config } = await loadConfigAndGames(createEngine);
+        let gameManager = await loadConfigAndGames(createEngine);
         try {
             await gameManager.loaded;
 
@@ -129,7 +129,6 @@ export function defineTestsForEngine(createEngine) {
                     logEntry: logBook.getEntry(lastId),
                     gameState: interactor.getGameStateById(lastId),
                     interactor: interactor,
-                    config,
                 });
 
                 for(const factory of factories) {

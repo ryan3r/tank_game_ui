@@ -37,7 +37,7 @@ export class LogBook {
         }
     }
 
-    static deserialize({gameVersion, rawEntries}, gameConfig, makeTimeStamp) {
+    static deserialize({gameVersion, rawEntries}, makeTimeStamp) {
         // 0 length log books are not supported start day 1 if we have no entries
         if(rawEntries === undefined || rawEntries.length === 0) {
             rawEntries = [
