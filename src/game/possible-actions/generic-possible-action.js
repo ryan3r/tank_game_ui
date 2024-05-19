@@ -2,9 +2,8 @@ import { prettyifyName } from "../../utils.js";
 import { LogFieldSpec } from "./log-field-spec.js";
 
 export class GenericPossibleAction {
-    constructor({ subject, actionName, fieldSpecs }) {
+    constructor({ actionName, fieldSpecs }) {
         this._actionName = actionName;
-        this._subject = subject;
         this._fieldSpecs = fieldSpecs;
     }
 
@@ -27,14 +26,12 @@ export class GenericPossibleAction {
         return {
             actionName: this._actionName,
             fieldSpecs: this._fieldSpecs.map(spec => spec.serialize()),
-            subject: this._subject,
         };
     }
 
     isValidEntry(logEntry) {
-        for(const parameters of this.getParameterSpec()) {
+        for(const parameters of this.getParameterSpec(logEntry)) {
             if(!parameters.isValid(logEntry[parameters.logEntryField])) {
-                console.log("Invalid", parameters, logEntry);
                 return false;
             }
         }
@@ -42,7 +39,7 @@ export class GenericPossibleAction {
         return true;
     }
 
-    getParameterSpec() {
+    getParameterSpec(logEntry) {
         return this._fieldSpecs;
     }
 

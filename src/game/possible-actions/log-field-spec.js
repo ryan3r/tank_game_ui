@@ -55,7 +55,7 @@ export class LogFieldSpec {
     }
 
     translateValue(displayName) {
-        return this._optionToValue[displayName];
+        return this._optionToValue?.[displayName] || displayName;
     }
 
     isValid(value) {
