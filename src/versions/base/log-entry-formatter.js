@@ -79,7 +79,7 @@ export function move(entry, formatter) {
     });
 
     return `${entry.subject} moved to ${location}`;
-};
+}
 
 
 export function shoot(entry, formatter) {
