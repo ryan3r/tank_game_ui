@@ -31,8 +31,9 @@ export class StartOfDayFactory extends GenericPossibleAction {
         return [
             new LogFieldSpec({
                 name: "day",
-                type: "select",
-                options: [this._dayToStart],
+                type: "set-value",
+                value: this._dayToStart,
+                hidden: true,
             }),
         ];
     }

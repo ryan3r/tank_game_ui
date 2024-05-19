@@ -31,7 +31,7 @@ export class GenericPossibleAction {
 
     isValidEntry(logEntry) {
         for(const parameters of this.getParameterSpec(logEntry)) {
-            if(!parameters.isValid(logEntry[parameters.logEntryField])) {
+            if(!parameters.isValid(logEntry[parameters.name])) {
                 return false;
             }
         }

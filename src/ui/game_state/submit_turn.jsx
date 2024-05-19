@@ -122,6 +122,9 @@ function SubmissionForm({ builtTurnState, buildTurnDispatch }) {
     return (
         <>
             {builtTurnState.currentSpecs.map(fieldSpec => {
+                // Don't display this field at all
+                if(fieldSpec.hidden) return;
+
                 let Element;
 
                 if(fieldSpec.type == "select-position") {

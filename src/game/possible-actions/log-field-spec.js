@@ -5,10 +5,11 @@ const VALID_TYPES = [
     "select-position",
     "input",
     "input-number",
+    "set-value",
 ];
 
 export class LogFieldSpec {
-    constructor({ name, type, logEntryField, options }) {
+    constructor({ name, type, options, value }) {
         if(!VALID_TYPES.includes(type)) {
             throw new Error(`Invalid log field spec type ${type}`);
         }
@@ -17,10 +18,14 @@ export class LogFieldSpec {
             throw new Error("Selects must have a list of options");
         }
 
+        if(type == "set-value") {
+            options = [value];
+        }
+
         this.name = name;
         this.displayName = prettyifyName(name);
         this.type = type;
-        this.logEntryField = logEntryField || name;
+        this.hidden = type == "set-value";
 
         if(options) {
             this._origOptions = options;
@@ -52,8 +57,8 @@ export class LogFieldSpec {
         return {
             name: this.name,
             type: this.type,
-            logEntryField: this.logEntryField,
             options: this._origOptions,
+            hidden: this.hidden,
         };
     }
 

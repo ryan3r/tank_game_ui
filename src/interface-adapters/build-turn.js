@@ -26,7 +26,7 @@ function buildLogEntry(state, currentSpecs, locationSelector) {
             locationSelector.location :
             state.uiFieldValues[spec.name];
 
-        logBookEntry[spec.logEntryField] = spec.translateValue(value);
+        logBookEntry[spec.name] = spec.translateValue(value);
     }
 
     return logBookEntry;

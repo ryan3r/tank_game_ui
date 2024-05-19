@@ -6,8 +6,8 @@ const possibleAction = new GenericPossibleAction({
     subject: "John",
     actionName: "buy_action",
     fieldSpecs: [
-        new LogFieldSpec({ logEntryField: "foo", type: "input" }),
-        new LogFieldSpec({ logEntryField: "bar", type: "input" }),
+        new LogFieldSpec({ name: "foo", type: "input" }),
+        new LogFieldSpec({ name: "bar", type: "input" }),
     ]
 });
 
