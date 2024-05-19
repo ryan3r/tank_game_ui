@@ -24,8 +24,8 @@ describe("LogFieldSpec", () => {
     });
 
     it("can validate user input", () => {
-        assert.ok(spec.isValid("Todd"));
-        assert.ok(spec.isValid("B2"));
+        assert.ok(spec.isValid(63));
+        assert.ok(spec.isValid("Janis"));
         assert.ok(spec.isValid(28));
         assert.ok(!spec.isValid(undefined));
         assert.ok(!spec.isValid(93));
