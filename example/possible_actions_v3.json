@@ -1,7 +1,8 @@
 {
     "fileFormatVersion": 5,
+    "openHours": [],
     "logBook": {
-        "gameVersion": "4"
+        "gameVersion": "3"
     },
     "initialGameState": {
         "type": "state",
@@ -223,9 +224,7 @@
             ],
             "senate": [
                 "Dan"
-            ],
-            "armistice_vote_cap": 100,
-            "armistice_vote_count": 0
+            ]
         }
     }
 }
