@@ -74,11 +74,11 @@ function updateActionData(state) {
     const locationSpecs = currentSpecs.filter(spec => spec.type == "select-position");
     if(locationSpecs.length == 1) {
         locationSelector.isSelecting = true;
-        locationSelector.selectableLocations = new Set(locationSpecs[0].options);
+        locationSelector.selectableLocations = locationSpecs[0].options;
         locationSelector._specName = locationSpecs[0].name;
 
         // Reuse the location if it still makes sense
-        if(locationSelector._specName == state.locationSelector._specName && locationSelector.selectableLocations.has(state.locationSelector.location)) {
+        if(locationSelector._specName == state.locationSelector._specName && locationSelector.selectableLocations.includes(state.locationSelector.location)) {
             locationSelector.location = state.locationSelector.location;
         }
     }

@@ -144,6 +144,7 @@ describe("BuildTurn", () => {
         compareState(state, {
             subject: "Teddy",
             actions,
+            currentActionName: "multiply",
             currentSpecs: mutliplyFieldSpecs,
             isValid: false,
             locationSelector: {
@@ -165,6 +166,7 @@ describe("BuildTurn", () => {
         compareState(state, {
             subject: "Teddy",
             actions,
+            currentActionName: "multiply",
             currentSpecs: mutliplyFieldSpecs,
             isValid: true,
             locationSelector: {
@@ -188,6 +190,7 @@ describe("BuildTurn", () => {
         compareState(state, {
             subject: "Teddy",
             actions,
+            currentActionName: "shoot",
             currentSpecs: shootFieldSpecs,
             isValid: false,
             locationSelector: {
@@ -210,6 +213,7 @@ describe("BuildTurn", () => {
         compareState(state, {
             subject: "Teddy",
             actions,
+            currentActionName: "shoot",
             currentSpecs: shootFieldSpecs,
             isValid: false,
             locationSelector: {
@@ -234,6 +238,7 @@ describe("BuildTurn", () => {
         compareState(state, {
             subject: "Teddy",
             actions,
+            currentActionName: "shoot",
             currentSpecs: shootFieldSpecs,
             isValid: true,
             locationSelector: {
@@ -267,6 +272,7 @@ describe("BuildTurn", () => {
             subject: "Pam",
             actions,
             currentSpecs: shootFieldSpecs,
+            currentActionName: "shoot",
             isValid: true,
             locationSelector: {
                 isSelecting: true,
@@ -304,7 +310,7 @@ describe("BuildTurn", () => {
 
         compareState(state, {
             subject: "Walter",
-            actions: [],
+            actions,
             currentSpecs: [],
             isValid: false,
             locationSelector: {
@@ -353,6 +359,7 @@ describe("BuildTurn", () => {
             subject: "George",
             actions,
             currentSpecs: [swappingBaseSpec],
+            currentActionName: "swapper",
             isValid: false,
             locationSelector: {
                 isSelecting: false,
@@ -372,6 +379,7 @@ describe("BuildTurn", () => {
             subject: "George",
             actions,
             currentSpecs: [swappingBaseSpec, swappingFieldSpec],
+            currentActionName: "swapper",
             isValid: false,
             locationSelector: {
                 isSelecting: true,
@@ -397,6 +405,7 @@ describe("BuildTurn", () => {
             subject: "George",
             actions,
             currentSpecs: [swappingBaseSpec, ...swappingYepSpec],
+            currentActionName: "swapper",
             isValid: false,
             locationSelector: {
                 isSelecting: false,
@@ -421,6 +430,7 @@ describe("BuildTurn", () => {
             subject: "George",
             actions,
             currentSpecs: [swappingBaseSpec, swappingThingSpec],
+            currentActionName: "swapper",
             isValid: false,
             locationSelector: {
                 isSelecting: false,

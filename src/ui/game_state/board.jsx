@@ -46,7 +46,7 @@ export function GameBoardView({ board, config, setSelectedUser, canSubmitAction,
         for(let x = 0; x < board.width; ++x) {
             const position = new Position(x, y);
             const disabled = locationSelector.isSelecting &&
-                !locationSelector.selectableLocations.has(position.humanReadable);
+                !locationSelector.selectableLocations.includes(position.humanReadable);
 
             const onClick = locationSelector.isSelecting && !disabled ? () => {
                 selectLocation(position.humanReadable);

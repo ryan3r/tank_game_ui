@@ -8,7 +8,7 @@ import { load, save, createGameManager, loadGameFromFile } from "../../src/drive
 import { logger } from "#platform/logging.js";
 import { OpenHours } from "../../src/game/open-hours/index.js";
 import { hashFile } from "../../src/drivers/file-utils.js";
-import { getGameVersion } from "../../src/versions/index.js";
+import { getAllVersions, getGameVersion } from "../../src/versions/index.js";
 import { buildTurnReducer, makeInitalState, selectActionType, selectLocation, setActionSpecificField, setPossibleActions, setSubject } from "../../src/interface-adapters/build-turn.js";
 
 export function defineTestsForEngine(createEngine) {
@@ -48,7 +48,7 @@ export function defineTestsForEngine(createEngine) {
         }
     });
 
-    for(const supportedGameVersion of ["3", "4"]) {
+    for(const supportedGameVersion of getAllVersions()) {
         const POSSIBLE_ACTIONS_PATH = `example/possible_actions_v${supportedGameVersion}.json`;
         const TEST_GAME_PATH = `example/tank_game_v${supportedGameVersion}.json`;
 
