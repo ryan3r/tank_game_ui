@@ -10,7 +10,7 @@ export class GameVersion {
     }
 
     formatLogEntry(logEntry, gameState) {
-        return this._logFormatter.format(logEntry, gameState);
+        return this._logFormatter.format(logEntry, gameState, this);
     }
 
     getEntityDescriptor(entity) {
