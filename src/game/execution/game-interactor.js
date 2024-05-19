@@ -50,7 +50,9 @@ export class GameInteractor {
             const logEntry = this._logBook.getEntry(i);
             const state = await this._engine.processAction(logEntry);
             this._previousState = state;
-            this._gameStates.splice(i, 0, this._engine.getGameStateFromEngineState(state)); // Insert state at i
+            const gameState = this._engine.getGameStateFromEngineState(state)
+            this._gameStates.splice(i, 0, gameState); // Insert state at i
+            logEntry.updateMessageWithBoardState(gameState);
         }
     }
 
@@ -89,8 +91,10 @@ export class GameInteractor {
         const state = await this._engine.processAction(entry);
         this._previousState = state;
 
+        const gameState = this._engine.getGameStateFromEngineState(state);
+        entry.updateMessageWithBoardState(gameState);
         this._logBook.addEntry(entry);
-        this._gameStates.push(this._engine.getGameStateFromEngineState(state));
+        this._gameStates.push(gameState);
 
         logger.info({
             msg: "Add logbook entry",

@@ -3,13 +3,19 @@ export class LogEntryFormatter {
         this._formatFunctions = formatFunctions;
     }
 
-    format(logEntry) {
+    format(logEntry, gameState) {
         const formatFunction = this._formatFunctions[logEntry.type];
         if(!formatFunction) {
             throw new Error(`Log entry type ${logEntry.type} is not supported`);
         }
 
-        return formatFunction(logEntry.rawLogEntry, this);
+        return formatFunction(logEntry.rawLogEntry, new FormatingHelpers(gameState));
+    }
+}
+
+class FormatingHelpers {
+    constructor(gameState) {
+        this._gameState = gameState;
     }
 }
 

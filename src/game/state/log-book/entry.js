@@ -5,6 +5,7 @@ export class LogEntry {
         this.type = rawLogEntry.action || "start_of_day";
         this.rawLogEntry = rawLogEntry;
         this.message = message || versionConfig?.formatLogEntry?.(this) || "";
+        this._versionConfig = versionConfig;
     }
 
     static deserialize(id, previousDay, rawEntry, versionConfig) {
@@ -33,5 +34,9 @@ export class LogEntry {
 
     getTimestamp() {
         return new Date(this.rawLogEntry.timestamp * 1000);
+    }
+
+    updateMessageWithBoardState(gameState) {
+        this.message = this._versionConfig.formatLogEntry(this, gameState);
     }
 }
