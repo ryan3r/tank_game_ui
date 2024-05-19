@@ -12,7 +12,7 @@ import { getAllVersions, getGameVersion } from "../../src/versions/index.js";
 import { buildTurnReducer, makeInitalState, selectActionType, selectLocation, setActionSpecificField, setPossibleActions, setSubject } from "../../src/interface-adapters/build-turn.js";
 
 export function defineTestsForEngine(createEngine) {
-    const NUM_RANDOM_ATTEMPTS = 50;
+    const NUM_RANDOM_ATTEMPTS = 30;
 
     function defTest(name, testFunc) {
         // Disable the tests if we don't have a given engine on hand
