@@ -1,3 +1,5 @@
+import { useReducer } from "preact/hooks";
+
 export function makeInitalState() {
     return {
         actions: [],
@@ -72,11 +74,11 @@ function updateActionData(state) {
     const locationSpecs = currentSpecs.filter(spec => spec.type == "select-position");
     if(locationSpecs.length == 1) {
         locationSelector.isSelecting = true;
-        locationSelector.selectableLocations = locationSpecs[0].options;
+        locationSelector.selectableLocations = new Set(locationSpecs[0].options);
         locationSelector._specName = locationSpecs[0].name;
 
         // Reuse the location if it still makes sense
-        if(locationSelector._specName == state.locationSelector._specName && locationSelector.selectableLocations.includes(state.locationSelector.location)) {
+        if(locationSelector._specName == state.locationSelector._specName && locationSelector.selectableLocations.has(state.locationSelector.location)) {
             locationSelector.location = state.locationSelector.location;
         }
     }
@@ -108,13 +110,11 @@ export function buildTurnReducer(state, invocation) {
         return {
             ...makeInitalState(),
             subject: invocation.subject,
+            _possibleActions: state._possibleActions,
+            actions: state.actions,
         }
     }
     else if(invocation.type == "set-possible-actions") {
-        if(!state.subject) {
-            throw new Error("Subject must be set before setting possible actions");
-        }
-
         return {
             ...makeInitalState(),
             subject: state.subject,
@@ -132,7 +132,7 @@ export function buildTurnReducer(state, invocation) {
     }
 
     // No possible actions reset our state
-    if(state._possibleActions === undefined) {
+    if(state._possibleActions === undefined || state.subject === undefined) {
         return makeInitalState();
     }
 
@@ -146,7 +146,11 @@ export function buildTurnReducer(state, invocation) {
 
             return updateActionData({
                 ...state,
+                currentActionName: invocation.actionName,
                 _currentFactory: currentFactory,
+                locationSelector: {
+                    isSelecting: false,
+                },
                 uiFieldValues: {},
                 logBookEntry: {},
             });
@@ -181,3 +185,7 @@ export const setPossibleActions = possibleActions => ({ type: "set-possible-acti
 export const selectActionType = actionName => ({ type: "select-action-type", actionName });
 export const setActionSpecificField = (name, value) => ({ type: "set-action-specific-field", name, value });
 export const selectLocation = location => ({ type: "select-location", location });
+
+export function useBuildTurn() {
+    return useReducer(buildTurnReducer, undefined, makeInitalState);
+}
