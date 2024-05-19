@@ -6,6 +6,18 @@ import { LogEntry } from "../../../../src/game/state/log-book/entry.js";
 const GAME_VERSION = 3;
 
 
+function makeMockState(obj) {
+    let state = Object.create({
+        board: {
+            getFloorTileAt() {},
+            getEntityAt() {},
+        },
+    });
+
+    Object.assign(state, obj);
+    return state;
+}
+
 export class MockEngine {
     constructor() {
         this._returnIdx = 1;
@@ -16,10 +28,10 @@ export class MockEngine {
     }
 
     getGameStateFromEngineState(state) {
-        return {
+        return makeMockState({
             converted: true,
             ...state
-        };
+        });
     }
 
     wereAllDelaysApplied() {
@@ -41,7 +53,7 @@ export class MockEngine {
         await this._delayOp();
 
         this.operations.push({ operation: "process-action",  logEntry });
-        return { stateNo: ++this._returnIdx };
+        return makeMockState({ stateNo: ++this._returnIdx });
     }
 
     async setBoardState(state) {
@@ -58,7 +70,7 @@ export class MockEngine {
 
 async function configureInteractor(logEntries, { saveHandler, waitForLoaded = true, processingDelays, versionConfig } = {}) {
     let logBook = new LogBook(GAME_VERSION, logEntries, versionConfig);
-    let initialGameState = { stateNo: 1 };
+    let initialGameState = makeMockState({ stateNo: 1 });
 
     let mockEngine = new MockEngine();
     mockEngine.processingDelays = processingDelays;
@@ -139,9 +151,9 @@ describe("GameInteractor", () => {
         ]);
 
         assert.deepEqual(versionConfig.getCalls(), [
-            [logEntries[0], { stateNo: 2, converted: true }],
-            [logEntries[1], { stateNo: 3, converted: true }],
-            [logEntries[2], { stateNo: 4, converted: true }],
+            // First call is ignored because state is undefined
+            [logEntries[1], { stateNo: 2, converted: true }],
+            [logEntries[2], { stateNo: 3, converted: true }],
         ]);
     });
 
@@ -179,8 +191,8 @@ describe("GameInteractor", () => {
         ]);
 
         assert.deepEqual(versionConfig.getCalls(), [
-            [logEntries[0], { stateNo: 2, converted: true }],
-            [newEntry, { stateNo: 3, converted: true }],
+            // First call is ignored because state is undefined
+            [newEntry, { stateNo: 2, converted: true }],
         ]);
     });
 

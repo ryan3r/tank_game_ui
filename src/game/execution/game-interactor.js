@@ -52,7 +52,9 @@ export class GameInteractor {
             this._previousState = state;
             const gameState = this._engine.getGameStateFromEngineState(state)
             this._gameStates.splice(i, 0, gameState); // Insert state at i
-            logEntry.updateMessageWithBoardState(gameState);
+
+            // Format log entry with previous state
+            logEntry.updateMessageWithBoardState(this._gameStates[this._gameStates.length - 2]);
         }
     }
 
@@ -92,7 +94,8 @@ export class GameInteractor {
         this._previousState = state;
 
         const gameState = this._engine.getGameStateFromEngineState(state);
-        entry.updateMessageWithBoardState(gameState);
+        // Format log entry with previous state
+        entry.updateMessageWithBoardState(this._gameStates[this._gameStates.length - 1]);
         this._logBook.addEntry(entry);
         this._gameStates.push(gameState);
 

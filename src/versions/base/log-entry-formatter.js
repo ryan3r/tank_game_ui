@@ -27,7 +27,7 @@ class FormatingHelpers {
             throw new Error("Argument locationInParenthisis must be specified")
         }
 
-        if(!this._gameState) return location;
+        if(this._gameState === undefined) return location;
         const position = Position.fromHumanReadable(location);
 
         let info;
