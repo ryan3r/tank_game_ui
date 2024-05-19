@@ -38,6 +38,9 @@ export class LogFieldSpec {
 
                 this._optionToValue[display] = option.value || option;
             }
+
+            // Get a list of the translated values that we expect to see in the log entry
+            this._logEntryValidValues = new Set(Object.values(this._optionToValue));
         }
     }
 
@@ -61,7 +64,7 @@ export class LogFieldSpec {
     isValid(value) {
         if(value === undefined) return false;
 
-        if(this.options) return this.options.includes(value);
+        if(this._logEntryValidValues) return this._logEntryValidValues.has(value);
 
         return true;
     }

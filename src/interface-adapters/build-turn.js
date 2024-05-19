@@ -140,6 +140,9 @@ export function buildTurnReducer(state, invocation) {
     switch(invocation.type) {
         case "select-action-type":
             currentFactory = state._possibleActions.find(factory => factory.getActionName() == invocation.actionName);
+            if(!currentFactory) {
+                throw new Error(`${invocation.actionName} does not match any known possible actions`);
+            }
 
             return updateActionData({
                 ...state,
