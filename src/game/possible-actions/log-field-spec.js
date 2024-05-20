@@ -31,22 +31,29 @@ export class LogFieldSpec {
             this._origOptions = options;
 
             // Get the value that the ui can show to the user (or give to the board)
-            this.options = options.map(option => option.display || option.position || option);
+            this.options = options.map(this._getDisplay);
 
             // Build a map from user facing values to
             this._optionToValue = {};
             for(const option of options) {
-                const display = option.display || option.position || option;
+                const display = this._getDisplay(option);
+
                 if(this._optionToValue[display] !== undefined) {
                     throw new Error(`While building log field spec ${name} (${type}) found duplicate display value: ${display}`);
                 }
 
-                this._optionToValue[display] = option.value || option;
+                this._optionToValue[display] = option.value !== undefined ? option.value : option;
             }
 
             // Get a list of the translated values that we expect to see in the log entry
             this._logEntryValidValues = new Set(Object.values(this._optionToValue));
         }
+    }
+
+    _getDisplay(option) {
+        if(option.display !== undefined) return option.display;
+        if(option.position !== undefined) return option.position;
+        return option;
     }
 
     static deserialize(rawSpec) {
@@ -63,7 +70,8 @@ export class LogFieldSpec {
     }
 
     translateValue(displayName) {
-        return this._optionToValue?.[displayName] || displayName;
+        const value = this._optionToValue?.[displayName];
+        return value !== undefined ? value : displayName;
     }
 
     isValid(value) {

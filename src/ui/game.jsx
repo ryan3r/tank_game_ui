@@ -1,5 +1,5 @@
 import { GameBoard } from "./game_state/board.jsx";
-import { useCallback, useState } from "preact/hooks";
+import { useCallback, useMemo, useState } from "preact/hooks";
 import { useGameInfo, useGameState } from "../drivers/rest/fetcher.js";
 import { LogEntrySelector } from "./game_state/log_entry_selector.jsx"
 import { SubmitTurn } from "./game_state/submit_turn.jsx";
@@ -116,6 +116,7 @@ export function Game({ game, setGame, debug }) {
                 <div className="centered">
                     <div>
                         {gameIsClosed ? undefined : <SubmitTurn
+                            context={gameState}
                             game={game}
                             builtTurnState={builtTurnState}
                             buildTurnDispatch={buildTurnDispatch}

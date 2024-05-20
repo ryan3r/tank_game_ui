@@ -29,8 +29,8 @@ export class GenericPossibleAction {
         };
     }
 
-    isValidEntry(logEntry) {
-        for(const parameters of this.getParameterSpec(logEntry)) {
+    isValidEntry(logEntry, context) {
+        for(const parameters of this.getParameterSpec(logEntry, context)) {
             if(!parameters.isValid(logEntry[parameters.name])) {
                 return false;
             }
@@ -41,9 +41,5 @@ export class GenericPossibleAction {
 
     getParameterSpec(logEntry) {
         return this._fieldSpecs;
-    }
-
-    toString() {
-        return prettyifyName(this._actionName);
     }
 }

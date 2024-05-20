@@ -37,8 +37,4 @@ export class StartOfDayFactory extends GenericPossibleAction {
             }),
         ];
     }
-
-    toString() {
-        return "Start day";
-    }
 }

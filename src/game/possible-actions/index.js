@@ -1,4 +1,5 @@
 import { GenericPossibleAction } from "./generic-possible-action.js";
+import { ShootAction } from "./shoot.js";
 import { StartOfDayFactory } from "./start-of-day-source.js";
 
 
@@ -15,6 +16,7 @@ export function buildRegistry(Types) {
 const defaultRegistry = buildRegistry([
     StartOfDayFactory,
     GenericPossibleAction,
+    ShootAction,
 ]);
 
 

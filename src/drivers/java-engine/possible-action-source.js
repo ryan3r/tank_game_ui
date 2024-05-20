@@ -1,7 +1,7 @@
 import { GenericPossibleAction } from "../../game/possible-actions/generic-possible-action.js";
-import { prettyifyName } from "../../utils.js";
 import { logger } from "#platform/logging.js";
 import { LogFieldSpec } from "../../game/possible-actions/log-field-spec.js";
+import { ShootAction } from "../../game/possible-actions/shoot.js";
 
 export class JavaEngineSource {
     constructor(engine) {
@@ -20,6 +20,14 @@ export class JavaEngineSource {
 
         return possibleActions.map(possibleAction => {
             const actionName = possibleAction.rule || possibleAction.name;
+
+            // Shoot has a custom action to handle determining how many dice to roll
+            if(actionName == "shoot") {
+                const targets = possibleAction.fields.find(field => field.name == "target").range;
+
+                return new ShootAction({ targets });
+            }
+
             const fieldSpecs = this._buildFieldSpecs(possibleAction.fields);
 
             // There is no way this action could be taken
