@@ -30,6 +30,14 @@ export function Game({ game, setGame, debug }) {
 
     const [builtTurnState, buildTurnDispatch] = useBuildTurn();
 
+    const versionConfig = gameInfo?.logBook?.gameVersion !== undefined ?
+        getGameVersion(gameInfo.logBook.gameVersion) : undefined;
+
+    const possibleActionsContext = useMemo(() => ({
+        gameState,
+        versionConfig,
+    }), [gameState, versionConfig]);
+
     const error = infoError || stateError;
 
     // The user that's currently submitting actions
@@ -56,9 +64,6 @@ export function Game({ game, setGame, debug }) {
             <ErrorMessage error={error}></ErrorMessage>
         </AppContent>;
     }
-
-    const versionConfig = gameInfo?.logBook?.gameVersion !== undefined ?
-        getGameVersion(gameInfo.logBook.gameVersion) : undefined;
 
     let gameMessage;
     if(gameState?.winner !== undefined) {
@@ -116,7 +121,7 @@ export function Game({ game, setGame, debug }) {
                 <div className="centered">
                     <div>
                         {gameIsClosed ? undefined : <SubmitTurn
-                            context={gameState}
+                            context={possibleActionsContext}
                             game={game}
                             builtTurnState={builtTurnState}
                             buildTurnDispatch={buildTurnDispatch}

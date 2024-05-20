@@ -31,8 +31,14 @@ export class ShootAction extends GenericPossibleAction {
 
         let hit;
         if(logEntry.target) {
-            const targetEntity = context.board.getEntityAt(Position.fromHumanReadable(logEntry.target));
+            const targetPosition = Position.fromHumanReadable(logEntry.target);
+            const targetEntity = context.gameState.board.getEntityAt();
             if(targetEntity.resources.health !== undefined) {
+                const ownEntities = context.gameState.players.getPlayerByName(logEntry.subject).entities;
+                const ownPosition = ownEntities[0].position;
+
+                const dice = ownEntities[0].resources.range.value - distance;
+
                 hit = new LogFieldSpec({
                     name: "hit",
                     type: "select",
