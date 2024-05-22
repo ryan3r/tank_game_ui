@@ -3,21 +3,17 @@ import { submitTurn, usePossibleActionFactories } from "../../drivers/rest/fetch
 import { ErrorMessage } from "../error_message.jsx";
 import "./submit_turn.css";
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
-import { resetPossibleActions, selectActionType, setActionSpecificField, setContext, setPossibleActions, setSubject } from "../../interface-adapters/build-turn.js";
+import { resetPossibleActions, selectActionType, setActionSpecificField, setPossibleActions, setSubject } from "../../interface-adapters/build-turn.js";
 import { prettyifyName } from "../../utils.js";
 
 export function SubmitTurn({ isLatestEntry, canSubmitAction, refreshGameInfo, game, debug, entryId, builtTurnState, buildTurnDispatch, context }) {
     // Set this to undefined so we don't send a request for anthing other than the last turn
     const possibleActionsEntryId = canSubmitAction && isLatestEntry ? entryId : undefined;
     const [actionFactories, error] = usePossibleActionFactories(game, builtTurnState.subject, possibleActionsEntryId);
-    useEffect(() => {
-        console.log(actionFactories);
-        buildTurnDispatch(setPossibleActions(actionFactories));
-    }, [actionFactories, buildTurnDispatch]);
 
     useEffect(() => {
-        buildTurnDispatch(setContext(context));
-    }, [context, buildTurnDispatch]);
+        buildTurnDispatch(setPossibleActions(actionFactories));
+    }, [actionFactories, buildTurnDispatch]);
 
     const [status, setStatus] = useState();
 
@@ -144,7 +140,7 @@ function SubmissionForm({ builtTurnState, buildTurnDispatch }) {
 
                 if(Element) {
                     return (
-                        <LabelElement key={fieldSpec.name} name={fieldSpec.name}>
+                        <LabelElement key={fieldSpec.name} name={fieldSpec.display}>
                             <Element
                                 type={fieldSpec.type}
                                 builtTurnState={builtTurnState}

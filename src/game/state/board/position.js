@@ -44,4 +44,11 @@ export class Position {
     get humanReadable() {
         return this.humanReadableX + this.humanReadableY;
     }
+
+    distanceTo(position) {
+        const xDiff = Math.abs(position.x - this.x);
+        const yDiff = Math.abs(position.y - this.y);
+        const sqrt = Math.sqrt(xDiff ** 2 + yDiff ** 2);
+        return Math.floor(sqrt);
+    }
 }

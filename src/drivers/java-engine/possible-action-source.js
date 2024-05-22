@@ -2,10 +2,43 @@ import { GenericPossibleAction } from "../../game/possible-actions/generic-possi
 import { logger } from "#platform/logging.js";
 import { LogFieldSpec } from "../../game/possible-actions/log-field-spec.js";
 import { ShootAction } from "../../game/possible-actions/shoot.js";
+import { Position } from "../../game/state/board/position.js";
+import { hitDie } from "../../game/possible-actions/die.js";
 
 export class JavaEngineSource {
     constructor(engine) {
         this._engine = engine;
+    }
+
+    _buildShootAction(possibleAction, gameState, player) {
+        const {range} = possibleAction.fields.find(field => field.name == "target");
+
+        if(player.entities.length != 1) {
+            throw new Error(`Expected player ${player.name} to have exactly 1 entity for shooting`);
+        }
+
+        const playerEntity = player.entities[0];
+
+        return new ShootAction({
+            targets: range.map(position => {
+                position = Position.fromHumanReadable(position);
+                const target = gameState.board.getEntityAt(position);
+                let dice = [];
+
+                // This target has health we must roll
+                if(target.resources.health !== undefined) {
+                    const distance = playerEntity.position.distanceTo(target.position);
+                    const numDice = (playerEntity.resources.range.value - distance) + 1;
+
+                    for(let i = 0; i < numDice; ++i) dice.push(hitDie);
+                }
+
+                return {
+                    position: position.humanReadable,
+                    dice,
+                };
+            })
+        });
     }
 
     async getActionFactoriesForPlayer({playerName, gameState, interactor}) {
@@ -23,9 +56,7 @@ export class JavaEngineSource {
 
             // Shoot has a custom action to handle determining how many dice to roll
             if(actionName == "shoot") {
-                const targets = possibleAction.fields.find(field => field.name == "target").range;
-
-                return new ShootAction({ targets });
+                return this._buildShootAction(possibleAction, gameState, player);
             }
 
             const fieldSpecs = this._buildFieldSpecs(possibleAction.fields);

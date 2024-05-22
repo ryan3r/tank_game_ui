@@ -1,4 +1,4 @@
-import { Position } from "../state/board/position.js";
+import { Die } from "./die.js";
 import { GenericPossibleAction } from "./generic-possible-action.js";
 import { LogFieldSpec } from "./log-field-spec.js";
 
@@ -6,6 +6,11 @@ export class ShootAction extends GenericPossibleAction {
     constructor({ targets }) {
         super({ actionName: "shoot" });
         this._targets = targets;
+
+        this._diceToRoll = {};
+        for(const target of targets) {
+            this._diceToRoll[target.position] = target.dice;
+        }
     }
 
     getType() {
@@ -13,50 +18,53 @@ export class ShootAction extends GenericPossibleAction {
     }
 
     static deserialize(rawShootAction) {
-        return new ShootAction(rawShootAction);
+        return new ShootAction({
+            targets: rawShootAction.targets.map(target => ({
+                ...target,
+                dice: target.dice.map(die => Die.deserialize(die)),
+            })),
+        });
     }
 
     serialize() {
         return {
-            targets: this._targets,
+            targets: this._targets.map(target => ({
+                ...target,
+                dice: target.dice.map(die => die.serialize()),
+            }))
         };
     }
 
-    getParameterSpec(logEntry, context) {
+    getParameterSpec(logEntry) {
         const targetSpec = this._targetSpec = new LogFieldSpec({
             name: "target",
             type: "select-position",
-            options: this._targets,
+            options: this._targets.map(target => target.position),
         });
 
-        let hit;
+        let hitFields = [];
         if(logEntry.target) {
-            const targetPosition = Position.fromHumanReadable(logEntry.target);
-            const targetEntity = context.gameState.board.getEntityAt();
-            if(targetEntity.resources.health !== undefined) {
-                const ownEntities = context.gameState.players.getPlayerByName(logEntry.subject).entities;
-                const ownPosition = ownEntities[0].position;
+            const dice = this._diceToRoll[logEntry.target];
 
-                const dice = ownEntities[0].resources.range.value - distance;
-
-                hit = new LogFieldSpec({
-                    name: "hit",
-                    type: "select",
-                    options: [
-                        { display: "miss", value: false },
-                        { display: "hit", value: true },
-                    ],
+            if(dice.length > 0) {
+                hitFields = dice.map((die, idx) => {
+                    return die.getLogFieldSpec({
+                        name: `die-${idx}`,
+                        display: `Die ${idx + 1}`,
+                    });
                 });
             }
             else {
-                hit = new LogFieldSpec({
-                    name: "hit",
-                    type: "set-value",
-                    value: true,
-                });
+                hitFields = [
+                    new LogFieldSpec({
+                        name: "hit",
+                        type: "set-value",
+                        value: true,
+                    })
+                ];
             }
         }
 
-        return hit ? [targetSpec, hit] : [targetSpec];
+        return [targetSpec, ...hitFields];
     }
 }

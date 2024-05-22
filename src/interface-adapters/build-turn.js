@@ -64,8 +64,7 @@ function updateActionData(state) {
 
     // Build the entry to inform our factory
     let logBookEntry = buildLogEntry(state, state.currentSpecs, state.locationSelector);
-    console.log("C", state.context)
-    const currentSpecs = state._currentFactory.getParameterSpec(logBookEntry, state.context);
+    const currentSpecs = state._currentFactory.getParameterSpec(logBookEntry);
 
     // Configure the location selector with the new specs
     let locationSelector = {
@@ -102,7 +101,7 @@ function updateActionData(state) {
         currentSpecs,
         locationSelector,
         logBookEntry,
-        isValid: state._currentFactory.isValidEntry(logBookEntry, state.context),
+        isValid: state._currentFactory.isValidEntry(logBookEntry),
     };
 }
 
@@ -111,7 +110,6 @@ export function buildTurnReducer(state, invocation) {
         return {
             ...makeInitalState(),
             subject: invocation.subject,
-            context: state.context,
             _possibleActions: state._possibleActions,
             actions: state.actions,
         }
@@ -120,20 +118,10 @@ export function buildTurnReducer(state, invocation) {
         return {
             ...makeInitalState(),
             subject: state.subject,
-            context: state.context,
             _possibleActions: invocation.possibleActions,
             actions: (invocation.possibleActions || []).map(factory => ({
                 name: factory.getActionName(),
             })),
-        };
-    }
-    else if(invocation.type == "set-context") {
-        return {
-            ...makeInitalState(),
-            subject: invocation.subject,
-            _possibleActions: state._possibleActions,
-            actions: state.actions,
-            context: invocation.context,
         };
     }
     else if(invocation.type == "reset") {
@@ -197,7 +185,6 @@ export const setPossibleActions = possibleActions => ({ type: "set-possible-acti
 export const selectActionType = actionName => ({ type: "select-action-type", actionName });
 export const setActionSpecificField = (name, value) => ({ type: "set-action-specific-field", name, value });
 export const selectLocation = location => ({ type: "select-location", location });
-export const setContext = context => ({ type: "set-context", context });
 
 export function useBuildTurn() {
     return useReducer(buildTurnReducer, undefined, makeInitalState);
