@@ -47,3 +47,22 @@
 .radio-button-wrapper, .radio-button-wrapper > label {
     padding: 5px 0px;
 }
+
+.submission-error-wrapper {
+    background: #f00;
+    border: 5px solid #a00;
+    padding: 10px 5px;
+    border-radius: 6px;
+    margin-top: 15px;
+    color: #fff;
+}
+
+.submission-error-title {
+    display: flex;
+    margin-bottom: 15px;
+}
+
+.submission-error-title h3 {
+    margin: 0px;
+    flex-grow: 1;
+}
