@@ -9,7 +9,7 @@ const VALID_TYPES = [
 ];
 
 export class LogFieldSpec {
-    constructor({ name, display, type, options, value }) {
+    constructor({ name, display, type, options, value, description }) {
         if(!VALID_TYPES.includes(type)) {
             throw new Error(`Invalid log field spec type ${type}`);
         }
@@ -24,6 +24,7 @@ export class LogFieldSpec {
 
         this.name = name;
         this.display = display || prettyifyName(name);
+        this.description = description;
         this.type = type;
         this.hidden = type == "set-value";
 
@@ -31,12 +32,12 @@ export class LogFieldSpec {
             this._origOptions = options;
 
             // Get the value that the ui can show to the user (or give to the board)
-            this.options = options.map(this._getDisplay);
+            this.options = options.map(this._getDisplayKey);
 
             // Build a map from user facing values to
             this._optionToValue = {};
             for(const option of options) {
-                const display = this._getDisplay(option);
+                const display = this._getDisplayKey(option);
 
                 if(this._optionToValue[display] !== undefined) {
                     throw new Error(`While building log field spec ${name} (${type}) found duplicate display value: ${display}`);
@@ -50,7 +51,7 @@ export class LogFieldSpec {
         }
     }
 
-    _getDisplay(option) {
+    _getDisplayKey(option) {
         if(option.display !== undefined) return option.display;
         if(option.position !== undefined) return option.position;
         return option;
@@ -66,7 +67,8 @@ export class LogFieldSpec {
             display: this.displayName,
             type: this.type,
             options: this._origOptions,
-            hidden: this.hidden,
+            value: this.options?.[0],
+            description: this.description,
         };
     }
 

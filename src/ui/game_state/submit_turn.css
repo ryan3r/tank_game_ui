@@ -48,6 +48,10 @@
     padding: 5px 0px;
 }
 
+.submit-turn-description {
+    max-width: 250px;
+}
+
 .submission-error-wrapper {
     background: #f00;
     border: 5px solid #a00;
