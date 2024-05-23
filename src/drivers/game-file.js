@@ -5,8 +5,6 @@ import { LogBook } from "../game/state/log-book/log-book.js";
 import { readJson, writeJson } from "./file-utils.js";
 import { logger } from "#platform/logging.js";
 import { GameInteractor } from "../game/execution/game-interactor.js";
-import { PossibleActionSourceSet } from "../game/possible-actions/index.js";
-import { StartOfDaySource } from "../game/possible-actions/start-of-day-source.js";
 import { OpenHours } from "../game/open-hours/index.js";
 import { getGameVersion } from "../versions/index.js";
 
@@ -150,20 +148,8 @@ export async function loadGameFromFile(filePath, createEngine, { saveBack, makeT
     const interactor = new GameInteractor(engine, file, saveHandler);
     await interactor.loaded;
 
-    let actionSets = [];
-
-    if(!interactor.hasAutomaticStartOfDay()) {
-        actionSets.push(new StartOfDaySource());
-    }
-
-    const engineSpecificSource = engine.getEngineSpecificSource &&
-        engine.getEngineSpecificSource();
-
-    if(engineSpecificSource) {
-        actionSets.push(engineSpecificSource);
-    }
-
-    const sourceSet = new PossibleActionSourceSet(actionSets);
+    const sourceSet = getGameVersion(interactor.getLogBook().gameVersion)
+        .constructActionSources(engine);
 
     return {
         interactor,

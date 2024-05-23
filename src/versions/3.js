@@ -1,3 +1,4 @@
+import { StartOfDaySource } from "../game/possible-actions/start-of-day-source.js";
 import { GameVersion } from "./base/index.js";
 import { LogEntryFormatter, baseEntryFunctions } from "./base/log-entry-formatter.js";
 import { GoldMineDescriptor } from "./shared/gold-mine.js";
@@ -10,6 +11,19 @@ class V3WallDescriptor extends Wall {
         2: "Wall-2",
         3: "Wall-4",
     };
+}
+
+function possibleActionsFactory(engine) {
+    let actionSets = [new StartOfDaySource()];
+
+    const engineSpecificSource = engine.getEngineSpecificSource &&
+        engine.getEngineSpecificSource();
+
+    if(engineSpecificSource) {
+        actionSets.push(engineSpecificSource);
+    }
+
+    return actionSets;
 }
 
 // V4 is almost identical to v3 so let it reuse everything
@@ -27,6 +41,7 @@ export const rawV3Config = {
         "senator",
     ],
     manualPath: "/manuals/Tank_Game_Rules_v3.pdf",
+    possibleActionsFactory,
 };
 
 export const version3 = new GameVersion(rawV3Config);
