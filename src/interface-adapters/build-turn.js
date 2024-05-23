@@ -115,7 +115,10 @@ export function buildTurnReducer(state, invocation) {
     }
     else {
         // Clear the last error on any user interaction
-        state.lastError = undefined;
+        state = {
+            ...state,
+            lastError: undefined,
+        };
     }
 
     if(invocation.type == "set-subject") {

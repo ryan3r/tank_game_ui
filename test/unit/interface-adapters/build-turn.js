@@ -106,7 +106,18 @@ const possibleActions = new NamedFactorySet(
     new SwappingPossibleAction(),
 );
 
+function deepFreeze(object) {
+    if(typeof object == "object") {
+        Object.freeze(object);
+
+        for(const key of Object.keys(object)) {
+            deepFreeze(object[key]);
+        }
+    }
+}
+
 function compareState(state, expected) {
+    deepFreeze(state);
     state = Object.assign({}, state);
     delete state._possibleActions;
     delete state._currentFactory;
