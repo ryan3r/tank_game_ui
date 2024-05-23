@@ -3,6 +3,10 @@ const POSITION_EXPR = /([A-Za-z]+)(\d+)/;
 
 export class Position {
     constructor(x, y) {
+        if(x < 0 || y < 0) {
+            throw new Error(`Invalid position (${x}, ${y})`);
+        }
+
         this.x = x;
         this.y = y;
     }

@@ -11,7 +11,17 @@ export class JavaEngineSource {
     }
 
     _buildShootAction(possibleAction, gameState, player) {
-        const {range} = possibleAction.fields.find(field => field.name == "target");
+        let {range} = possibleAction.fields.find(field => field.name == "target");
+
+        // Parse positions and remove invalid ones
+        range = range.map(position => {
+            try {
+                return Position.fromHumanReadable(position);
+            }
+            catch(err) {
+                logger.warn({ msg: "Recieved invalid position from engine (dropping)", err, position });
+            }
+        }).filter(position => position && gameState.board.isInBounds(position));
 
         if(player.entities.length != 1) {
             throw new Error(`Expected player ${player.name} to have exactly 1 entity for shooting`);
@@ -21,7 +31,6 @@ export class JavaEngineSource {
 
         return new ShootAction({
             targets: range.map(position => {
-                position = Position.fromHumanReadable(position);
                 const target = gameState.board.getEntityAt(position);
                 let dice = [];
 
