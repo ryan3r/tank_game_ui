@@ -11,6 +11,9 @@ import { hashFile } from "../../src/drivers/file-utils.js";
 import { getAllVersions, getGameVersion } from "../../src/versions/index.js";
 import { buildTurnReducer, makeInitalState, selectActionType, selectLocation, setActionSpecificField, setPossibleActions, setSubject } from "../../src/interface-adapters/build-turn.js";
 
+// Random numbers to give input-number fields
+const NUMBERS_TO_TRY = [1, 2, 3];
+
 export function defineTestsForEngine(createEngine) {
     const NUM_RANDOM_ATTEMPTS = 30;
 
@@ -111,6 +114,40 @@ export function defineTestsForEngine(createEngine) {
                 }
             });
 
+            async function buildAllPossibleActions(actionBuilder, specIdx, callback) {
+                // We've built a full action spit it out
+                if(specIdx == actionBuilder.currentSpecs.length) {
+                    await callback(actionBuilder);
+                    return;
+                }
+
+                const spec = actionBuilder.currentSpecs[specIdx];
+                const options = spec.type == "input-number" ? NUMBERS_TO_TRY : spec.options;
+
+                // nothing to iterate
+                if(!options?.length) {
+                    return;
+                }
+
+                for(const option of options) {
+                    let currentBuilder;
+                    if(spec.type == "select-position") {
+                        // HACK: Engine claims that Dan can sent stimulus to Lena (B3, dead tank) which is invald
+                        if(option == "B3") continue;
+
+                        // HACK: Engine claims that B0 and @2 are a valid spaces
+                        if(typeof option == "string" && (option.match(/[A-Z]0/) || !option.match(/[A-Z]\d+/))) continue;
+
+                        currentBuilder = buildTurnReducer(actionBuilder, selectLocation(option));
+                    }
+                    else {
+                        currentBuilder = buildTurnReducer(actionBuilder, setActionSpecificField(spec.name, option));
+                    }
+
+                    await buildAllPossibleActions(currentBuilder, specIdx + 1, callback);
+                }
+            }
+
             defTest("can provide a list of possible actions", async () => {
                 let lastTime = 0;
                 const makeTimeStamp = () => {
@@ -128,7 +165,6 @@ export function defineTestsForEngine(createEngine) {
                         throw new Error("Expected at least on player");
                     }
 
-                    let submittedAction = false;
                     for(const player of players) {
                         const factories = await sourceSet.getActionFactoriesForPlayer({
                             playerName: player.name,
@@ -141,71 +177,33 @@ export function defineTestsForEngine(createEngine) {
                         let actionBuilder = buildTurnReducer(makeInitalState(), setSubject(player.name));
                         actionBuilder = buildTurnReducer(actionBuilder, setPossibleActions(factories));
 
-                        actionLoop: for(const action of actionBuilder.actions) {
-                            for(let attempt = 0; attempt < NUM_RANDOM_ATTEMPTS; ++attempt) {
-                                // Building a log entry may involve mutliple steps but if it takes more than
-                                // 2 something is probably wrong
-                                let buildActionLoopsCount = 2;
+                        for(const action of actionBuilder.actions) {
+                            actionBuilder = buildTurnReducer(actionBuilder, selectActionType(action.name));
 
-                                actionBuilder = buildTurnReducer(actionBuilder, selectActionType(action.name));
+                            let actionsAttempted = 0;
+                            await buildAllPossibleActions(actionBuilder, 0, async finalizedBuilder => {
+                                if(finalizedBuilder.isValid) {
+                                    ++actionsAttempted;
 
-                                while(!actionBuilder.isValid) {
-                                    if(buildActionLoopsCount-- === 0) {
-                                        const msg = `Failed to fill parameters for ${action.name}`;
-                                        logger.error({
-                                            msg,
-                                            actionBuilder,
-                                        });
-
-                                        throw new Error(msg);
-                                    }
-
-                                    // This option has some unbounded component to it we can't easily sent it back
-                                    const canNotEnumerate = actionBuilder.currentSpecs.find(field => !field.options?.length);
-                                    if(canNotEnumerate) continue actionLoop;
-
-                                    for(const field of actionBuilder.currentSpecs) {
-                                        const optionIdx = Math.min(Math.floor(Math.random() * field.options.length), field.options.length - 1);
-                                        const option = field.options[optionIdx];
-
-                                        // HACK: Engine claims that Dan can sent stimulus to Lena (B3, dead tank) which is invald
-                                        if(option == "B3") continue actionLoop;
-
-                                        // HACK: Engine claims that B0 and @2 are a valid spaces
-                                        if(typeof option == "string" && (option.match(/[A-Z]0/) || !option.match(/[A-Z]\d+/))) continue actionLoop;
-
-                                        if(field.type == "select-position") {
-                                            actionBuilder = buildTurnReducer(actionBuilder, selectLocation(option));
-                                        }
-                                        else {
-                                            actionBuilder = buildTurnReducer(actionBuilder, setActionSpecificField(field.name, option));
-                                        }
-                                    }
-                                }
-
-                                if(actionBuilder.isValid) {
-                                    logger.info({ msg: "Testing action", actionBuilder });
+                                    logger.info({ msg: "Testing action", finalizedBuilder });
 
                                     // It's possible that a possible action could fail due to players not having
                                     // enough resouces so we can rettry until one passes.  We just care that
                                     // it can generate at least one valid action
-                                    assert.ok(await interactor.canProcessAction(actionBuilder.logBookEntry),
-                                        `Processing ${JSON.stringify(actionBuilder.logBookEntry, null, 4)}`);
-
-                                    // Make sure we submit at least one action
-                                    submittedAction = true;
+                                    assert.ok(await interactor.canProcessAction(finalizedBuilder.logBookEntry),
+                                        `Processing ${JSON.stringify(finalizedBuilder.logBookEntry, null, 4)}`);
                                 }
                                 else {
                                     logger.warn({
                                         msg: `Failed to build a possible action for ${action.name}`,
-                                        actionBuilder,
+                                        finalizedBuilder,
                                     });
                                 }
-                            }
+                            });
+
+                            assert.ok(actionsAttempted > 0, `Didn't attempt any actions for ${player.name} ${action.name}`);
                         }
                     }
-
-                    assert.ok(submittedAction);
                 }
                 finally {
                     await interactor.shutdown();
