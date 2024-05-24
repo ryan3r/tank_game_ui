@@ -72,18 +72,29 @@ export function defineTestsForEngine(createEngine) {
                     // Create one instance that starts with the log book full
                     // This triggers a set version, set state, and a series of process actions
                     logger.debug("[integration-test] Process actions as a group");
-                    let fullInteractor = new GameInteractor(fullEngine, { logBook, initialGameState, openHours: new OpenHours([]) });
+                    let fullInteractor = new GameInteractor({
+                        engine: fullEngine,
+                        gameData: {
+                            logBook,
+                            initialGameState,
+                            openHours: new OpenHours([]),
+                        },
+                    });
                     await fullInteractor.loaded;
 
                     // Create another instance that starts with no log enties and has then added
                     // This triggers a set version and then a set state and process action for each entry
                     logger.debug("[integration-test] Process individual actions");
                     const saveHandler = (...args) => save(TEST_GAME_RECREATE_PATH, ...args);
-                    let incrementalInteractor = new GameInteractor(incrementalEngine, {
-                        logBook: emptyLogBook,
-                        initialGameState,
-                        openHours: new OpenHours([]),
-                    }, saveHandler);
+                    let incrementalInteractor = new GameInteractor({
+                        engine: incrementalEngine,
+                        gameData: {
+                            logBook: emptyLogBook,
+                            initialGameState,
+                            openHours: new OpenHours([]),
+                        },
+                        saveHandler,
+                    });
 
                     for(const entry of logBook) {
                         await incrementalInteractor.addLogBookEntry(entry.rawLogEntry);

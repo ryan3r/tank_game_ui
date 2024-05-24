@@ -141,19 +141,17 @@ export class GameManager {
 }
 
 export async function loadGameFromFile(filePath, createEngine, { saveBack, makeTimeStamp } = {}) {
-    const file = await load(filePath, { saveBack, makeTimeStamp });
+    const gameData = await load(filePath, { saveBack, makeTimeStamp });
+    const gameVersion = getGameVersion(gameData.logBook.gameVersion);
 
     const engine = createEngine();
     const saveHandler = data => save(filePath, data);
-    const interactor = new GameInteractor(engine, file, saveHandler);
+    const interactor = new GameInteractor({ engine, gameData, saveHandler });
     await interactor.loaded;
-
-    const sourceSet = getGameVersion(interactor.getLogBook().gameVersion)
-        .constructActionSources(engine);
 
     return {
         interactor,
-        sourceSet,
+        sourceSet: gameVersion.constructActionSources(engine),
     };
 }
 

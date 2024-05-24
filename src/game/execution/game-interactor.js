@@ -3,7 +3,7 @@ import { AutomaticStartOfDay } from "../open-hours/automatic-start-of-day.js";
 import { PromiseLock } from "../../utils.js";
 
 export class GameInteractor {
-    constructor(engine, { logBook, initialGameState, openHours }, saveHandler) {
+    constructor({ engine, gameData: { logBook, initialGameState, openHours }, saveHandler }) {
         this._saveHandler = saveHandler;
         this._engine = engine;
         this._logBook = logBook;

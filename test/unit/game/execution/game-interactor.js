@@ -74,7 +74,14 @@ async function configureInteractor(logEntries, { saveHandler, waitForLoaded = tr
 
     let mockEngine = new MockEngine();
     mockEngine.processingDelays = processingDelays;
-    let interactor = new GameInteractor(mockEngine, { logBook, initialGameState }, saveHandler);
+    let interactor = new GameInteractor({
+        engine: mockEngine,
+        gameData: {
+            logBook,
+            initialGameState,
+        },
+        saveHandler,
+    });
 
     if(waitForLoaded) await interactor.loaded;
 
