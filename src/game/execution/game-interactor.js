@@ -3,13 +3,14 @@ import { AutomaticStartOfDay } from "../open-hours/automatic-start-of-day.js";
 import { PromiseLock } from "../../utils.js";
 
 export class GameInteractor {
-    constructor({ engine, gameData, saveHandler }) {
+    constructor({ engine, gameData, saveHandler, gameVersion }) {
         this._saveHandler = saveHandler;
         this._engine = engine;
         this._gameData = gameData;
         this._gameStates = [];
         this._lock = new PromiseLock();
         this._previousState = gameData.initialGameState;
+        this._gameVersion = gameVersion;
 
         // Process any unprocessed log book entries.
         this.loaded = this._processActions();
@@ -128,15 +129,21 @@ export class GameInteractor {
         return success;
     }
 
+    _finalizeEntry(entry) {
+        entry = this._gameVersion?.finalizeLogEntry?.(entry) || entry;
+        entry = this._gameData.logBook.makeEntryFromRaw(entry);
+        return entry;
+    }
+
     addLogBookEntry(entry) {
         return this._lock.use(() => {
-            return this._addLogBookEntry(this._gameData.logBook.makeEntryFromRaw(entry));
+            return this._addLogBookEntry(this._finalizeEntry(entry));
         });
     }
 
     canProcessAction(entry) {
         return this._lock.use(() => {
-            return this._canProcessAction(this._gameData.logBook.makeEntryFromRaw(entry));
+            return this._canProcessAction(this._finalizeEntry(entry));
         });
     }
 

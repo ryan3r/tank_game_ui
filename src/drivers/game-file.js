@@ -146,7 +146,7 @@ export async function loadGameFromFile(filePath, createEngine, { saveBack, makeT
 
     const engine = createEngine();
     const saveHandler = data => save(filePath, data);
-    const interactor = new GameInteractor({ engine, gameData, saveHandler });
+    const interactor = new GameInteractor({ engine, gameData, saveHandler, gameVersion });
     await interactor.loaded;
 
     return {
