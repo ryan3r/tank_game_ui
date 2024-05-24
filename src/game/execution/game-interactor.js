@@ -3,26 +3,25 @@ import { AutomaticStartOfDay } from "../open-hours/automatic-start-of-day.js";
 import { PromiseLock } from "../../utils.js";
 
 export class GameInteractor {
-    constructor({ engine, gameData: { logBook, initialGameState, openHours }, saveHandler }) {
+    constructor({ engine, gameData, saveHandler }) {
         this._saveHandler = saveHandler;
         this._engine = engine;
-        this._logBook = logBook;
+        this._gameData = gameData;
         this._gameStates = [];
         this._lock = new PromiseLock();
-        this._initialGameState = this._previousState = initialGameState;
-        this._openHours = openHours;
+        this._previousState = gameData.initialGameState;
 
         // Process any unprocessed log book entries.
         this.loaded = this._processActions();
 
-        if(openHours?.hasAutomaticStartOfDay?.()) {
+        if(this._gameData.openHours?.hasAutomaticStartOfDay?.()) {
             this._automaticStartOfDay = new AutomaticStartOfDay(this);
             this.loaded.then(() => this._automaticStartOfDay.start());
         }
     }
 
     getLogBook() {
-        return this._logBook;
+        return this._gameData.logBook;
     }
 
     _processActions() {
@@ -32,10 +31,10 @@ export class GameInteractor {
 
     async _processActionsLogic() {
         // Nothing to process
-        if(this._gameStates.length === this._logBook.getLength()) return;
+        if(this._gameStates.length === this._gameData.logBook.getLength()) return;
 
         const startIndex = this._gameStates.length;
-        const endIndex = this._logBook.getLastEntryId();
+        const endIndex = this._gameData.logBook.getLastEntryId();
 
         if(startIndex > endIndex) {
             throw new Error(`startIndex (${startIndex}) can't be larger than endIndex (${endIndex})`);
@@ -47,7 +46,7 @@ export class GameInteractor {
         this._gameStates.splice(startIndex, (endIndex - startIndex) + 1);
 
         for(let i = startIndex; i <= endIndex; ++i) {
-            const logEntry = this._logBook.getEntry(i);
+            const logEntry = this._gameData.logBook.getEntry(i);
             const state = await this._engine.processAction(logEntry);
             this._previousState = state;
             const gameState = this._engine.getGameStateFromEngineState(state)
@@ -59,7 +58,7 @@ export class GameInteractor {
     }
 
     async sendPreviousState() {
-        await this._engine.setGameVersion(this._logBook.gameVersion);
+        await this._engine.setGameVersion(this._gameData.logBook.gameVersion);
         await this._engine.setBoardState(this._previousState);
     }
 
@@ -68,12 +67,12 @@ export class GameInteractor {
     }
 
     getOpenHours() {
-        return this._openHours;
+        return this._gameData.openHours;
     }
 
     isGameOpen() {
-        return this._openHours !== undefined ?
-            this._openHours.isGameOpen() : true;
+        return this._gameData.openHours !== undefined ?
+            this._gameData.openHours.isGameOpen() : true;
     }
 
     _throwIfGameNotOpen() {
@@ -83,8 +82,8 @@ export class GameInteractor {
     }
 
     async _addLogBookEntry(entry) {
-        if(this._gameStates.length !== this._logBook.getLength()) {
-            throw new Error(`Logbook length and states length should be identical (log book = ${this._logBook.getLength()}, states = ${this._gameStates.length})`);
+        if(this._gameStates.length !== this._gameData.logBook.getLength()) {
+            throw new Error(`Logbook length and states length should be identical (log book = ${this._gameData.logBook.getLength()}, states = ${this._gameStates.length})`);
         }
 
         this._throwIfGameNotOpen();
@@ -96,7 +95,7 @@ export class GameInteractor {
         const gameState = this._engine.getGameStateFromEngineState(state);
         // Format log entry with previous state
         entry.updateMessageWithBoardState(this._gameStates[this._gameStates.length - 1]);
-        this._logBook.addEntry(entry);
+        this._gameData.logBook.addEntry(entry);
         this._gameStates.push(gameState);
 
         logger.info({
@@ -106,17 +105,13 @@ export class GameInteractor {
 
         // Save the modified log book if we know were to save it too
         if(this._saveHandler) {
-            await this._saveHandler({
-                initialGameState: this._initialGameState,
-                logBook: this._logBook,
-                openHours: this._openHours,
-            });
+            await this._saveHandler(this._gameData);
         }
     }
 
     async _canProcessAction(entry) {
-        if(this._gameStates.length !== this._logBook.getLength()) {
-            throw new Error(`Logbook length and states length should be identical (log book = ${this._logBook.getLength()}, states = ${this._gameStates.length})`);
+        if(this._gameStates.length !== this._gameData.logBook.getLength()) {
+            throw new Error(`Logbook length and states length should be identical (log book = ${this._gameData.logBook.getLength()}, states = ${this._gameStates.length})`);
         }
 
         this._throwIfGameNotOpen();
@@ -135,13 +130,13 @@ export class GameInteractor {
 
     addLogBookEntry(entry) {
         return this._lock.use(() => {
-            return this._addLogBookEntry(this._logBook.makeEntryFromRaw(entry));
+            return this._addLogBookEntry(this._gameData.logBook.makeEntryFromRaw(entry));
         });
     }
 
     canProcessAction(entry) {
         return this._lock.use(() => {
-            return this._canProcessAction(this._logBook.makeEntryFromRaw(entry));
+            return this._canProcessAction(this._gameData.logBook.makeEntryFromRaw(entry));
         });
     }
 
