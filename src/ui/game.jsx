@@ -2,7 +2,7 @@ import { GameBoard } from "./game_state/board.jsx";
 import { useCallback, useMemo, useState } from "preact/hooks";
 import { useGameInfo, useGameState } from "../drivers/rest/fetcher.js";
 import { LogEntrySelector } from "./game_state/log_entry_selector.jsx"
-import { SubmitTurn } from "./game_state/submit_turn.jsx";
+import { SubmitTurn } from "./game_state/submit-turn/submit-turn.jsx";
 import { Council } from "./game_state/council.jsx";
 import { LogBook } from "./game_state/log_book.jsx";
 import { ErrorMessage } from "./error_message.jsx";

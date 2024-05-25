@@ -1,9 +1,13 @@
-import { submitTurn, usePossibleActionFactories } from "../../drivers/rest/fetcher.js";
-import { ErrorMessage } from "../error_message.jsx";
-import "./submit_turn.css";
+import "./submit-turn.css";
+import { submitTurn, usePossibleActionFactories } from "../../../drivers/rest/fetcher.js";
+import { ErrorMessage } from "../../error_message.jsx";
 import { useCallback, useEffect, useMemo, useState } from "preact/hooks";
-import { resetPossibleActions, selectActionType, setActionSpecificField, setLastError, setPossibleActions, setSubject } from "../../interface-adapters/build-turn.js";
-import { prettyifyName } from "../../utils.js";
+import { resetPossibleActions, selectActionType, setActionSpecificField, setLastError, setPossibleActions, setSubject } from "../../../interface-adapters/build-turn.js";
+import { prettyifyName } from "../../../utils.js";
+import { LabelElement } from "./base.jsx";
+import { Select, SelectPosition } from "./select.jsx";
+import { Input } from "./input.jsx";
+import { RollDice } from "./roll-dice.jsx";
 
 export function SubmitTurn({ isLatestEntry, canSubmitAction, refreshGameInfo, game, debug, entryId, builtTurnState, buildTurnDispatch, context }) {
     // Set this to undefined so we don't send a request for anthing other than the last turn
@@ -173,150 +177,4 @@ function SubmissionForm({ builtTurnState, buildTurnDispatch }) {
             })}
         </>
     )
-}
-
-function LabelElement({ name, small=false, children }) {
-    return (
-        <div className="field-wrapper">
-            {small ? <h4>{name}</h4> : <h3>{name}</h3>}
-            {children}
-        </div>
-    );
-}
-
-function Select({ spec, value, setValue }) {
-    const onChange = useCallback(e => {
-        setValue(e.target.value == "unset" ? undefined : spec.options[+e.target.value]);
-    }, [setValue, spec]);
-
-    const currentIndex = value !== undefined ? spec.options.indexOf(value) : -1;
-
-    return (
-        <div className="radio-container">
-            {spec.options.map((element, index) => {
-                const value = element.toString();
-
-                return (
-                    <div key={index} className="radio-button-wrapper">
-                        <label>
-                            <input type="radio" value={index} onChange={onChange} checked={index === currentIndex}/>
-                            {value}
-                        </label>
-                    </div>
-                );
-            })}
-        </div>
-    );
-}
-
-function Input({ spec, type, value, setValue }) {
-    const inputType = type.split("-")[1];
-    const convert = value => {
-        return inputType == "number" ? +value : value;
-    };
-
-    return (
-        <input
-            type={inputType || "text"}
-            value={value}
-            onInput={e => setValue(convert(e.target.value))}
-            placeholder={spec.placeholder || spec.name}/>
-    );
-}
-
-function SelectPosition({ builtTurnState }) {
-    const {location} = builtTurnState.locationSelector;
-    const message = location ?
-        `${location} (select a different space to change)` :
-        `Select a location on the board`;
-
-    return (
-        <span>{message}</span>
-    );
-}
-
-function RollDice({ spec, value, setValue }) {
-    if(value === undefined) {
-        setValue({ type: "die-roll", manual: false });
-        return;
-    }
-
-    const selectManualRoll = () => {
-        setValue({
-            type: "die-roll",
-            manual: true,
-            dice: spec.expandedDice.map(() => undefined),
-        });
-    };
-
-    // The number of dice has changed
-    if(value.manual && spec.expandedDice.length !== value.dice.length) {
-        selectManualRoll();
-        return;
-    }
-
-    const selectRollType = rollType => {
-        if(rollType == "Manual Roll") {
-            selectManualRoll();
-        }
-        else {
-            setValue({ type: "die-roll", manual: false });
-        }
-    };
-
-    let diceSection;
-    if(value.manual) {
-        let dieNumber;
-        let dieName;
-
-        diceSection = (
-            <div className="submit-turn-field-wrapper">
-                {spec.expandedDice.map((die, index) => {
-                    const setDieValue = newRoll => {
-                        setValue({
-                            ...value,
-                            dice: [...value.dice.slice(0, index), newRoll, ...value.dice.slice(index + 1)]
-                        });
-                    };
-
-                    // Count the number of die of each type
-                    if(dieName != die.name) {
-                        dieName = die.name;
-                        dieNumber = 0;
-                    }
-
-                    ++dieNumber;
-
-                    return (
-                        <LabelElement key={index} name={`${prettyifyName(die.name)} ${dieNumber}`} small>
-                            <Select
-                                spec={{ options: die.sideNames }}
-                                value={value.dice[index]}
-                                setValue={setDieValue}></Select>
-                        </LabelElement>
-                    );
-                })}
-            </div>
-        );
-    }
-
-    return (
-        <>
-            <Select
-                spec={{ options: ["Auto Roll", "Manual Roll"] }}
-                value={value.manual ? "Manual Roll" : "Auto Roll"}
-                setValue={selectRollType}></Select>
-            <p>
-                {value.manual ? "Roll the following dice" : "The following dice will be rolled on submit"}
-                <ul>
-                    {spec.describeDice().map(description => {
-                        return (
-                            <li key={description}>{description}</li>
-                        );
-                    })}
-                </ul>
-            </p>
-            {diceSection}
-        </>
-    );
 }
