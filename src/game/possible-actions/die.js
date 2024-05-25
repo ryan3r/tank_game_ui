@@ -1,4 +1,4 @@
-export class Die {
+class Die {
     constructor({ name, namePlural, sides }) {
         this.name = name;
         this.namePlural = namePlural || name + "s";
@@ -14,18 +14,6 @@ export class Die {
             this._displayToRaw[display] = value;
             this._rawToDisplay[value] = display;
         }
-    }
-
-    static deserialize(rawDie) {
-        return new Die(rawDie);
-    }
-
-    serialize() {
-        return {
-            name: this.name,
-            namePlural: this.namePlural,
-            sides: this.sides,
-        };
     }
 
     roll() {
@@ -44,9 +32,9 @@ export class Die {
 
 
 export class Dice {
-    constructor(count, die) {
+    constructor(count, dieName) {
         this.count = count;
-        this.die = die;
+        this.die = commonDice[dieName];
     }
 
     static expandAll(dice) {
@@ -54,27 +42,13 @@ export class Dice {
     }
 
     static deserialize(rawDice) {
-        let die;
-        if(typeof rawDice.die == "string") {
-            die = commonDice[rawDice.die];
-        }
-        else {
-            die = Die.deserialize(rawDice.die);
-        }
-
-        return new Dice(rawDice.count, die);
+        return new Dice(rawDice.count, rawDice.die);
     }
 
     serialize() {
-        let die = this.die.serialize();
-        // If this die is known just serialize it as its name
-        if(commonDice[this.die.name] !== undefined) {
-            die = this.die.name;
-        }
-
         return {
             count: this.count,
-            die,
+            die: this.die.name,
         };
     }
 
@@ -92,21 +66,13 @@ export class Dice {
     }
 }
 
-
-export const hitDie = new Die({
-    name: "hit die",
-    namePlural: "hit dice",
-    sides: [
-        { display: "hit", value: true },
-        { display: "miss", value: false },
-    ]
-});
-
-
 const commonDice = {
-    "hit die": hitDie,
+    "hit die": new Die({
+        name: "hit die",
+        namePlural: "hit dice",
+        sides: [
+            { display: "hit", value: true },
+            { display: "miss", value: false },
+        ]
+    }),
 };
-
-export function getDieByName(name) {
-    return commonDice[name];
-}
