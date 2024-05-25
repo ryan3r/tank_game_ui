@@ -175,10 +175,10 @@ function SubmissionForm({ builtTurnState, buildTurnDispatch }) {
     )
 }
 
-function LabelElement({ name, children }) {
+function LabelElement({ name, small=false, children }) {
     return (
         <div className="field-wrapper">
-            <h3>{name}</h3>
+            {small ? <h4>{name}</h4> : <h3>{name}</h3>}
             {children}
         </div>
     );
@@ -288,7 +288,7 @@ function RollDice({ spec, value, setValue }) {
                     ++dieNumber;
 
                     return (
-                        <LabelElement key={index} name={`${prettyifyName(die.name)} ${dieNumber}`}>
+                        <LabelElement key={index} name={`${prettyifyName(die.name)} ${dieNumber}`} small>
                             <Select
                                 spec={{ options: die.sideNames }}
                                 value={value.dice[index]}
