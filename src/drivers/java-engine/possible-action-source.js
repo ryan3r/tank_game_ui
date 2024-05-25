@@ -3,7 +3,7 @@ import { logger } from "#platform/logging.js";
 import { LogFieldSpec } from "../../game/possible-actions/log-field-spec.js";
 import { ShootAction } from "../../game/possible-actions/shoot.js";
 import { Position } from "../../game/state/board/position.js";
-import { hitDie } from "../../game/possible-actions/die.js";
+import { Dice, hitDie } from "../../game/possible-actions/die.js";
 
 export class JavaEngineSource {
     constructor(engine) {
@@ -39,7 +39,7 @@ export class JavaEngineSource {
                     const distance = playerEntity.position.distanceTo(target.position);
                     const numDice = (playerEntity.resources.range.value - distance) + 1;
 
-                    for(let i = 0; i < numDice; ++i) dice.push(hitDie);
+                    dice.push(new Dice(numDice, hitDie));
                 }
 
                 return {

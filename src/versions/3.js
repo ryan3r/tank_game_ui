@@ -47,7 +47,7 @@ export const rawV3Config = {
             // If the hit field wasn't set process the dice
             if(logEntry.rawLogEntry.hit === undefined) {
                 // If any dice hit the shot hits
-                logEntry.rawLogEntry.hit = !!logEntry.rawLogEntry.hit_chance.dice.find(hit => hit);
+                logEntry.rawLogEntry.hit = !!logEntry.rawLogEntry.hit_roll.dice.find(hit => hit);
             }
 
             return logEntry;

@@ -13,7 +13,7 @@
 }
 
 .submit-turn-form {
-    min-width: 700px;
+    min-width: 750px;
 }
 
 .submit-turn-field-wrapper {
@@ -38,6 +38,7 @@
 
 .submit-action-button-wrapper {
     text-align: right;
+    padding-top: 20px;
 }
 
 .radio-container {
@@ -81,8 +82,4 @@
 .submission-error-title h3 {
     margin: 0px;
     flex-grow: 1;
-}
-
-.auto-roll-description {
-    padding: 6px;
 }

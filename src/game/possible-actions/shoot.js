@@ -1,5 +1,5 @@
 import { DiceLogFieldSpec } from "./dice-log-field-spec.js";
-import { Die } from "./die.js";
+import { Dice } from "./die.js";
 import { GenericPossibleAction } from "./generic-possible-action.js";
 import { LogFieldSpec } from "./log-field-spec.js";
 
@@ -22,7 +22,7 @@ export class ShootAction extends GenericPossibleAction {
         return new ShootAction({
             targets: rawShootAction.targets.map(target => ({
                 ...target,
-                dice: target.dice.map(die => Die.deserialize(die)),
+                dice: target.dice.map(dice => Dice.deserialize(dice)),
             })),
         });
     }
@@ -31,7 +31,7 @@ export class ShootAction extends GenericPossibleAction {
         return {
             targets: this._targets.map(target => ({
                 ...target,
-                dice: target.dice.map(die => die.serialize()),
+                dice: target.dice.map(dice => dice.serialize()),
             }))
         };
     }
@@ -50,7 +50,7 @@ export class ShootAction extends GenericPossibleAction {
             if(dice.length > 0) {
                 hitFields = [
                     new DiceLogFieldSpec({
-                        name: "hit_chance",
+                        name: "hit_roll",
                         dice,
                     }),
                 ];

@@ -241,25 +241,38 @@ function RollDice({ spec, value, setValue }) {
         return;
     }
 
+    const isManual = value.type == "manual-roll";
+
+    const selectManualRoll = () => {
+        setValue({
+            type: "manual-roll",
+            dice: spec.expandedDice.map(() => undefined),
+        });
+    };
+
+    // The number of dice has changed
+    if(isManual && spec.expandedDice.length !== value.dice.length) {
+        selectManualRoll();
+        return;
+    }
+
     const selectRollType = rollType => {
         if(rollType == "Manual Roll") {
-            setValue({
-                type: "manual-roll",
-                dice: spec.dice.map(() => undefined),
-            });
+            selectManualRoll();
         }
         else {
             setValue({ type: "auto-roll" });
         }
     };
 
-    const isManual = value.type == "manual-roll";
-
     let diceSection;
     if(isManual) {
+        let dieNumber;
+        let dieName;
+
         diceSection = (
             <div className="submit-turn-field-wrapper">
-                {spec.dice.map((die, index) => {
+                {spec.expandedDice.map((die, index) => {
                     const setDieValue = newRoll => {
                         setValue({
                             ...value,
@@ -267,8 +280,16 @@ function RollDice({ spec, value, setValue }) {
                         });
                     };
 
+                    // Count the number of die of each type
+                    if(dieName != die.name) {
+                        dieName = die.name;
+                        dieNumber = 0;
+                    }
+
+                    ++dieNumber;
+
                     return (
-                        <LabelElement key={index} name={`Die ${index + 1}`}>
+                        <LabelElement key={index} name={`${prettyifyName(die.name)} ${dieNumber}`}>
                             <Select
                                 spec={{ options: die.sideNames }}
                                 value={value.dice[index]}
@@ -279,10 +300,15 @@ function RollDice({ spec, value, setValue }) {
             </div>
         );
     }
-    else {
-        diceSection = (
-            <div className="auto-roll-description">
-                The following dice will be rolled on submit
+
+    return (
+        <>
+            <Select
+                spec={{ options: ["Auto Roll", "Manual Roll"] }}
+                value={isManual ? "Manual Roll" : "Auto Roll"}
+                setValue={selectRollType}></Select>
+            <p>
+                {isManual ? "Roll the following dice" : "The following dice will be rolled on submit"}
                 <ul>
                     {spec.describeDice().map(description => {
                         return (
@@ -290,17 +316,8 @@ function RollDice({ spec, value, setValue }) {
                         );
                     })}
                 </ul>
-            </div>
-        );
-    }
-
-    return (
-        <div>
-            <Select
-                spec={{ options: ["Auto Roll", "Manual Roll"] }}
-                value={isManual ? "Manual Roll" : "Auto Roll"}
-                setValue={selectRollType}></Select>
+            </p>
             {diceSection}
-        </div>
+        </>
     );
 }

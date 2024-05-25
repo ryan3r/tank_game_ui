@@ -95,7 +95,7 @@ export function shoot(entry, formatter) {
         locationInParenthisis: false,
     });
 
-    return `${entry.subject}${formatter.dieRoll(entry.hit_chance, { prefix: " rolled ", suffix: " and " })} ${verb} ${target}`
+    return `${entry.subject}${formatter.dieRoll(entry.hit_roll, { prefix: " rolled ", suffix: " and " })} ${verb} ${target}`
 }
 
 
