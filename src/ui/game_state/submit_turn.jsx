@@ -311,7 +311,7 @@ function RollDice({ spec, value, setValue }) {
                 <ul>
                     {spec.describeDice().map(description => {
                         return (
-                            <li>{description}</li>
+                            <li key={description}>{description}</li>
                         );
                     })}
                 </ul>
