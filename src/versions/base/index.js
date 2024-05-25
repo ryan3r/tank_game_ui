@@ -16,9 +16,9 @@ export class GameVersion {
         return this._logFormatter.format(logEntry, gameState, this);
     }
 
-    finalizeLogEntry(rawLogEntry) {
-        const finalizer = this._entryFinalizers[rawLogEntry.action] || this._entryFinalizers.default;
-        return finalizer?.(rawLogEntry) || rawLogEntry;
+    finalizeLogEntry(logEntry) {
+        const finalizer = this._entryFinalizers[logEntry.type] || this._entryFinalizers.default;
+        return finalizer?.(logEntry) || logEntry;
     }
 
     getEntityDescriptor(entity) {

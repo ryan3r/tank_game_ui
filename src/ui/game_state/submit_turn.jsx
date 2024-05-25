@@ -237,25 +237,70 @@ function SelectPosition({ builtTurnState }) {
 
 function RollDice({ spec, value, setValue }) {
     if(value === undefined) {
-        value = spec.dice.map(() => undefined);
+        setValue({ type: "auto-roll" });
+        return;
+    }
+
+    const selectRollType = rollType => {
+        if(rollType == "Manual Roll") {
+            setValue({
+                type: "manual-roll",
+                dice: spec.dice.map(() => undefined),
+            });
+        }
+        else {
+            setValue({ type: "auto-roll" });
+        }
+    };
+
+    const isManual = value.type == "manual-roll";
+
+    let diceSection;
+    if(isManual) {
+        diceSection = (
+            <div className="submit-turn-field-wrapper">
+                {spec.dice.map((die, index) => {
+                    const setDieValue = newRoll => {
+                        setValue({
+                            ...value,
+                            dice: [...value.dice.slice(0, index), newRoll, ...value.dice.slice(index + 1)]
+                        });
+                    };
+
+                    return (
+                        <LabelElement key={index} name={`Die ${index + 1}`}>
+                            <Select
+                                spec={{ options: die.sideNames }}
+                                value={value.dice[index]}
+                                setValue={setDieValue}></Select>
+                        </LabelElement>
+                    );
+                })}
+            </div>
+        );
+    }
+    else {
+        diceSection = (
+            <div className="auto-roll-description">
+                The following dice will be rolled on submit
+                <ul>
+                    {spec.describeDice().map(description => {
+                        return (
+                            <li>{description}</li>
+                        );
+                    })}
+                </ul>
+            </div>
+        );
     }
 
     return (
-        <div className="submit-turn-field-wrapper">
-            {spec.dice.map((die, index) => {
-                const setDieValue = newRoll => {
-                    setValue([...value.slice(0, index), newRoll, ...value.slice(index + 1)]);
-                };
-
-                return (
-                    <LabelElement key={index} name={`Die ${index + 1}`}>
-                        <Select
-                            spec={{ options: die.sideNames }}
-                            value={value[index]}
-                            setValue={setDieValue}></Select>
-                    </LabelElement>
-                );
-            })}
+        <div>
+            <Select
+                spec={{ options: ["Auto Roll", "Manual Roll"] }}
+                value={isManual ? "Manual Roll" : "Auto Roll"}
+                setValue={selectRollType}></Select>
+            {diceSection}
         </div>
     );
 }

@@ -1,3 +1,5 @@
+import { Die } from "../../possible-actions/die.js";
+
 export class LogEntry {
     constructor(day, rawLogEntry, id, versionConfig, message) {
         this.id = id;
@@ -38,5 +40,21 @@ export class LogEntry {
 
     updateMessageWithBoardState(gameState) {
         this.message = this._versionConfig.formatLogEntry(this, gameState);
+    }
+
+    finalizeEntry() {
+        for(const field of Object.keys(this.rawLogEntry)) {
+            const value = this.rawLogEntry[field];
+
+            // Roll any unrolled dice
+            if(value?.type == "auto-roll") {
+                const dice = value.dice.map(die => Die.deserialize(die));
+
+                this.rawLogEntry[field] = {
+                    type: "auto-roll-resolved",
+                    dice: dice.map(die => die.roll()),
+                };
+            }
+        }
     }
 }

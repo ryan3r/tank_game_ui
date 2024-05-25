@@ -64,7 +64,7 @@ class FormatingHelpers {
         if(roll === undefined) return "";
 
         // TODO: Translate roll to actual names?
-        return `${prefix}${roll.join(", ")}`;
+        return `${prefix}${roll.dice.join(", ")}`;
     }
 }
 

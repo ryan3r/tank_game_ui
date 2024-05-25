@@ -13,7 +13,7 @@
 }
 
 .submit-turn-form {
-    min-width: 650px;
+    min-width: 700px;
 }
 
 .submit-turn-field-wrapper {
@@ -81,4 +81,8 @@
 .submission-error-title h3 {
     margin: 0px;
     flex-grow: 1;
+}
+
+.auto-roll-description {
+    padding: 6px;
 }

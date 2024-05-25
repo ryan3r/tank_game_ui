@@ -1,7 +1,6 @@
-import { LogFieldSpec } from "./log-field-spec.js";
-
 export class Die {
-    constructor(sides) {
+    constructor(name, sides) {
+        this.name = name;
         this.sides = sides;
 
         this._displayMappings = {};
@@ -14,11 +13,12 @@ export class Die {
     }
 
     static deserialize(rawDie) {
-        return new Die(rawDie.sides);
+        return new Die(rawDie.name, rawDie.sides);
     }
 
     serialize() {
         return {
+            name: this.name,
             sides: this.sides,
         };
     }
@@ -34,7 +34,7 @@ export class Die {
 }
 
 
-export const hitDie = new Die([
+export const hitDie = new Die("hit dice", [
     { display: "hit", value: true },
     { display: "miss", value: false },
 ]);

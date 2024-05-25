@@ -130,8 +130,9 @@ export class GameInteractor {
     }
 
     _finalizeEntry(entry) {
-        entry = this._gameVersion?.finalizeLogEntry?.(entry) || entry;
         entry = this._gameData.logBook.makeEntryFromRaw(entry);
+        entry.finalizeEntry();
+        entry = this._gameVersion?.finalizeLogEntry?.(entry) || entry;
         return entry;
     }
 

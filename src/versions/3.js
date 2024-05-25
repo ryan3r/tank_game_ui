@@ -43,17 +43,14 @@ export const rawV3Config = {
     manualPath: "/manuals/Tank_Game_Rules_v3.pdf",
     possibleActionsFactory,
     entryFinalizers: {
-        shoot(rawLogEntry) {
+        shoot(logEntry) {
             // If the hit field wasn't set process the dice
-            if(rawLogEntry.hit === undefined) {
-                return {
-                    ...rawLogEntry,
-                    // If any dice hit the shot hits
-                    hit: !!rawLogEntry.hit_chance.find(hit => hit),
-                };
+            if(logEntry.rawLogEntry.hit === undefined) {
+                // If any dice hit the shot hits
+                logEntry.rawLogEntry.hit = !!logEntry.rawLogEntry.hit_chance.dice.find(hit => hit);
             }
 
-            return rawLogEntry;
+            return logEntry;
         }
     },
 };
