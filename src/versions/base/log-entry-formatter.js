@@ -60,11 +60,11 @@ class FormatingHelpers {
         return `${location} (${info})`;
     }
 
-    dieRoll(roll, prefix="") {
+    dieRoll(roll, { prefix="", suffix="" }) {
         if(roll === undefined) return "";
 
         // TODO: Translate roll to actual names?
-        return `${prefix}${roll.dice.join(", ")}`;
+        return `${prefix}${roll.dice.join(", ")}${suffix}`;
     }
 }
 
@@ -95,7 +95,7 @@ export function shoot(entry, formatter) {
         locationInParenthisis: false,
     });
 
-    return `${entry.subject}${formatter.dieRoll(entry.hit_chance, " rolled ")} and ${verb} ${target}`
+    return `${entry.subject}${formatter.dieRoll(entry.hit_chance, { prefix: " rolled ", suffix: " and " })} ${verb} ${target}`
 }
 
 

@@ -1,10 +1,15 @@
 import assert from "node:assert";
-import { NamedFactorySet, buildRegistry } from "../../../../src/game/possible-actions/index.js";
+import { NamedFactorySet } from "../../../../src/game/possible-actions/index.js";
+import { buildDeserializer } from "../../../../src/utils.js";
 
 
 class MockPossibleAction {
-    getType() {
-        return "mock-action"
+    constructor() {
+        this.type = "mock-action";
+    }
+
+    static canConstruct(type) {
+        return type == "mock-action";
     }
 
     static deserialize(raw) {
@@ -17,8 +22,12 @@ class MockPossibleAction {
 }
 
 class OtherMockPossibleAction {
-    getType() {
-        return "other-mock-action"
+    constructor() {
+        this.type = "other-mock-action";
+    }
+
+    static canConstruct(type) {
+        return type == "other-mock-action";
     }
 
     static deserialize(raw) {
@@ -30,7 +39,7 @@ class OtherMockPossibleAction {
     }
 }
 
-const testRegistry = buildRegistry([MockPossibleAction, OtherMockPossibleAction]);
+const testDeserializer = buildDeserializer([MockPossibleAction, OtherMockPossibleAction]);
 
 
 describe("NamedFactorySet", () => {
@@ -44,7 +53,7 @@ describe("NamedFactorySet", () => {
                 type: "other-mock-action",
                 otherFlag: 2,
             },
-        ], testRegistry);
+        ], testDeserializer);
 
         assert.deepEqual(deserialized, [
             {
