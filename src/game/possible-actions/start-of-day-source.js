@@ -14,12 +14,12 @@ export class StartOfDaySource {
 
 export class StartOfDayFactory extends GenericPossibleAction {
     constructor(dayToStart) {
-        super({ actionName: "start_of_day" });
+        super({ actionName: "start_of_day", type: "start-of-day" });
         this._dayToStart = dayToStart;
     }
 
-    getType() {
-        return "start-of-day";
+    static canConstruct(type) {
+        return type == "start-of-day";
     }
 
     static deserialize(rawStartOfDayFactory) {

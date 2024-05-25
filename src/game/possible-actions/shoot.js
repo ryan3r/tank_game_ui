@@ -1,10 +1,11 @@
+import { DiceLogFieldSpec } from "./dice-log-field-spec.js";
 import { Die } from "./die.js";
 import { GenericPossibleAction } from "./generic-possible-action.js";
 import { LogFieldSpec } from "./log-field-spec.js";
 
 export class ShootAction extends GenericPossibleAction {
     constructor({ targets }) {
-        super({ actionName: "shoot" });
+        super({ actionName: "shoot", type: "shoot" });
         this._targets = targets;
 
         this._diceToRoll = {};
@@ -13,8 +14,8 @@ export class ShootAction extends GenericPossibleAction {
         }
     }
 
-    getType() {
-        return "shoot";
+    static canConstruct(type) {
+        return type == "shoot";
     }
 
     static deserialize(rawShootAction) {
@@ -47,12 +48,12 @@ export class ShootAction extends GenericPossibleAction {
             const dice = this._diceToRoll[logEntry.target];
 
             if(dice.length > 0) {
-                hitFields = dice.map((die, idx) => {
-                    return die.getLogFieldSpec({
-                        name: `die-${idx}`,
-                        display: `Die ${idx + 1}`,
-                    });
-                });
+                hitFields = [
+                    new DiceLogFieldSpec({
+                        name: "hit_chance",
+                        dice,
+                    }),
+                ];
             }
             else {
                 hitFields = [

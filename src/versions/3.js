@@ -49,9 +49,7 @@ export const rawV3Config = {
                 return {
                     ...rawLogEntry,
                     // If any dice hit the shot hits
-                    hit: !!Object.keys(rawLogEntry)
-                        .filter(key => key.startsWith("die-"))
-                        .find(hit => hit),
+                    hit: !!rawLogEntry.hit_chance.find(hit => hit),
                 };
             }
 

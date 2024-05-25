@@ -57,6 +57,10 @@ export class LogFieldSpec {
         return option;
     }
 
+    static canConstruct(type) {
+        return VALID_TYPES.includes(type);
+    }
+
     static deserialize(rawSpec) {
         return new LogFieldSpec(rawSpec);
     }
@@ -64,7 +68,7 @@ export class LogFieldSpec {
     serialize() {
         return {
             name: this.name,
-            display: this.displayName,
+            display: this.display,
             type: this.type,
             options: this._origOptions,
             value: this.options?.[0],

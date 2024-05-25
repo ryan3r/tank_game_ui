@@ -61,19 +61,22 @@ export function SubmitTurn({ isLatestEntry, canSubmitAction, refreshGameInfo, ga
         return buildTurnDispatch(selectActionType(possibleActions.prettyToInternal[actionName]));
     };
 
-    // Game over no more actions to submit or we haven't picked a user yet
-    if(!canSubmitAction || builtTurnState.actions.length === 0) {
+    // Game over no more actions to submit
+    if(!canSubmitAction) {
         return;
     }
+
+    if(error) {
+        return <ErrorMessage error={error}></ErrorMessage>
+    }
+
+    // Actions aren't available yet
+    if(builtTurnState.actions.length === 0) return;
 
     if(!isLatestEntry) {
         return (
             <p>You can only submit actions on the most recent turn.</p>
         );
-    }
-
-    if(error) {
-        return <ErrorMessage error={error}></ErrorMessage>
     }
 
     if(status) {
@@ -138,6 +141,9 @@ function SubmissionForm({ builtTurnState, buildTurnDispatch }) {
                 if(fieldSpec.type == "select-position") {
                     Element = SelectPosition;
                 }
+                else if(fieldSpec.type == "roll-dice") {
+                    Element = RollDice;
+                }
                 else if(fieldSpec.type.startsWith("select")) {
                     Element = Select;
                 }
@@ -171,10 +177,10 @@ function SubmissionForm({ builtTurnState, buildTurnDispatch }) {
 
 function LabelElement({ name, children }) {
     return (
-        <label className="submit-turn-field" key={name}>
+        <div className="field-wrapper">
             <h3>{name}</h3>
             {children}
-        </label>
+        </div>
     );
 }
 
@@ -226,5 +232,30 @@ function SelectPosition({ builtTurnState }) {
 
     return (
         <span>{message}</span>
+    );
+}
+
+function RollDice({ spec, value, setValue }) {
+    if(value === undefined) {
+        value = spec.dice.map(() => undefined);
+    }
+
+    return (
+        <div className="submit-turn-field-wrapper">
+            {spec.dice.map((die, index) => {
+                const setDieValue = newRoll => {
+                    setValue([...value.slice(0, index), newRoll, ...value.slice(index + 1)]);
+                };
+
+                return (
+                    <LabelElement key={index} name={`Die ${index + 1}`}>
+                        <Select
+                            spec={{ options: die.sideNames }}
+                            value={value[index]}
+                            setValue={setDieValue}></Select>
+                    </LabelElement>
+                );
+            })}
+        </div>
     );
 }

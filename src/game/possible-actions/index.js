@@ -1,19 +1,13 @@
+import { buildDeserializer } from "../../utils.js";
+import { DiceLogFieldSpec } from "./dice-log-field-spec.js";
 import { GenericPossibleAction } from "./generic-possible-action.js";
+import { LogFieldSpec } from "./log-field-spec.js";
 import { ShootAction } from "./shoot.js";
 import { StartOfDayFactory } from "./start-of-day-source.js";
 
 
-export function buildRegistry(Types) {
-    let registry = {};
-    for(const Type of Types) {
-        registry[Type.prototype.getType()] = Type;
-    }
-
-    return registry;
-}
-
 // Build the default registry with all of the action types
-const defaultRegistry = buildRegistry([
+const possibleActionsDeserializer = buildDeserializer([
     StartOfDayFactory,
     GenericPossibleAction,
     ShootAction,
@@ -24,23 +18,15 @@ export class NamedFactorySet extends Array {
     serialize() {
         return this.map(factory => {
             return({
-                type: factory.getType(),
+                type: factory.type,
                 ...factory.serialize()
             })
         });
     }
 
-    static deserialize(factories, registry = defaultRegistry) {
+    static deserialize(factories, deserializer = possibleActionsDeserializer) {
         return new NamedFactorySet(
-            ...factories.map(rawFactory => {
-                const Type = registry[rawFactory.type];
-
-                if(!Type) {
-                    throw new Error(`No action factory for ${rawFactory.type}`);
-                }
-
-                return Type.deserialize(rawFactory);
-            })
+            ...factories.map(rawFactory => deserializer(rawFactory)),
         );
     }
 }

@@ -44,8 +44,20 @@
     display: inline-block;
 }
 
-.radio-button-wrapper, .radio-button-wrapper > label {
+.radio-button-wrapper {
     padding: 5px 0px;
+}
+
+.field-wrapper {
+    padding: 5px 7px;
+}
+
+.field-wrapper:first-child {
+    padding-left: 0px;
+}
+
+.field-wrapper:last-child {
+    padding-right: 0px;
 }
 
 .submit-turn-description {
