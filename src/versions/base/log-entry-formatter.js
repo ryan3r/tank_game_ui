@@ -1,3 +1,4 @@
+import { Dice } from "../../game/possible-actions/die.js";
 import { Position } from "../../game/state/board/position.js";
 import { prettyifyName } from "../../utils.js";
 
@@ -61,10 +62,13 @@ class FormatingHelpers {
     }
 
     dieRoll(roll, { prefix="", suffix="" }) {
-        if(roll === undefined) return "";
+        if(!Array.isArray(roll?.roll)) return "";
 
-        // TODO: Translate roll to actual names?
-        return `${prefix}${roll.dice.join(", ")}${suffix}`;
+        const dice = roll.dice.map(dice => Dice.deserialize(dice));
+        const prettyRoll = Dice.expandAll(dice)
+            .map((die, idx) => die.getSideNameFromValue(roll.roll[idx]));
+
+        return `${prefix}${prettyRoll.join(", ")}${suffix}`;
     }
 }
 
@@ -95,7 +99,7 @@ export function shoot(entry, formatter) {
         locationInParenthisis: false,
     });
 
-    return `${entry.subject}${formatter.dieRoll(entry.hit_roll, { prefix: " rolled ", suffix: " and " })} ${verb} ${target}`
+    return `${entry.subject}${formatter.dieRoll(entry.hit_roll, { prefix: " rolled a ", suffix: " and " })} ${verb} ${target}`
 }
 
 

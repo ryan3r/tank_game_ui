@@ -237,21 +237,20 @@ function SelectPosition({ builtTurnState }) {
 
 function RollDice({ spec, value, setValue }) {
     if(value === undefined) {
-        setValue({ type: "auto-roll" });
+        setValue({ type: "die-roll", manual: false });
         return;
     }
 
-    const isManual = value.type == "manual-roll";
-
     const selectManualRoll = () => {
         setValue({
-            type: "manual-roll",
+            type: "die-roll",
+            manual: true,
             dice: spec.expandedDice.map(() => undefined),
         });
     };
 
     // The number of dice has changed
-    if(isManual && spec.expandedDice.length !== value.dice.length) {
+    if(value.manual && spec.expandedDice.length !== value.dice.length) {
         selectManualRoll();
         return;
     }
@@ -261,12 +260,12 @@ function RollDice({ spec, value, setValue }) {
             selectManualRoll();
         }
         else {
-            setValue({ type: "auto-roll" });
+            setValue({ type: "die-roll", manual: false });
         }
     };
 
     let diceSection;
-    if(isManual) {
+    if(value.manual) {
         let dieNumber;
         let dieName;
 
@@ -305,10 +304,10 @@ function RollDice({ spec, value, setValue }) {
         <>
             <Select
                 spec={{ options: ["Auto Roll", "Manual Roll"] }}
-                value={isManual ? "Manual Roll" : "Auto Roll"}
+                value={value.manual ? "Manual Roll" : "Auto Roll"}
                 setValue={selectRollType}></Select>
             <p>
-                {isManual ? "Roll the following dice" : "The following dice will be rolled on submit"}
+                {value.manual ? "Roll the following dice" : "The following dice will be rolled on submit"}
                 <ul>
                     {spec.describeDice().map(description => {
                         return (

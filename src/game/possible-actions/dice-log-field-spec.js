@@ -1,4 +1,5 @@
 import { prettyifyName } from "../../utils.js";
+import { Dice } from "./die.js";
 
 export class DiceLogFieldSpec {
     constructor({ name, display, description, dice }) {
@@ -7,7 +8,7 @@ export class DiceLogFieldSpec {
         this.display = display || prettyifyName(name);
         this.type = "roll-dice";
         this.dice = dice;
-        this.expandedDice = this.dice.flatMap(dice => dice.expandDice());
+        this.expandedDice = Dice.expandAll(this.dice);
     }
 
     static canConstruct(type) {
@@ -29,33 +30,42 @@ export class DiceLogFieldSpec {
 
     translateValue(uiValue) {
         if(uiValue !== undefined) {
-            if(uiValue.type === "auto-roll") {
+            const dice = this.dice.map(dice => dice.serialize());
+
+            if(!uiValue.manual) {
                 return {
-                    type: "auto-roll",
-                    dice: this.expandedDice.map(die => die.serialize()),
+                    type: "die-roll",
+                    manual: false,
+                    dice,
                 };
             }
 
             // Bad dice count reject it
-            if(uiValue.dice.length != this.expandedDice.length) {
+            if(uiValue.dice?.length != this.expandedDice.length) {
                 return undefined;
             }
 
             return {
-                type: "manual-roll",
-                dice: uiValue.dice.map((value, idx) => this.expandedDice[idx].translateValue(value))
+                type: "die-roll",
+                manual: true,
+                dice,
+                roll: uiValue.dice.map((value, idx) => this.expandedDice[idx].translateValue(value))
             };
         }
     }
 
     isValid(value) {
-        if(value?.type === "auto-roll") return true;
+        if(value === undefined) return false;
 
-        // Manual roll
-        if(value?.dice?.length !== this.expandedDice.length) return false;
+        if(value?.manual) {
+            // Manual roll
+            if(value.roll.length !== this.expandedDice.length) return false;
 
-        // If all sides are defined assume they're valid
-        return value.dice.reduce((previous, side) => previous && side !== undefined, true);
+            // If all sides are defined assume they're valid
+            return value.roll.reduce((previous, side) => previous && side !== undefined, true);
+        }
+
+        return true;
     }
 
     describeDice() {

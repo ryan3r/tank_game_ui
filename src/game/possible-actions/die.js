@@ -4,12 +4,15 @@ export class Die {
         this.namePlural = namePlural || name + "s";
         this.sides = sides;
 
-        this._displayMappings = {};
+        this._displayToRaw = {};
+        this._rawToDisplay = {};
         this.sideNames = [];
         for(const side of sides) {
             const display = side.display !== undefined ? side.display : side;
+            const value = side.value !== undefined ? side.value : side;
             this.sideNames.push(display);
-            this._displayMappings[display] = side.value !== undefined ? side.value : side;
+            this._displayToRaw[display] = value;
+            this._rawToDisplay[value] = display;
         }
     }
 
@@ -31,7 +34,11 @@ export class Die {
     }
 
     translateValue(display) {
-        return this._displayMappings[display];
+        return this._displayToRaw[display];
+    }
+
+    getSideNameFromValue(value) {
+        return this._rawToDisplay[value];
     }
 }
 
@@ -42,14 +49,32 @@ export class Dice {
         this.die = die;
     }
 
+    static expandAll(dice) {
+        return dice.flatMap(dice => dice.expandDice());
+    }
+
     static deserialize(rawDice) {
-        return new Dice(rawDice.count, Die.deserialize(rawDice.die));
+        let die;
+        if(typeof rawDice.die == "string") {
+            die = commonDice[rawDice.die];
+        }
+        else {
+            die = Die.deserialize(rawDice.die);
+        }
+
+        return new Dice(rawDice.count, die);
     }
 
     serialize() {
+        let die = this.die.serialize();
+        // If this die is known just serialize it as its name
+        if(commonDice[this.die.name] !== undefined) {
+            die = this.die.name;
+        }
+
         return {
             count: this.count,
-            die: this.die.serialize(),
+            die,
         };
     }
 
@@ -76,3 +101,12 @@ export const hitDie = new Die({
         { display: "miss", value: false },
     ]
 });
+
+
+const commonDice = {
+    "hit die": hitDie,
+};
+
+export function getDieByName(name) {
+    return commonDice[name];
+}
