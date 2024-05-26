@@ -119,6 +119,7 @@ export const useGameInfo = makeReactDataFetchHelper({
     url: game => `/api/game/${game}/`,
     parse: data => {
         return {
+            gameSettings: data.gameSettings,
             buildInfo: data.buildInfo,
             openHours: OpenHours.deserialize(data.openHours),
             logBook: LogBook.deserialize(data.logBook),

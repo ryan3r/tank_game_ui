@@ -129,7 +129,8 @@ export function Game({ game, setGame, debug }) {
                             refreshGameInfo={refreshGameInfo}
                             debug={debug}
                             entryId={currentTurnMgrState.entryId}
-                            isLatestEntry={currentTurnMgrState.isLatestEntry}></SubmitTurn>}
+                            isLatestEntry={currentTurnMgrState.isLatestEntry}
+                            allowManualRolls={gameInfo?.gameSettings?.allowManualRolls}></SubmitTurn>}
                     </div>
                 </div>
             </AppContent>

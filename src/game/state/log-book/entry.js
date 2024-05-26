@@ -43,12 +43,12 @@ export class LogEntry {
         this.message = this._versionConfig.formatLogEntry(this, gameState);
     }
 
-    finalizeEntry(gameState) {
+    finalizeEntry(gameState, allowManualRolls) {
         for(const field of Object.keys(this.rawLogEntry)) {
             const value = this.rawLogEntry[field];
 
             // Roll any unrolled dice
-            if(value?.type == "die-roll" && value.roll === undefined) {
+            if(value?.type == "die-roll" && (value.roll === undefined || !allowManualRolls)) {
                 const dice = this._versionConfig.getDiceFor(this.type, field, {
                     gameState,
                     rawLogEntry: this.rawLogEntry,

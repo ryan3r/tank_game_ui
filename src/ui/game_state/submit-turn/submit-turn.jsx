@@ -9,7 +9,7 @@ import { Select, SelectPosition } from "./select.jsx";
 import { Input } from "./input.jsx";
 import { RollDice } from "./roll-dice.jsx";
 
-export function SubmitTurn({ isLatestEntry, canSubmitAction, refreshGameInfo, game, debug, entryId, builtTurnState, buildTurnDispatch, context }) {
+export function SubmitTurn({ isLatestEntry, canSubmitAction, refreshGameInfo, game, debug, entryId, builtTurnState, buildTurnDispatch, allowManualRolls }) {
     // Set this to undefined so we don't send a request for anthing other than the last turn
     const possibleActionsEntryId = canSubmitAction && isLatestEntry ? entryId : undefined;
     const [actionFactories, error] = usePossibleActionFactories(game, builtTurnState.subject, possibleActionsEntryId);
@@ -106,7 +106,8 @@ export function SubmitTurn({ isLatestEntry, canSubmitAction, refreshGameInfo, ga
                         </LabelElement>
                         <SubmissionForm
                             builtTurnState={builtTurnState}
-                            buildTurnDispatch={buildTurnDispatch}></SubmissionForm>
+                            buildTurnDispatch={buildTurnDispatch}
+                            allowManualRolls={allowManualRolls}></SubmissionForm>
                     </div>
                     <div className="submit-action-button-wrapper">
                         <button type="submit" disabled={!builtTurnState.isValid}>Submit action</button>
@@ -133,7 +134,7 @@ export function SubmitTurn({ isLatestEntry, canSubmitAction, refreshGameInfo, ga
     );
 }
 
-function SubmissionForm({ builtTurnState, buildTurnDispatch }) {
+function SubmissionForm({ builtTurnState, buildTurnDispatch, allowManualRolls }) {
     return (
         <>
             {builtTurnState.currentSpecs.map(fieldSpec => {
@@ -167,7 +168,8 @@ function SubmissionForm({ builtTurnState, buildTurnDispatch }) {
                                 builtTurnState={builtTurnState}
                                 spec={fieldSpec}
                                 value={builtTurnState.uiFieldValues[fieldSpec.name]}
-                                setValue={setValue}></Element>
+                                setValue={setValue}
+                                allowManualRolls={allowManualRolls}></Element>
                         </LabelElement>
                     );
                 }

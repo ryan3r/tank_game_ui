@@ -129,9 +129,10 @@ export class GameInteractor {
     }
 
     _finalizeEntry(entry) {
+        const {allowManualRolls} = this.getSettings();
         const lastState = this.getGameStateById(this._gameData.logBook.getLastEntryId());
         entry = this._gameData.logBook.makeEntryFromRaw(entry);
-        entry.finalizeEntry(lastState);
+        entry.finalizeEntry(lastState, allowManualRolls);
         return entry;
     }
 
@@ -157,5 +158,15 @@ export class GameInteractor {
 
     hasAutomaticStartOfDay() {
         return !!this._automaticStartOfDay;
+    }
+
+    getSettings() {
+        let settings = this._gameData.gameSettings || {};
+
+        if(settings.allowManualRolls === undefined) {
+            settings.allowManualRolls = true;
+        }
+
+        return settings;
     }
 }

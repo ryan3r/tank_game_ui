@@ -2,7 +2,7 @@ import { prettyifyName } from "../../../utils.js";
 import { LabelElement } from "./base.jsx";
 import { Select } from "./select.jsx";
 
-export function RollDice({ spec, value, setValue }) {
+export function RollDice({ spec, value, setValue, allowManualRolls }) {
     if(value === undefined) {
         setValue({ type: "die-roll", manual: false });
         return;
@@ -69,10 +69,11 @@ export function RollDice({ spec, value, setValue }) {
 
     return (
         <>
-            <Select
-                spec={{ options: ["Auto Roll", "Manual Roll"] }}
-                value={value.manual ? "Manual Roll" : "Auto Roll"}
-                setValue={selectRollType}></Select>
+            {allowManualRolls ?
+                <Select
+                    spec={{ options: ["Auto Roll", "Manual Roll"] }}
+                    value={value.manual ? "Manual Roll" : "Auto Roll"}
+                    setValue={selectRollType}></Select> : undefined}
             <p>
                 {value.manual ? "Roll the following dice" : "The following dice will be rolled on submit"}
                 <ul>

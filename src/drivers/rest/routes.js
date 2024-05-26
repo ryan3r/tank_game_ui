@@ -23,6 +23,7 @@ export function defineRoutes(app, buildInfo) {
 
         res.json({
             buildInfo,
+            gameSettings: interactor.getSettings(),
             openHours: interactor.getOpenHours().serialize({ resolved: true }),
             logBook: interactor.getLogBook().serialize(),
         });
