@@ -3,14 +3,14 @@ import { logger } from "#platform/logging.js";
 import { LogFieldSpec } from "../../game/possible-actions/log-field-spec.js";
 import { ShootAction } from "../../game/possible-actions/shoot.js";
 import { Position } from "../../game/state/board/position.js";
-import { Dice } from "../../game/possible-actions/die.js";
+import { getGameVersion } from "../../versions/index.js";
 
 export class JavaEngineSource {
     constructor(engine) {
         this._engine = engine;
     }
 
-    _buildShootAction(possibleAction, gameState, player) {
+    _buildShootAction(possibleAction, gameState, playerName, versionConfig) {
         let {range} = possibleAction.fields.find(field => field.name == "target");
 
         // Parse positions and remove invalid ones
@@ -23,34 +23,28 @@ export class JavaEngineSource {
             }
         }).filter(position => position && gameState.board.isInBounds(position));
 
-        if(player.entities.length != 1) {
-            throw new Error(`Expected player ${player.name} to have exactly 1 entity for shooting`);
-        }
-
-        const playerEntity = player.entities[0];
-
         return new ShootAction({
             targets: range.map(position => {
-                const target = gameState.board.getEntityAt(position);
-                let dice = [];
+                position = position.humanReadable;
 
-                // This target has health we must roll
-                if(target.resources.health !== undefined) {
-                    const distance = playerEntity.position.distanceTo(target.position);
-                    const numDice = (playerEntity.resources.range.value - distance) + 1;
-
-                    dice.push(new Dice(numDice, "hit die"));
-                }
+                const dice = versionConfig.getDiceFor("shoot", "hit_roll", {
+                    gameState,
+                    rawLogEntry: {
+                        subject: playerName,
+                        target: position,
+                    },
+                });
 
                 return {
-                    position: position.humanReadable,
+                    position,
                     dice,
                 };
             })
         });
     }
 
-    async getActionFactoriesForPlayer({playerName, gameState, interactor}) {
+    async getActionFactoriesForPlayer({playerName, gameState, interactor, logBook}) {
+        const versionConfig = getGameVersion(logBook.gameVersion);
         const player = gameState.players.getPlayerByName(playerName);
         if(!player) return [];
 
@@ -65,7 +59,7 @@ export class JavaEngineSource {
 
             // Shoot has a custom action to handle determining how many dice to roll
             if(actionName == "shoot") {
-                return this._buildShootAction(possibleAction, gameState, player);
+                return this._buildShootAction(possibleAction, gameState, playerName, versionConfig);
             }
 
             const fieldSpecs = this._buildFieldSpecs(possibleAction.fields);

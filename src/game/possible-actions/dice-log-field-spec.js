@@ -30,13 +30,10 @@ export class DiceLogFieldSpec {
 
     translateValue(uiValue) {
         if(uiValue !== undefined) {
-            const dice = this.dice.map(dice => dice.serialize());
-
             if(!uiValue.manual) {
                 return {
                     type: "die-roll",
                     manual: false,
-                    dice,
                 };
             }
 
@@ -48,7 +45,6 @@ export class DiceLogFieldSpec {
             return {
                 type: "die-roll",
                 manual: true,
-                dice,
                 roll: uiValue.dice.map((value, idx) => this.expandedDice[idx].translateValue(value))
             };
         }

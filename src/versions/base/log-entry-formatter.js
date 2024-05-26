@@ -61,10 +61,15 @@ class FormatingHelpers {
         return `${location} (${info})`;
     }
 
-    dieRoll(roll, { prefix="", suffix="" }) {
+    dieRoll(entry, field, { prefix="", suffix="" }) {
+        const roll = entry[field];
         if(!Array.isArray(roll?.roll)) return "";
 
-        const dice = roll.dice.map(dice => Dice.deserialize(dice));
+        const dice = this._version.getDiceFor(entry.action, field, {
+            gameState: this._gameState,
+            rawLogEntry: entry,
+        });
+
         const prettyRoll = Dice.expandAll(dice)
             .map((die, idx) => die.getSideNameFromValue(roll.roll[idx]));
 
@@ -81,6 +86,7 @@ export const upgradeRange = entry => `${entry.subject} upgraded their range`
 export const bounty = entry => `${entry.subject} placed a ${entry.bounty} gold bounty on ${entry.target}`
 export const stimulus = entry => `${entry.subject} granted a stimulus of 1 action to ${entry.target}`
 export const grantLife = entry => `${entry.subject} granted 1 life to ${entry.target}`
+
 
 export function move(entry, formatter) {
     const location = formatter.describeLocation(entry.target, {
@@ -99,7 +105,7 @@ export function shoot(entry, formatter) {
         locationInParenthisis: false,
     });
 
-    return `${entry.subject}${formatter.dieRoll(entry.hit_roll, { prefix: " rolled a ", suffix: " and " })} ${verb} ${target}`
+    return `${entry.subject}${formatter.dieRoll(entry, "hit_roll", { prefix: " rolled a ", suffix: " and " })} ${verb} ${target}`
 }
 
 

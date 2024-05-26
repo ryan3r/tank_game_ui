@@ -1,3 +1,4 @@
+import { logger } from "#platform/logging.js";
 import { Dice } from "../../possible-actions/die.js";
 
 export class LogEntry {
@@ -42,17 +43,26 @@ export class LogEntry {
         this.message = this._versionConfig.formatLogEntry(this, gameState);
     }
 
-    finalizeEntry() {
+    finalizeEntry(gameState) {
         for(const field of Object.keys(this.rawLogEntry)) {
             const value = this.rawLogEntry[field];
 
             // Roll any unrolled dice
             if(value?.type == "die-roll" && value.roll === undefined) {
-                const dice = value.dice.map(die => Dice.deserialize(die));
-                const expandedDice = Dice.expandAll(dice);
+                const dice = this._versionConfig.getDiceFor(this.type, field, {
+                    gameState,
+                    rawLogEntry: this.rawLogEntry,
+                });
 
+                const expandedDice = Dice.expandAll(dice);
                 this.rawLogEntry[field].roll = expandedDice.map(die => die.roll());
             }
+        }
+
+        // Apply any version specific transforms before submitting
+        const newRawEntry = this._versionConfig?.finalizeLogEntry?.(this.rawLogEntry);
+        if(newRawEntry) {
+            this.rawLogEntry = newRawEntry
         }
     }
 }
