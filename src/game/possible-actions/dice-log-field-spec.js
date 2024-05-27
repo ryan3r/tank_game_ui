@@ -55,7 +55,7 @@ export class DiceLogFieldSpec {
 
         if(value?.manual) {
             // Manual roll
-            if(value.roll.length !== this.expandedDice.length) return false;
+            if(value.roll?.length !== this.expandedDice.length) return false;
 
             // If all sides are defined assume they're valid
             return value.roll.reduce((previous, side) => previous && side !== undefined, true);

@@ -15,9 +15,10 @@ function validateLogBook(logBook) {
     assert.equal(logBook.getEntry(77).type, "shoot");
 }
 
-function validateSampleFile({logBook, initialGameState}) {
+function validateSampleFile({logBook, initialGameState, gameSettings}) {
     // Sanity check a few properties to make sure we loaded the data
     validateLogBook(logBook);
+    assert.equal(gameSettings.something, "else");
     assert.equal(initialGameState.board.unit_board.length, 11);
     assert.equal(initialGameState.board.unit_board[0].length, 11);
     assert.deepEqual(initialGameState.council.council, []);
