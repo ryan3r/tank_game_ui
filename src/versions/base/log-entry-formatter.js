@@ -1,5 +1,3 @@
-import { logger } from "#platform/logging.js";
-import { Dice } from "../../game/possible-actions/die.js";
 import { Position } from "../../game/state/board/position.js";
 import { prettyifyName } from "../../utils.js";
 
@@ -99,7 +97,7 @@ export function shoot(entry, formatter) {
         locationInParenthisis: false,
     });
 
-    return `${entry.subject}${formatter.dieRoll("hit_roll", { prefix: " rolled a ", suffix: " and " })} ${verb} ${target}`
+    return `${entry.subject} ${verb} ${target}${formatter.dieRoll("hit_roll", { prefix: " [", suffix: "]" })}`
 }
 
 
