@@ -37,7 +37,7 @@ export class ShootAction extends GenericPossibleAction {
     }
 
     getParameterSpec(logEntry) {
-        const targetSpec = this._targetSpec = new LogFieldSpec({
+        const targetSpec = new LogFieldSpec({
             name: "target",
             type: "select-position",
             options: this._targets.map(target => target.position),
