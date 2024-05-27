@@ -65,7 +65,9 @@ class FormatingHelpers {
         const roll = this._logEntry.dieRolls?.[field];
         if(!roll) return "";
 
-        return `${prefix}${roll.map(dieSide => dieSide.display).join(", ")}${suffix}`;
+        const manual = this._logEntry.rawLogEntry?.[field]?.manual;
+
+        return `${prefix}${roll.map(dieSide => dieSide.display).join(", ")}${manual ? " (manual)": ""}${suffix}`;
     }
 }
 
