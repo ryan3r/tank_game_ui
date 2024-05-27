@@ -107,6 +107,8 @@ export class GameInteractor {
         if(this._saveHandler) {
             await this._saveHandler(this._gameData);
         }
+
+        return entry;
     }
 
     async _canProcessAction(entry) {

@@ -83,3 +83,26 @@
     margin: 0px;
     flex-grow: 1;
 }
+
+.roll-result-body {
+    min-width: 350px;
+}
+
+.die-box {
+    background: #fff;
+    border: 3px solid;
+    margin: 5px;
+    width: 50px;
+    height: 50px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.die-box:first-child {
+    margin-left: 0px;
+}
+
+.die-box:last-child {
+    margin-right: 0px;
+}

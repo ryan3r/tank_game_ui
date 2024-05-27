@@ -1,3 +1,4 @@
+import { logger } from "#platform/logging.js";
 import { Dice } from "../../game/possible-actions/die.js";
 import { Position } from "../../game/state/board/position.js";
 import { prettyifyName } from "../../utils.js";
@@ -13,14 +14,15 @@ export class LogEntryFormatter {
             throw new Error(`Log entry type ${logEntry.type} is not supported`);
         }
 
-        return formatFunction(logEntry.rawLogEntry, new FormatingHelpers(gameState, version));
+        return formatFunction(logEntry.rawLogEntry, new FormatingHelpers(gameState, version, logEntry));
     }
 }
 
 class FormatingHelpers {
-    constructor(gameState, version) {
+    constructor(gameState, version, logEntry) {
         this._gameState = gameState;
         this._version = version;
+        this._logEntry = logEntry;
     }
 
     describeLocation(location, { locationInParenthisis, entity = true, floor = false }) {
@@ -61,19 +63,11 @@ class FormatingHelpers {
         return `${location} (${info})`;
     }
 
-    dieRoll(entry, field, { prefix="", suffix="" }) {
-        const roll = entry[field];
-        if(!Array.isArray(roll?.roll)) return "";
+    dieRoll(field, { prefix="", suffix="" }) {
+        const roll = this._logEntry.dieRolls?.[field];
+        if(!roll) return "";
 
-        const dice = this._version.getDiceFor(entry.action, field, {
-            gameState: this._gameState,
-            rawLogEntry: entry,
-        });
-
-        const prettyRoll = Dice.expandAll(dice)
-            .map((die, idx) => die.getSideNameFromValue(roll.roll[idx]));
-
-        return `${prefix}${prettyRoll.join(", ")}${suffix}`;
+        return `${prefix}${roll.join(", ")}${suffix}`;
     }
 }
 
@@ -105,7 +99,7 @@ export function shoot(entry, formatter) {
         locationInParenthisis: false,
     });
 
-    return `${entry.subject}${formatter.dieRoll(entry, "hit_roll", { prefix: " rolled a ", suffix: " and " })} ${verb} ${target}`
+    return `${entry.subject}${formatter.dieRoll("hit_roll", { prefix: " rolled a ", suffix: " and " })} ${verb} ${target}`
 }
 
 

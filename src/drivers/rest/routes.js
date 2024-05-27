@@ -44,8 +44,8 @@ export function defineRoutes(app, buildInfo) {
         const log = req.log || logger;
 
         try {
-            await interactor.addLogBookEntry(req.body);
-            res.json({ success: true });
+            const entry = await interactor.addLogBookEntry(req.body);
+            res.json({ success: true, entry: entry.serialize() });
         }
         catch(err) {
             log.info({

@@ -121,6 +121,20 @@ export function buildTurnReducer(state, invocation) {
         };
     }
 
+    if(invocation.type == "set-last-roll-entry") {
+        return {
+            ...state,
+            lastRollEntry: invocation.lastRollEntry,
+        };
+    }
+    else if(invocation.type != "set-possible-actions") {
+        // Reset for anything except for possible actions being set
+        state = {
+            ...state,
+            lastRollEntry: undefined,
+        };
+    }
+
     if(invocation.type == "set-subject") {
         return {
             ...makeInitalState(),
@@ -134,6 +148,7 @@ export function buildTurnReducer(state, invocation) {
             ...makeInitalState(),
             subject: state.subject,
             _possibleActions: invocation.possibleActions,
+            lastRollEntry: state.lastRollEntry,
             actions: (invocation.possibleActions || []).map(factory => ({
                 name: factory.getActionName(),
             })),
@@ -201,6 +216,7 @@ export const selectActionType = actionName => ({ type: "select-action-type", act
 export const setActionSpecificField = (name, value) => ({ type: "set-action-specific-field", name, value });
 export const selectLocation = location => ({ type: "select-location", location });
 export const setLastError = error => ({ type: "set-last-error", error });
+export const setLastRollEntry = lastRollEntry => ({ type: "set-last-roll-entry", lastRollEntry });
 
 export function useBuildTurn() {
     return useReducer(buildTurnReducer, undefined, makeInitalState);

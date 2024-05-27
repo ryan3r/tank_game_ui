@@ -88,3 +88,43 @@ export function RollDice({ spec, value, setValue, allowManualRolls }) {
         </>
     );
 }
+
+export function DieRollResults({ rollLogEntry, onClose }) {
+    const rollFields = Object.keys(rollLogEntry.dieRolls)
+        .map(key => [key, rollLogEntry.dieRolls[key]])
+        .filter(field => !rollLogEntry.rawLogEntry[field[0]].manual);
+
+    // Nothing was rolled close the view
+    if(rollFields.length === 0) {
+        onClose();
+    }
+
+    return (
+        <div className="submit-turn-box">
+            <div className="submit-turn-title">
+                <h2>Die roll results</h2>
+                <div>
+                <button onClick={onClose}>Close</button>
+                </div>
+            </div>
+            <div className="roll-result-body">
+                {rollFields.map(([fieldName, field]) => {
+                    return (
+                        <div key={fieldName}>
+                            <h3>{prettyifyName(fieldName)}</h3>
+                            <p>
+                                {field.map(dieSide => {
+                                    return (
+                                        <div className="die-box">
+                                            <span>{dieSide}</span>
+                                        </div>
+                                    );
+                                })}
+                            </p>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
