@@ -121,7 +121,7 @@ export function DieRollResults({ rollLogEntry, onClose }) {
                                     };
 
                                     return (
-                                        <div className="die-box" style={style}>
+                                        <div className="die-box" style={style} key={dieSide.display}>
                                             {dieSide.icon === undefined ?
                                                 <span>{dieSide.display}</span> :
                                                 undefined}
