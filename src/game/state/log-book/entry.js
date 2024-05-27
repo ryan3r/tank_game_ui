@@ -56,7 +56,7 @@ export class LogEntry {
             });
 
             this.dieRolls[rollField.key] = Dice.expandAll(dice)
-                .map((die, idx) => die.getSideNameFromValue(rollField.value.roll[idx]));
+                .map((die, idx) => die.getSideFromValue(rollField.value.roll[idx]));
         }
 
         this.message = this._versionConfig.formatLogEntry(this, gameState);

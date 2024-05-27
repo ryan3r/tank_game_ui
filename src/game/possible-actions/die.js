@@ -12,7 +12,7 @@ class Die {
             const value = side.value !== undefined ? side.value : side;
             this.sideNames.push(display);
             this._displayToRaw[display] = value;
-            this._rawToDisplay[value] = display;
+            this._rawToDisplay[value] = { display, icon: side.icon };
         }
     }
 
@@ -25,7 +25,7 @@ class Die {
         return this._displayToRaw[display];
     }
 
-    getSideNameFromValue(value) {
+    getSideFromValue(value) {
         return this._rawToDisplay[value];
     }
 }
@@ -71,8 +71,8 @@ const commonDice = {
         name: "hit die",
         namePlural: "hit dice",
         sides: [
-            { display: "hit", value: true },
-            { display: "miss", value: false },
+            { display: "hit", value: true, icon: "hit" },
+            { display: "miss", value: false, icon: "" },
         ]
     }),
 };

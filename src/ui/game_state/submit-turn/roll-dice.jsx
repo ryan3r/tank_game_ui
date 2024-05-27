@@ -1,4 +1,5 @@
 import { prettyifyName } from "../../../utils.js";
+import { imageBackground } from "../../../versions/base/descriptors.js";
 import { LabelElement } from "./base.jsx";
 import { Select } from "./select.jsx";
 
@@ -102,9 +103,9 @@ export function DieRollResults({ rollLogEntry, onClose }) {
     return (
         <div className="submit-turn-box">
             <div className="submit-turn-title">
-                <h2>Die roll results</h2>
+                <h2>Die Roll Results</h2>
                 <div>
-                <button onClick={onClose}>Close</button>
+                    <button onClick={onClose}>Close</button>
                 </div>
             </div>
             <div className="roll-result-body">
@@ -114,9 +115,16 @@ export function DieRollResults({ rollLogEntry, onClose }) {
                             <h3>{prettyifyName(fieldName)}</h3>
                             <p>
                                 {field.map(dieSide => {
+                                    const style = {
+                                        background: imageBackground(dieSide.icon),
+                                        backgroundSize: "cover", // Stretch to fit
+                                    };
+
                                     return (
-                                        <div className="die-box">
-                                            <span>{dieSide}</span>
+                                        <div className="die-box" style={style}>
+                                            {dieSide.icon === undefined ?
+                                                <span>{dieSide.display}</span> :
+                                                undefined}
                                         </div>
                                     );
                                 })}
