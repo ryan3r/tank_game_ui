@@ -1,4 +1,3 @@
-import { logger } from "#platform/logging.js";
 import { PossibleActionSourceSet } from "../../game/possible-actions/index.js";
 import { EntityDescriptor, FloorTileDescriptor } from "./descriptors.js";
 
