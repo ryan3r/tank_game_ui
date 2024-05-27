@@ -11,6 +11,7 @@ export function makeInitalState() {
         isValid: false,
         logBookEntry: {},
         lastError: undefined,
+        lastRollEntry: undefined,
     };
 }
 
