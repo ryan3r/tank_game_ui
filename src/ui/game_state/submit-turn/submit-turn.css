@@ -97,6 +97,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    font-size: 1.5em;
 }
 
 .die-box:first-child {
