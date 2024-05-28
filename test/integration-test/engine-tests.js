@@ -125,6 +125,30 @@ export function defineTestsForEngine(createEngine) {
                 }
             });
 
+            async function buildAllDieRolls(actionBuilder, specIdx, dieIdx, dieSides, callback) {
+                const spec = actionBuilder.currentSpecs[specIdx];
+
+                // We've filled out this die continue filling out the action
+                if(dieIdx === spec.expandedDice.length) {
+                    const value = {
+                        manual: true,
+                        dice: dieSides,
+                    };
+
+                    const currentBuilder = buildTurnReducer(actionBuilder, setActionSpecificField(spec.name, value));
+
+                    await buildAllPossibleActions(currentBuilder, specIdx + 1, callback);
+                    return;
+                }
+
+                const die = spec.expandedDice[dieIdx];
+
+                for(const sideName of die.sideNames) {
+                    const currentSides = [...dieSides, sideName];
+                    await buildAllDieRolls(actionBuilder, specIdx, dieIdx + 1, currentSides, callback);
+                }
+            }
+
             async function buildAllPossibleActions(actionBuilder, specIdx, callback) {
                 // We've built a full action spit it out
                 if(specIdx == actionBuilder.currentSpecs.length) {
@@ -133,6 +157,19 @@ export function defineTestsForEngine(createEngine) {
                 }
 
                 const spec = actionBuilder.currentSpecs[specIdx];
+
+                if(spec.type == "roll-dice") {
+                    // Build and submit a turn with an automatic roll
+                    const currentBuilder = buildTurnReducer(actionBuilder,
+                        setActionSpecificField(spec.name, { manual: false }));
+
+                    await buildAllPossibleActions(currentBuilder, specIdx + 1, callback);
+
+                    // Build all possible manual rolls
+                    await buildAllDieRolls(actionBuilder, specIdx, 0, [], callback);
+                    return;
+                }
+
                 const options = spec.type == "input-number" ? NUMBERS_TO_TRY : spec.options;
 
                 // nothing to iterate
