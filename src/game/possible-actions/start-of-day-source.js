@@ -2,13 +2,13 @@ import { GenericPossibleAction } from "./generic-possible-action.js";
 import { LogFieldSpec } from "./log-field-spec.js";
 
 export class StartOfDaySource {
-    async getActionFactoriesForPlayer({logEntry, interactor}) {
+    async getActionFactoriesForPlayer({day, interactor}) {
         // Don't give the users the ability to start new days
         if(interactor.hasAutomaticStartOfDay()) {
             return [];
         }
 
-        return [new StartOfDayFactory(logEntry.day + 1)];
+        return [new StartOfDayFactory(day + 1)];
     }
 }
 

@@ -13,7 +13,8 @@ export class ShootActionSource {
 
     async getActionFactoriesForPlayer({playerName, gameState, engine}) {
         // This player can't shoot nothing to do
-        if(!this._playerCanShoot(gameState.players.getPlayerByName(playerName))) {
+        const player = gameState.players.getPlayerByName(playerName);
+        if(!player || !this._playerCanShoot(player)) {
             return [];
         }
 
@@ -45,7 +46,7 @@ export class ShootActionSource {
                         dice,
                     };
                 })
-            })
+            }),
         ];
     }
 }
@@ -114,5 +115,9 @@ export class ShootAction extends GenericPossibleAction {
         }
 
         return [targetSpec, ...hitFields];
+    }
+
+    getDiceFor(fieldName, { rawLogEntry }) {
+        return this._diceToRoll[rawLogEntry.target];
     }
 }

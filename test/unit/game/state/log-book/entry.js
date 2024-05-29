@@ -7,19 +7,31 @@ import { Dice } from "../../../../../src/game/possible-actions/die.js";
 class MockVersionConfig {
     constructor() {
         this.formatArgs = [];
-        this.diceArgs = [];
     }
 
     formatLogEntry(logEntry, gameState) {
         this.formatArgs.push([logEntry, gameState]);
         return "My formatted message";
     }
+}
 
-    getDiceFor(...args) {
-        this.diceArgs.push(args);
-        return [new Dice(3, "hit die")];
+class MockActionSet {
+    constructor() {
+        this.getArgs = [];
+        this.diceArgs = [];
+    }
+
+    get(actionName) {
+        this.getArgs.push(actionName);
+        return {
+            getDiceFor: (...args) => {
+                this.diceArgs.push(args);
+                return [new Dice(3, "hit die")];
+            }
+        };
     }
 }
+
 
 function makeBasicHitEntry(roll) {
     const versionConfig = new MockVersionConfig();
@@ -59,7 +71,11 @@ describe("LogEntry", () => {
 
     it("can convert dice rolls to be UI friendly", () => {
         let {hitEntry, versionConfig} = makeBasicHitEntry([true, false, true]);
-        hitEntry.updateMessageWithBoardState({ stateNo: 2 });
+        let actions = new MockActionSet();
+        hitEntry.updateMessageWithBoardState({
+            previousState: { stateNo: 2 },
+            actions,
+        });
 
         assert.equal(hitEntry.message, "My formatted message")
         assert.deepEqual(versionConfig.formatArgs, [
@@ -76,16 +92,27 @@ describe("LogEntry", () => {
     });
 
     it("can finalize the log entry", () => {
-        let {hitEntry, versionConfig} = makeBasicHitEntry([true, false]);
-        hitEntry.finalizeEntry({ stateNo: 2 }, true);
+        let {hitEntry} = makeBasicHitEntry([true, false]);
+        let actions = new MockActionSet();
+        hitEntry.finalizeEntry({
+            gameState: { stateNo: 2 },
+            allowManualRolls: true,
+            actions,
+        });
 
         // Hit field is unmodified for manual roll
         assert.deepEqual(hitEntry.rawLogEntry.hit_roll.roll, [true, false]);
 
-        hitEntry.finalizeEntry({ stateNo: 2 }, false);
+        hitEntry.finalizeEntry({
+            gameState: { stateNo: 2 },
+            allowManualRolls: false,
+            actions,
+        });
 
-        assert.deepEqual(versionConfig.diceArgs, [
-            ["shoot", "hit_roll", {
+        assert.deepEqual(actions.getArgs, ["shoot"]);
+
+        assert.deepEqual(actions.diceArgs, [
+            ["hit_roll", {
                 gameState: { stateNo: 2 },
                 rawLogEntry: hitEntry.rawLogEntry
             }],

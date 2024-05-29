@@ -62,16 +62,20 @@ export function defineTestsForEngine(createEngine) {
                     return logBook.getEntry(timeStampEntryId)?.rawLogEntry?.timestamp || -1;
                 };
 
-                let emptyLogBook = new LogBook(logBook.gameVersion, [], getGameVersion(logBook.gameVersion), makeTimeStamp);
+                const versionConfig = getGameVersion(logBook.gameVersion);
+                let emptyLogBook = new LogBook(logBook.gameVersion, [], versionConfig, makeTimeStamp);
 
                 let fullEngine = createEngine();
                 let incrementalEngine = createEngine();
+                const fullFactories = versionConfig.getActionFactories(fullEngine);
+                const incrementalFactories = versionConfig.getActionFactories(incrementalEngine);
                 try {
                     // Create one instance that starts with the log book full
                     // This triggers a set version, set state, and a series of process actions
                     logger.debug("[integration-test] Process actions as a group");
                     let fullInteractor = new GameInteractor({
                         engine: fullEngine,
+                        actionFactories: fullFactories,
                         gameData: {
                             logBook,
                             initialGameState,
@@ -86,6 +90,7 @@ export function defineTestsForEngine(createEngine) {
                     const saveHandler = (...args) => save(TEST_GAME_RECREATE_PATH, ...args);
                     let incrementalInteractor = new GameInteractor({
                         engine: incrementalEngine,
+                        actionFactories: incrementalFactories,
                         gameData: {
                             logBook: emptyLogBook,
                             initialGameState,

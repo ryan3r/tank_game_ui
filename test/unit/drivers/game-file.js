@@ -10,6 +10,16 @@ const sampleFileBaseName = `tank_game_v3_format_v${FILE_FORMAT_VERSION}`;
 const sampleFilePath = path.join(TEST_FILES, `${sampleFileBaseName}.json`);
 
 
+class MockGameVersion {
+    getActionFactories() {
+        return {
+            getActionFactoriesForPlayer() {
+                return [];
+            },
+        };
+    }
+}
+
 function validateLogBook(logBook) {
     assert.equal(logBook.getMaxDay(), 16);
     assert.equal(logBook.getEntry(77).type, "shoot");
@@ -65,7 +75,9 @@ describe("GameFile", () => {
 
         // This test logs load errors to the console as warnings.  You may want to set the LOG_LEVEL to info
         // in the package.json if you want to debug this test.
-        const gameManager = new GameManager(TEST_FILES, mockEngineFactory);
+        const gameManager = new GameManager(TEST_FILES, mockEngineFactory, {
+            gameVersion: new MockGameVersion(),
+        });
 
         await gameManager.loaded;
 

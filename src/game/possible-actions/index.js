@@ -57,6 +57,10 @@ export class NamedFactorySet {
             ...f,
         );
     }
+
+    get(actionName) {
+        return this._actionsByName[actionName];
+    }
 }
 
 export class PossibleActionSourceSet {

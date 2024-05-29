@@ -160,6 +160,7 @@ describe("GameInteractor", () => {
 
         assert.deepEqual(versionConfig.getCalls(), [
             // First call is ignored because state is undefined
+            [logEntries[0], { stateNo: 1, converted: true }],
             [logEntries[1], { stateNo: 2, converted: true }],
             [logEntries[2], { stateNo: 3, converted: true }],
         ]);
@@ -179,7 +180,9 @@ describe("GameInteractor", () => {
 
         const rawEntry = { action: "run" };
         let newEntry = new LogEntry(1, rawEntry, 1, versionConfig);
-        newEntry.updateMessageWithBoardState({ stateNo: 2 });
+        newEntry.updateMessageWithBoardState({
+            previousState: { stateNo: 2 },
+        });
         await interactor.addLogBookEntry(rawEntry);
 
         assert.deepEqual(mockEngine.operations, [
@@ -201,6 +204,7 @@ describe("GameInteractor", () => {
 
         assert.deepEqual(versionConfig.getCalls(), [
             // First call is ignored because state is undefined
+            [logEntries[0], { stateNo: 1, converted: true }],
             [newEntry, { stateNo: 2 }],
             [newEntry, { stateNo: 2, converted: true }],
         ]);
@@ -286,9 +290,13 @@ describe("GameInteractor", () => {
 
         const rawEntry = { action: "run" };
         let newEntry = new LogEntry(2, rawEntry, 3, versionConfig);
-        newEntry.updateMessageWithBoardState({ stateNo: 3 });
+        newEntry.updateMessageWithBoardState({
+            previousState: { stateNo: 3 },
+        });
         let newEntry2 = new LogEntry(2, rawEntry, 4, versionConfig);
-        newEntry2.updateMessageWithBoardState({ stateNo: 4 });
+        newEntry2.updateMessageWithBoardState({
+            previousState: { stateNo: 4 },
+        });
         mockEngine.processingDelay = firstAddActionDelay;
         interactor.addLogBookEntry(rawEntry);
         mockEngine.processingDelay = secondAddActionDelay;

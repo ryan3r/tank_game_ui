@@ -41,20 +41,27 @@ export class GameInteractor {
             throw new Error(`startIndex (${startIndex}) can't be larger than endIndex (${endIndex})`);
         }
 
-        await this._sendPreviousState(startIndex);
-
-        // Remove any states that might already be there
-        this._gameStates.splice(startIndex, (endIndex - startIndex) + 1);
+        await this._sendPreviousState();
 
         for(let i = startIndex; i <= endIndex; ++i) {
-            const logEntry = this._gameData.logBook.getEntry(i);
+            let logEntry = this._gameData.logBook.getEntry(i);
+
+            // Format log entry with previous state
+            const previousState = this._gameStates[this._gameStates.length - 1] ||
+                this._engine.getGameStateFromEngineState(this._gameData.initialGameState);
+
+            logEntry.updateMessageWithBoardState({
+                previousState,
+                actions: await this.getActions(logEntry.rawLogEntry.subject, {
+                    day: logEntry.day,
+                }),
+            });
+
+            // Process the action
             const state = await this._engine.processAction(logEntry);
             this._previousState = state;
             const gameState = this._engine.getGameStateFromEngineState(state)
             this._gameStates.splice(i, 0, gameState); // Insert state at i
-
-            // Format log entry with previous state
-            logEntry.updateMessageWithBoardState(this._gameStates[this._gameStates.length - 2]);
         }
     }
 
@@ -90,12 +97,18 @@ export class GameInteractor {
         this._throwIfGameNotOpen();
 
         await this._sendPreviousState();
+
+        // Format log entry with previous state
+        entry.updateMessageWithBoardState({
+            previousState: this._gameStates[this._gameStates.length - 1],
+            actions: await this.getActions(entry.rawLogEntry.subject),
+        });
+
         const state = await this._engine.processAction(entry);
         this._previousState = state;
 
         const gameState = this._engine.getGameStateFromEngineState(state);
-        // Format log entry with previous state
-        entry.updateMessageWithBoardState(this._gameStates[this._gameStates.length - 1]);
+
         this._gameData.logBook.addEntry(entry);
         this._gameStates.push(gameState);
 
@@ -131,23 +144,27 @@ export class GameInteractor {
         return success;
     }
 
-    _finalizeEntry(entry) {
+    async _finalizeEntry(entry) {
         const {allowManualRolls} = this.getSettings();
         const lastState = this.getGameStateById(this._gameData.logBook.getLastEntryId());
         entry = this._gameData.logBook.makeEntryFromRaw(entry);
-        entry.finalizeEntry(lastState, allowManualRolls);
+        entry.finalizeEntry({
+            gameState: lastState,
+            allowManualRolls,
+            actions: await this.getActions(entry.rawLogEntry.subject),
+        });
         return entry;
     }
 
     addLogBookEntry(entry) {
-        return this._lock.use(() => {
-            return this._addLogBookEntry(this._finalizeEntry(entry));
+        return this._lock.use(async () => {
+            return this._addLogBookEntry(await this._finalizeEntry(entry));
         });
     }
 
     canProcessAction(entry) {
-        return this._lock.use(() => {
-            return this._canProcessAction(this._finalizeEntry(entry));
+        return this._lock.use(async () => {
+            return this._canProcessAction(await this._finalizeEntry(entry));
         });
     }
 
@@ -173,20 +190,25 @@ export class GameInteractor {
         return settings;
     }
 
-    async getActions(playerName) {
+    // Some action factories communicate with the backend directly so it's assumed we're on the state before this action is submitted
+    async _getActions(playerName, { day } = {}) {
         const {logBook} = this._gameData;
         const lastEntryId = logBook.getLastEntryId();
 
-        // Some action factories communicate with the backend directly.  Make sure it has the correct state.
-        await this._sendPreviousState();
+        const gameState = this.getGameStateById(lastEntryId) ||
+            this._engine.getGameStateFromEngineState(this._gameData.initialGameState);
 
         return await this._actionFactories.getActionFactoriesForPlayer({
             playerName,
             logBook,
-            logEntry: logBook.getEntry(lastEntryId),
-            gameState: this.getGameStateById(lastEntryId),
+            day: day === undefined ? logBook.getMaxDay() : day,
+            gameState,
             interactor: this,
             engine: this._engine,
         });
+    }
+
+    async getActions(playerName) {
+        return await this._getActions(playerName);
     }
 }

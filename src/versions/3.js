@@ -89,38 +89,6 @@ export const rawV3Config = {
 
             return rawLogEntry;
         }
-    },
-    diceFactories: {
-        shoot: {
-            hit_roll({ gameState, rawLogEntry }) {
-                // First action doesn't have state but it will always be start of day
-                if(!gameState) return [];
-
-                const player = gameState.players.getPlayerByName(rawLogEntry.subject);
-
-                if(!player) {
-                    throw new Error(`No such player ${rawLogEntry.subject}`)
-                }
-
-                if(player.entities.length != 1) {
-                    throw new Error(`Expected player ${player.name} to have exactly 1 entity for shooting`);
-                }
-
-                const playerEntity = player.entities[0];
-
-                const target = gameState.board.getEntityAt(Position.fromHumanReadable(rawLogEntry.target));
-
-                // This target has health we must roll
-                if(target.resources.health !== undefined) {
-                    const distance = playerEntity.position.distanceTo(target.position);
-                    const numDice = (playerEntity.resources.range.value - distance) + 1;
-
-                    return [new Dice(numDice, "hit die")];
-                }
-
-                return [];
-            }
-        }
     }
 };
 

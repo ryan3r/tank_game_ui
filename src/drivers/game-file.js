@@ -71,7 +71,7 @@ export class GameManager {
         this._interactors = [];
     }
 
-    async _loadGamesFromFolder({ saveBack, makeTimeStamp }) {
+    async _loadGamesFromFolder(gameOptions) {
         this._gamePromises = {};
         this._games = {};
 
@@ -84,7 +84,7 @@ export class GameManager {
             logger.info(`Loading ${name} from ${filePath}`);
 
             // Load and process the game asyncronously
-            this._gamePromises[name] = loadGameFromFile(filePath, this._createEngine, { saveBack, makeTimeStamp })
+            this._gamePromises[name] = loadGameFromFile(filePath, this._createEngine, gameOptions)
                 .then((interactor) => {
                     // We've already been asked to shutdown kill this game
                     if(this._isShutDown) interactor.shutdown();
@@ -141,9 +141,12 @@ export class GameManager {
     }
 }
 
-export async function loadGameFromFile(filePath, createEngine, { saveBack, makeTimeStamp } = {}) {
+export async function loadGameFromFile(filePath, createEngine, { saveBack, makeTimeStamp, gameVersion } = {}) {
     const gameData = await load(filePath, { saveBack, makeTimeStamp });
-    const gameVersion = getGameVersion(gameData.logBook.gameVersion);
+
+    if(gameVersion === undefined) {
+        gameVersion = getGameVersion(gameData.logBook.gameVersion);
+    }
 
     const engine = createEngine();
     const saveHandler = data => save(filePath, data);

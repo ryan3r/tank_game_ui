@@ -7,7 +7,7 @@ export class JavaEngineSource {
         this._actionsToSkip = new Set(actionsToSkip);
     }
 
-    async getActionFactoriesForPlayer({playerName, gameState, logBook, engine}) {
+    async getActionFactoriesForPlayer({playerName, gameState, engine}) {
         const player = gameState.players.getPlayerByName(playerName);
         if(!player) return [];
 

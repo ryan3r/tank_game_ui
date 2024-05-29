@@ -42,15 +42,15 @@ export class LogEntry {
         return new Date(this.rawLogEntry.timestamp * 1000);
     }
 
-    updateMessageWithBoardState(gameState) {
+    updateMessageWithBoardState({ previousState, actions }) {
         this.dieRolls = {};
         const rollFields = Object.keys(this.rawLogEntry)
             .map(key => ({ key, value: this.rawLogEntry[key] }))
             .filter(field => field.value?.type == "die-roll");
 
         for(const rollField of rollFields) {
-            const dice = this._versionConfig.getDiceFor(this.type, rollField.key, {
-                gameState: gameState,
+            const dice = actions.get(this.type).getDiceFor(rollField.key, {
+                gameState: previousState,
                 rawLogEntry: this.rawLogEntry,
             });
 
@@ -58,10 +58,10 @@ export class LogEntry {
                 .map((die, idx) => die.getSideFromValue(rollField.value.roll[idx]));
         }
 
-        this.message = this._versionConfig.formatLogEntry(this, gameState);
+        this.message = this._versionConfig.formatLogEntry(this, previousState);
     }
 
-    finalizeEntry(gameState, allowManualRolls) {
+    finalizeEntry({ gameState, allowManualRolls, actions }) {
         for(const field of Object.keys(this.rawLogEntry)) {
             const value = this.rawLogEntry[field];
 
@@ -70,7 +70,7 @@ export class LogEntry {
                 if(!allowManualRolls) value.manual = false;
 
                 if(!value.manual) {
-                    const dice = this._versionConfig.getDiceFor(this.type, field, {
+                    const dice = actions.get(this.type).getDiceFor(field, {
                         gameState,
                         rawLogEntry: this.rawLogEntry,
                     });
