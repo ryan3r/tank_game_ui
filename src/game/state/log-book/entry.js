@@ -62,6 +62,8 @@ export class LogEntry {
     }
 
     finalizeEntry({ gameState, allowManualRolls, actions }) {
+        const action = actions.get(this.type);
+
         for(const field of Object.keys(this.rawLogEntry)) {
             const value = this.rawLogEntry[field];
 
@@ -70,7 +72,7 @@ export class LogEntry {
                 if(!allowManualRolls) value.manual = false;
 
                 if(!value.manual) {
-                    const dice = actions.get(this.type).getDiceFor(field, {
+                    const dice = action.getDiceFor(field, {
                         gameState,
                         rawLogEntry: this.rawLogEntry,
                     });
@@ -82,7 +84,7 @@ export class LogEntry {
         }
 
         // Apply any version specific transforms before submitting
-        const newRawEntry = this._versionConfig?.finalizeLogEntry?.(this.rawLogEntry);
+        const newRawEntry = action?.finalizeLogEntry?.(this.rawLogEntry);
         if(newRawEntry) {
             this.rawLogEntry = newRawEntry
         }

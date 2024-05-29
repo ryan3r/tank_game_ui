@@ -120,4 +120,13 @@ export class ShootAction extends GenericPossibleAction {
     getDiceFor(fieldName, { rawLogEntry }) {
         return this._diceToRoll[rawLogEntry.target];
     }
+
+    finalizeLogEntry(rawLogEntry) {
+        if(rawLogEntry.hit === undefined) {
+            // If any dice hit the shot hits
+            rawLogEntry.hit = !!rawLogEntry.hit_roll.roll.find(hit => hit);
+        }
+
+        return rawLogEntry;
+    }
 }

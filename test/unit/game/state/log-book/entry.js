@@ -109,7 +109,7 @@ describe("LogEntry", () => {
             actions,
         });
 
-        assert.deepEqual(actions.getArgs, ["shoot"]);
+        assert.deepEqual(actions.getArgs, ["shoot", "shoot"]);
 
         assert.deepEqual(actions.diceArgs, [
             ["hit_roll", {
