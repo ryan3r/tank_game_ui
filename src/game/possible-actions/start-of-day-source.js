@@ -33,13 +33,14 @@ export class StartOfDayFactory extends GenericPossibleAction {
     }
 
     getParameterSpec() {
-        return [
-            new LogFieldSpec({
-                name: "day",
-                type: "set-value",
-                value: this._dayToStart,
-                hidden: true,
-            }),
-        ];
+        return [];
+    }
+
+    finalizeLogEntry(rawLogEntry) {
+        if(rawLogEntry.day === undefined) {
+            rawLogEntry.day = this._dayToStart;
+        }
+
+        return rawLogEntry;
     }
 }
