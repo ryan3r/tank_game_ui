@@ -6,8 +6,8 @@ import { Position } from "../../game/state/board/position.js";
 import { getGameVersion } from "../../versions/index.js";
 
 export class JavaEngineSource {
-    constructor(engine) {
-        this._engine = engine;
+    constructor({ actionsToSkip = [] } = {}) {
+        this._actionsToSkip = new Set(actionsToSkip);
     }
 
     _buildShootAction(possibleAction, gameState, playerName, versionConfig) {
@@ -43,7 +43,7 @@ export class JavaEngineSource {
         });
     }
 
-    async getActionFactoriesForPlayer({playerName, gameState, interactor, logBook}) {
+    async getActionFactoriesForPlayer({playerName, gameState, logBook, engine}) {
         const versionConfig = getGameVersion(logBook.gameVersion);
         const player = gameState.players.getPlayerByName(playerName);
         if(!player) return [];
@@ -51,11 +51,13 @@ export class JavaEngineSource {
         const isCouncil = ["senator", "councilor"].includes(player.type);
         const subject = playerName;
 
-        await interactor.sendPreviousState();
-        let possibleActions = await this._engine.getPossibleActions(isCouncil ? "Council" : playerName);
+        let possibleActions = await engine.getPossibleActions(isCouncil ? "Council" : playerName);
 
         return possibleActions.map(possibleAction => {
             const actionName = possibleAction.rule || possibleAction.name;
+
+            // This action will be handled by another factory
+            if(this._actionsToSkip.has(actionName)) return;
 
             // Shoot has a custom action to handle determining how many dice to roll
             if(actionName == "shoot") {

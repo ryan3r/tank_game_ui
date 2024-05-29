@@ -256,8 +256,8 @@ class TankGameEngine {
         });
     }
 
-    getEngineSpecificSource() {
-        return new JavaEngineSource(this);
+    getEngineSpecificSource(opts) {
+        return new JavaEngineSource(opts);
     }
 }
 

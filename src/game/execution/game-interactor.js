@@ -41,7 +41,7 @@ export class GameInteractor {
             throw new Error(`startIndex (${startIndex}) can't be larger than endIndex (${endIndex})`);
         }
 
-        await this.sendPreviousState(startIndex);
+        await this._sendPreviousState(startIndex);
 
         // Remove any states that might already be there
         this._gameStates.splice(startIndex, (endIndex - startIndex) + 1);
@@ -58,7 +58,7 @@ export class GameInteractor {
         }
     }
 
-    async sendPreviousState() {
+    async _sendPreviousState() {
         await this._engine.setGameVersion(this._gameData.logBook.gameVersion);
         await this._engine.setBoardState(this._previousState);
     }
@@ -89,7 +89,7 @@ export class GameInteractor {
 
         this._throwIfGameNotOpen();
 
-        await this.sendPreviousState();
+        await this._sendPreviousState();
         const state = await this._engine.processAction(entry);
         this._previousState = state;
 
@@ -119,7 +119,7 @@ export class GameInteractor {
 
         this._throwIfGameNotOpen();
 
-        await this.sendPreviousState();
+        await this._sendPreviousState();
 
         let success = false;
         try {
@@ -176,6 +176,9 @@ export class GameInteractor {
     async getActions(playerName) {
         const {logBook} = this._gameData;
         const lastEntryId = logBook.getLastEntryId();
+
+        // Some action factories communicate with the backend directly.  Make sure it has the correct state.
+        await this._sendPreviousState();
 
         return await this._actionFactories.getActionFactoriesForPlayer({
             playerName,
