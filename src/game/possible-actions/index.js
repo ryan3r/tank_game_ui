@@ -14,19 +14,47 @@ const possibleActionsDeserializer = buildDeserializer([
 ]);
 
 
-export class NamedFactorySet extends Array {
+export class NamedFactorySet {
+    constructor(...actions) {
+        this._actionsByName = {};
+        for(const action of actions) {
+            this._mapActionToName(action);
+        }
+    }
+
+    *[Symbol.iterator]() {
+        for(const action of Object.values(this._actionsByName)) {
+            yield action;
+        }
+    }
+
+    push(action) {
+        this._mapActionToName(action);
+    }
+
+    _mapActionToName(action) {
+        const name = action.getActionName();
+
+        if(this._actionsByName[name]) {
+            throw new Error(`Multiple actions name ${name} (types = [${this._actionsByName[name].type}, ${action.type}])`);
+        }
+
+        this._actionsByName[name] = action;
+    }
+
     serialize() {
-        return this.map(factory => {
-            return({
+        return Object.values(this._actionsByName).map(factory => {
+            return {
                 type: factory.type,
                 ...factory.serialize()
-            })
+            };
         });
     }
 
     static deserialize(factories, deserializer = possibleActionsDeserializer) {
+        const f = factories.map(rawFactory => deserializer(rawFactory));
         return new NamedFactorySet(
-            ...factories.map(rawFactory => deserializer(rawFactory)),
+            ...f,
         );
     }
 }

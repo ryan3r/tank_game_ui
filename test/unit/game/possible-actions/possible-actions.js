@@ -4,8 +4,13 @@ import { buildDeserializer } from "../../../../src/utils.js";
 
 
 class MockPossibleAction {
-    constructor() {
+    constructor(flag) {
+        this.flag = flag;
         this.type = "mock-action";
+    }
+
+    getActionName() {
+        return "mock";
     }
 
     static canConstruct(type) {
@@ -13,17 +18,22 @@ class MockPossibleAction {
     }
 
     static deserialize(raw) {
-        return { from: "main", flag: raw.flag };
+        return new MockPossibleAction(raw.flag);
     }
 
     serialize() {
-        return { flag: 3 };
+        return { flag: this.flag };
     }
 }
 
 class OtherMockPossibleAction {
-    constructor() {
+    constructor(otherFlag) {
         this.type = "other-mock-action";
+        this.otherFlag = otherFlag;
+    }
+
+    getActionName() {
+        return "other";
     }
 
     static canConstruct(type) {
@@ -31,11 +41,11 @@ class OtherMockPossibleAction {
     }
 
     static deserialize(raw) {
-        return { from: "other", otherFlag: raw.otherFlag, };
+        return new OtherMockPossibleAction(raw.otherFlag + 3);
     }
 
     serialize() {
-        return { otherFlag: 4 };
+        return { otherFlag: this.otherFlag };
     }
 }
 
@@ -55,22 +65,22 @@ describe("NamedFactorySet", () => {
             },
         ], testDeserializer);
 
-        assert.deepEqual(deserialized, [
+        assert.deepEqual(Array.from(deserialized), [
             {
-                from: "main",
+                type: "mock-action",
                 flag: 1,
             },
             {
-                from: "other",
-                otherFlag: 2,
+                type: "other-mock-action",
+                otherFlag: 5,
             },
         ]);
     });
 
     it("can serialize factories", () => {
         const set = new NamedFactorySet(
-            new MockPossibleAction(),
-            new OtherMockPossibleAction(),
+            new MockPossibleAction(3),
+            new OtherMockPossibleAction(4),
         );
 
         assert.deepEqual(set.serialize(), [

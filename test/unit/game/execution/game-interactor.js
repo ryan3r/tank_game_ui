@@ -2,6 +2,7 @@ import assert from "node:assert";
 import { LogBook } from "../../../../src/game/state/log-book/log-book.js";
 import { GameInteractor } from "../../../../src/game/execution/game-interactor.js";
 import { LogEntry } from "../../../../src/game/state/log-book/entry.js";
+import { PossibleActionSourceSet } from "../../../../src/game/possible-actions/index.js";
 
 const GAME_VERSION = 3;
 
@@ -67,8 +68,7 @@ export class MockEngine {
     }
 }
 
-
-async function configureInteractor(logEntries, { saveHandler, waitForLoaded = true, processingDelays, versionConfig } = {}) {
+async function configureInteractor(logEntries, { saveHandler, waitForLoaded = true, processingDelays, versionConfig, actionFactories = [] } = {}) {
     let logBook = new LogBook(GAME_VERSION, logEntries, versionConfig);
     let initialGameState = makeMockState({ stateNo: 1 });
 
@@ -81,6 +81,7 @@ async function configureInteractor(logEntries, { saveHandler, waitForLoaded = tr
             initialGameState,
         },
         saveHandler,
+        actionFactories: new PossibleActionSourceSet(actionFactories),
     });
 
     if(waitForLoaded) await interactor.loaded;

@@ -150,7 +150,7 @@ export function buildTurnReducer(state, invocation) {
             subject: state.subject,
             _possibleActions: invocation.possibleActions,
             lastRollEntry: state.lastRollEntry,
-            actions: (invocation.possibleActions || []).map(factory => ({
+            actions: Array.from(invocation.possibleActions || []).map(factory => ({
                 name: factory.getActionName(),
             })),
         };
@@ -170,7 +170,7 @@ export function buildTurnReducer(state, invocation) {
     let currentFactory;
     switch(invocation.type) {
         case "select-action-type":
-            currentFactory = state._possibleActions.find(factory => factory.getActionName() == invocation.actionName);
+            currentFactory = Array.from(state._possibleActions).find(factory => factory.getActionName() == invocation.actionName);
             if(!currentFactory) {
                 throw new Error(`${invocation.actionName} does not match any known possible actions`);
             }

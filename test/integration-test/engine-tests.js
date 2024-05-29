@@ -15,8 +15,6 @@ import { buildTurnReducer, makeInitalState, selectActionType, selectLocation, se
 const NUMBERS_TO_TRY = [1, 2, 3];
 
 export function defineTestsForEngine(createEngine) {
-    const NUM_RANDOM_ATTEMPTS = 30;
-
     function defTest(name, testFunc) {
         // Disable the tests if we don't have a given engine on hand
         let register = createEngine === undefined ? xit : it;
@@ -203,7 +201,7 @@ export function defineTestsForEngine(createEngine) {
                     return lastTime;
                 };
 
-                const {sourceSet, interactor} = await loadGameFromFile(POSSIBLE_ACTIONS_PATH, createEngine, {makeTimeStamp});
+                const interactor = await loadGameFromFile(POSSIBLE_ACTIONS_PATH, createEngine, {makeTimeStamp});
                 try {
                     const logBook = interactor.getLogBook();
                     const lastId = logBook.getLastEntryId();
@@ -214,13 +212,7 @@ export function defineTestsForEngine(createEngine) {
                     }
 
                     for(const player of players) {
-                        const factories = await sourceSet.getActionFactoriesForPlayer({
-                            playerName: player.name,
-                            logBook,
-                            logEntry: logBook.getEntry(lastId),
-                            gameState: interactor.getGameStateById(lastId),
-                            interactor: interactor,
-                        });
+                        const factories = await interactor.getActions(player.name);
 
                         let actionBuilder = buildTurnReducer(makeInitalState(), setSubject(player.name));
                         actionBuilder = buildTurnReducer(actionBuilder, setPossibleActions(factories));

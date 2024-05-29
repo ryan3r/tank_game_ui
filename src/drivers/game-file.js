@@ -85,7 +85,7 @@ export class GameManager {
 
             // Load and process the game asyncronously
             this._gamePromises[name] = loadGameFromFile(filePath, this._createEngine, { saveBack, makeTimeStamp })
-                .then(({ interactor, sourceSet }) => {
+                .then((interactor) => {
                     // We've already been asked to shutdown kill this game
                     if(this._isShutDown) interactor.shutdown();
 
@@ -94,7 +94,6 @@ export class GameManager {
                     this._games[name] = {
                         loaded: true,
                         interactor,
-                        sourceSet,
                     };
 
                     return this._games[name];
@@ -148,13 +147,16 @@ export async function loadGameFromFile(filePath, createEngine, { saveBack, makeT
 
     const engine = createEngine();
     const saveHandler = data => save(filePath, data);
-    const interactor = new GameInteractor({ engine, gameData, saveHandler, gameVersion });
+    const interactor = new GameInteractor({
+        engine,
+        gameData,
+        saveHandler,
+        actionFactories: gameVersion.getActionFactories(engine),
+    });
+
     await interactor.loaded;
 
-    return {
-        interactor,
-        sourceSet: gameVersion.constructActionSources(engine),
-    };
+    return interactor;
 }
 
 export async function createGameManager(createEngine, saveUpdatedFiles) {

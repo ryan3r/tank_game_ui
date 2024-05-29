@@ -58,7 +58,7 @@ export function defineRoutes(app, buildInfo) {
     });
 
     app.get("/api/game/:gameName/possible-actions/:playerName/:lastTurnId", async (req, res) => {
-        const {valid, interactor, sourceSet} = req.games.getGameIfAvailable();
+        const {valid, interactor} = req.games.getGameIfAvailable();
         if(!valid) return;
 
         const logBook = interactor.getLogBook();
@@ -72,14 +72,7 @@ export function defineRoutes(app, buildInfo) {
             return;
         }
 
-        const factories = await sourceSet.getActionFactoriesForPlayer({
-            playerName: req.params.playerName,
-            logBook,
-            logEntry: logBook.getEntry(lastId),
-            gameState: interactor.getGameStateById(lastId),
-            interactor: interactor,
-        });
-
+        const factories = await interactor.getActions(req.params.playerName);
         res.json(factories.serialize());
     });
 

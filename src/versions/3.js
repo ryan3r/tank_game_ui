@@ -15,7 +15,7 @@ class V3WallDescriptor extends Wall {
     };
 }
 
-function possibleActionsFactory(engine) {
+function actionFactory(engine) {
     let actionSets = [new StartOfDaySource()];
 
     const engineSpecificSource = engine.getEngineSpecificSource &&
@@ -43,7 +43,7 @@ export const rawV3Config = {
         "senator",
     ],
     manualPath: "/manuals/Tank_Game_Rules_v3.pdf",
-    possibleActionsFactory,
+    actionFactory,
     entryFinalizers: {
         shoot(rawLogEntry) {
             // If the hit field wasn't set process the dice
