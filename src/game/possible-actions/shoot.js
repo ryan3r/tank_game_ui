@@ -1,7 +1,54 @@
+import { logger } from "#platform/logging.js";
+import { Position } from "../state/board/position.js";
 import { DiceLogFieldSpec } from "./dice-log-field-spec.js";
 import { Dice } from "./die.js";
 import { GenericPossibleAction } from "./generic-possible-action.js";
 import { LogFieldSpec } from "./log-field-spec.js";
+
+export class ShootActionSource {
+    constructor({ getDiceForTarget, playerCanShoot }) {
+        this._getDiceForTarget = getDiceForTarget;
+        this._playerCanShoot = playerCanShoot;
+    }
+
+    async getActionFactoriesForPlayer({playerName, gameState, engine}) {
+        // This player can't shoot nothing to do
+        if(!this._playerCanShoot(gameState.players.getPlayerByName(playerName))) {
+            return [];
+        }
+
+        let range = await engine.getLineOfSightFor(playerName);
+
+        // Parse positions and remove invalid ones
+        range = range.map(position => {
+            try {
+                return Position.fromHumanReadable(position);
+            }
+            catch(err) {
+                logger.warn({ msg: "Recieved invalid position from engine (dropping)", err, position });
+            }
+        }).filter(position => position && gameState.board.isInBounds(position));
+
+        return [
+            new ShootAction({
+                targets: range.map(position => {
+                    position = position.humanReadable;
+
+                    const dice = this._getDiceForTarget({
+                        gameState,
+                        subject: playerName,
+                        target: position,
+                    });
+
+                    return {
+                        position,
+                        dice,
+                    };
+                })
+            })
+        ];
+    }
+}
 
 export class ShootAction extends GenericPossibleAction {
     constructor({ targets }) {

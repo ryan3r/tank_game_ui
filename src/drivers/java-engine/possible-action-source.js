@@ -1,50 +1,13 @@
 import { GenericPossibleAction } from "../../game/possible-actions/generic-possible-action.js";
 import { logger } from "#platform/logging.js";
 import { LogFieldSpec } from "../../game/possible-actions/log-field-spec.js";
-import { ShootAction } from "../../game/possible-actions/shoot.js";
-import { Position } from "../../game/state/board/position.js";
-import { getGameVersion } from "../../versions/index.js";
 
 export class JavaEngineSource {
     constructor({ actionsToSkip = [] } = {}) {
         this._actionsToSkip = new Set(actionsToSkip);
     }
 
-    _buildShootAction(possibleAction, gameState, playerName, versionConfig) {
-        let {range} = possibleAction.fields.find(field => field.name == "target");
-
-        // Parse positions and remove invalid ones
-        range = range.map(position => {
-            try {
-                return Position.fromHumanReadable(position);
-            }
-            catch(err) {
-                logger.warn({ msg: "Recieved invalid position from engine (dropping)", err, position });
-            }
-        }).filter(position => position && gameState.board.isInBounds(position));
-
-        return new ShootAction({
-            targets: range.map(position => {
-                position = position.humanReadable;
-
-                const dice = versionConfig.getDiceFor("shoot", "hit_roll", {
-                    gameState,
-                    rawLogEntry: {
-                        subject: playerName,
-                        target: position,
-                    },
-                });
-
-                return {
-                    position,
-                    dice,
-                };
-            })
-        });
-    }
-
     async getActionFactoriesForPlayer({playerName, gameState, logBook, engine}) {
-        const versionConfig = getGameVersion(logBook.gameVersion);
         const player = gameState.players.getPlayerByName(playerName);
         if(!player) return [];
 
@@ -58,11 +21,6 @@ export class JavaEngineSource {
 
             // This action will be handled by another factory
             if(this._actionsToSkip.has(actionName)) return;
-
-            // Shoot has a custom action to handle determining how many dice to roll
-            if(actionName == "shoot") {
-                return this._buildShootAction(possibleAction, gameState, playerName, versionConfig);
-            }
 
             const fieldSpecs = this._buildFieldSpecs(possibleAction.fields);
 

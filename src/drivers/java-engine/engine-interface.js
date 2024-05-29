@@ -259,6 +259,21 @@ class TankGameEngine {
     getEngineSpecificSource(opts) {
         return new JavaEngineSource(opts);
     }
+
+    async getLineOfSightFor(player) {
+        const actions = await this.getPossibleActions(player);
+        const shootAction = actions.find(action => action.rule == "shoot");
+        if(!shootAction) {
+            throw new Error("Failed to find shoot action");
+        }
+
+        const targets = shootAction.fields.find(field => field.name == "target");
+        if(!targets) {
+            throw new Error("Shoot action is missing the target parameter");
+        }
+
+        return targets.range;
+    }
 }
 
 export function createEngine(timeout = TANK_GAME_TIMEOUT) {
