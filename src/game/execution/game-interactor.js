@@ -201,10 +201,12 @@ export class GameInteractor {
             this.getGameStateById(entryId - 1) :
             this._engine.getGameStateFromEngineState(this._gameData.initialGameState);
 
+        const logEntry = logBook.getEntry(entryId);
+
         return await this._actionFactories.getActionFactoriesForPlayer({
             playerName,
             logBook,
-            day: logBook.getEntry(entryId).day,
+            day: logEntry !== undefined ? logEntry.day : logBook.getMaxDay(),
             gameState,
             interactor: this,
             engine: this._engine,
