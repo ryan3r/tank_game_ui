@@ -194,7 +194,7 @@ export class GameInteractor {
     async _getActions(playerName, { entryId } = {}) {
         const {logBook} = this._gameData;
         if(entryId === undefined) {
-            entryId = logBook.getLastEntryId() + 1;
+            entryId = logBook.getLength();
         }
 
         const gameState = entryId > 0 ?
