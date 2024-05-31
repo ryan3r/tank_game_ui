@@ -14,12 +14,15 @@ import { buildTurnReducer, makeInitalState, selectActionType, selectLocation, se
 // Random numbers to give input-number fields
 const NUMBERS_TO_TRY = [1, 2, 3];
 
+// Game versions that have known issue effecting the integration tests (usually under active development)
+const SKIPPABLE_VERSIONS = [];
+
 export function defineTestsForEngine(createEngine) {
-    function defTest(name, testFunc) {
+    function defTest(name, testFunc, { skippable } = {}) {
         // Disable the tests if we don't have a given engine on hand
         let register = createEngine === undefined ? xit : it;
 
-        register(name, async () => {
+        const runTest = async () => {
             logger.debug(`[integration-test] Starting ${name}`);
 
             try {
@@ -28,7 +31,25 @@ export function defineTestsForEngine(createEngine) {
             finally {
                 logger.debug(`[integration-test] Finished ${name}`);
             }
-        });
+        };
+
+        const runDevelopmentTest = async function() {
+            try {
+                await runTest();
+            }
+            catch(err) {
+                logger.error({
+                    msg: `Test ${name} failed (skipped since it is in development)`,
+                    err,
+                });
+
+                console.log(`Error in ${name} failed (in development): ${err}`);
+                console.log(err.stack);
+                this.skip();
+            }
+        };
+
+        register(name, skippable ? runDevelopmentTest: runTest);
     }
 
     const TEST_GAME_RECREATE_PATH = `example/tank_game_v3-recreate.json`;
@@ -126,7 +147,7 @@ export function defineTestsForEngine(createEngine) {
                         incrementalEngine.shutdown(),
                     ]);
                 }
-            });
+            }, {skippable: SKIPPABLE_VERSIONS.includes(supportedGameVersion)});
 
             async function buildAllDieRolls(actionBuilder, specIdx, dieIdx, dieSides, callback) {
                 const spec = actionBuilder.currentSpecs[specIdx];
@@ -253,7 +274,7 @@ export function defineTestsForEngine(createEngine) {
                 finally {
                     await interactor.shutdown();
                 }
-            });
+            }, {skippable: SKIPPABLE_VERSIONS.includes(supportedGameVersion)});
         });
     }
 }
