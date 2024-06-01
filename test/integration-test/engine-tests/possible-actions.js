@@ -107,7 +107,10 @@ export async function testPossibleActions(createEngine, possibleActionsPath) {
                     if(finalizedBuilder.isValid) {
                         ++actionsAttempted;
 
-                        logger.info({ msg: "Testing action", finalizedBuilder });
+                        logger.info({
+                            msg: "Testing action",
+                            logEntry: finalizedBuilder.logEntry,
+                        });
 
                         // It's possible that a possible action could fail due to players not having
                         // enough resouces so we can rettry until one passes.  We just care that
