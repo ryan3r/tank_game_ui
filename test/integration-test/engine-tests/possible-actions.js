@@ -63,9 +63,6 @@ async function buildAllPossibleActions(actionBuilder, specIdx, callback) {
     for(const option of options) {
         let currentBuilder;
         if(spec.type == "select-position") {
-            // HACK: Engine claims that Dan can sent stimulus to Lena (B3, dead tank) which is invald
-            if(option == "B3") continue;
-
             currentBuilder = buildTurnReducer(actionBuilder, selectLocation(option));
         }
         else {
