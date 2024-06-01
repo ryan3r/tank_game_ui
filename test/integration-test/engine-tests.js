@@ -23,11 +23,18 @@ export function defineTestsForEngine(createEngine) {
         let register = createEngine === undefined || (requiresFile && !exists(requiresFile)) ? xit : it;
 
         register(name, async () => {
-            configureLogging({
-                logFile: `integration-tests/${logFile}`,
-                logLevel: "trace",
-                overwrite: true,
-            });
+            if(process.env.TEST_MODE === "ci") {
+                // Suppress all non fatal logging in CI to improve performance
+                configureLogging({ logLevel: "error" });
+            }
+            else {
+                // Save full trace logs for easy local debugging
+                configureLogging({
+                    logFile: `integration-tests/${logFile}`,
+                    logLevel: process.env.LOG_LEVEL || "trace",
+                    overwrite: true,
+                });
+            }
 
             try {
                 await testFunc();
