@@ -66,9 +66,6 @@ async function buildAllPossibleActions(actionBuilder, specIdx, callback) {
             // HACK: Engine claims that Dan can sent stimulus to Lena (B3, dead tank) which is invald
             if(option == "B3") continue;
 
-            // HACK: Engine claims that B0 and @2 are a valid spaces
-            if(typeof option == "string" && (option.match(/[A-Z]0/) || !option.match(/[A-Z]\d+/))) continue;
-
             currentBuilder = buildTurnReducer(actionBuilder, selectLocation(option));
         }
         else {
