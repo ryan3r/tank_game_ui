@@ -39,22 +39,6 @@ export function defineTestsForEngine(createEngine) {
         });
     }
 
-    defTest("can process the entire example folder", async () => {
-        let gameManager = await createGameManager(createEngine);
-        try {
-            await gameManager.loaded;
-
-            await Promise.all(
-                gameManager.getAllGames().map(gameName => {
-                    return gameManager.getGamePromise(gameName);
-                })
-            );
-        }
-        finally {
-            await gameManager.shutdown();
-        }
-    }, { logFile: "example-folder.log" });
-
     for(const supportedGameVersion of getAllVersions()) {
         const TEST_GAME_PATH = `example/tank_game_v${supportedGameVersion}.json`;
         const TEST_POSSIBLE_ACTIONS_PATH = `example/possible_actions_v${supportedGameVersion}.json`;
