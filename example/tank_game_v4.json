@@ -1909,7 +1909,7 @@
                         true
                     ]
                 },
-                "hit": false
+                "hit": true
             },
             {
                 "type": "action",
