@@ -1,6 +1,6 @@
 // A suite of tests to make sure we're properly interfacing with the engine
+/* global process */
 import fs from "node:fs";
-import { createGameManager } from "../../src/drivers/game-file.js";
 import { configureLogging } from "#platform/logging.js";
 import { getAllVersions } from "../../src/versions/index.js";
 import { testPossibleActions } from "./engine-tests/possible-actions.js";
