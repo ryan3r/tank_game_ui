@@ -15,7 +15,7 @@
 	"forwardPorts": [3000],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "npm install && git submodule init && git submodule update && cd engine && mvn clean compile package",
+	"postCreateCommand": "./scripts/git-hook && npm install && git submodule init && git submodule update && cd engine && mvn clean compile package",
 
 	// Configure tool-specific properties.
 	// "customizations": {},
