@@ -84,7 +84,7 @@ describe("GameFile", () => {
         // Wait for all the games to load and swallow the load errors
         await Promise.all(
             gameManager.getAllGames()
-                .map(name => gameManager.getGamePromise(name).catch(() => {}))
+                .map(game => game.loaded.catch(() => {}))
         );
 
         const game = gameManager.getGame(sampleFileBaseName);

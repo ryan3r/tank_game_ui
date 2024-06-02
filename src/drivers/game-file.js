@@ -90,14 +90,6 @@ export class GameManager {
         return this._games[name];
     }
 
-    async getGamePromise(name) {
-        const game = this._games[name];
-        if(!game) return undefined;
-
-        await game.loaded;
-        return game;
-    }
-
     getAllGames() {
         return Object.values(this._games) || [];
     }
