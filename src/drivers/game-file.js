@@ -122,7 +122,7 @@ export function loadGameFromFile(filePath, createEngine, { saveBack, makeTimeSta
     });
 }
 
-export async function createGameManager(createEngine, saveUpdatedFiles) {
+export function createGameManager(createEngine, saveUpdatedFiles) {
     const gamesFolder = path.join(process.env.TANK_GAMES_FOLDER || ".");
     const gameManager = new GameManager(gamesFolder, createEngine, { saveBack: saveUpdatedFiles });
     return gameManager;

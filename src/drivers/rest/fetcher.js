@@ -113,6 +113,7 @@ export function useGame() {
 
 export const useGameList = makeReactDataFetchHelper({
     url: "/api/games",
+    frequency: FETCH_FREQUENCY,
 });
 
 export const useGameInfo = makeReactDataFetchHelper({

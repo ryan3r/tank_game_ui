@@ -52,19 +52,16 @@ function gameAccessor(gameManager) {
 }
 
 const port = 3333;
+let gameManager = createGameManager(createEngine, true /* save updated files */);
 
-(async () => {
-    let gameManager = await createGameManager(createEngine, true /* save updated files */);
+const app = express();
 
-    const app = express();
+app.use(makeHttpLogger());
+app.use(express.json());
+app.use(gameAccessor(gameManager));
 
-    app.use(makeHttpLogger());
-    app.use(express.json());
-    app.use(gameAccessor(gameManager));
+defineRoutes(app, buildInfo);
 
-    defineRoutes(app, buildInfo);
-
-    app.listen(port, () => {
-        logger.info(`Listening on ${port}`);
-    });
-})();
+app.listen(port, () => {
+    logger.info(`Listening on ${port}`);
+});
