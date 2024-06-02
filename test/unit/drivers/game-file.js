@@ -87,9 +87,9 @@ describe("GameFile", () => {
                 .map(name => gameManager.getGamePromise(name).catch(() => {}))
         );
 
-        const {interactor: game} = await gameManager.getGamePromise(sampleFileBaseName);
+        const game = await gameManager.getGamePromise(sampleFileBaseName);
 
-        validateLogBook(game.getLogBook());
+        validateLogBook(game.interactor.getLogBook());
 
         // Files from previous versions should be loaded
         for(let version = MINIMUM_SUPPORTED_FILE_FORMAT_VERSION; version < FILE_FORMAT_VERSION; ++version) {

@@ -1,0 +1,123 @@
+import { getGameVersion } from "../../versions/index.js";
+import { StartOfDaySource } from "../possible-actions/start-of-day-source.js";
+import { GameInteractor } from "./game-interactor.js";
+
+
+export class Game {
+    constructor(opts) {
+        this.state = "loading";
+        this._hasBeenShutDown = false;
+        this.loaded = this._initializeGame(opts);
+    }
+
+    async _initializeGame({ gameDataPromise, createEngine, saveHandler }) {
+        const gameData = await gameDataPromise;
+        this._openHours = gameData.openHours;
+
+        // Shutdown was called during load bail before we create the interactor
+        // After this point shutdown with directly terminte the interactor
+        if(this._hasBeenShutDown) return;
+
+        this.state = "running";
+
+        const gameVersion = getGameVersion(gameData.logBook.gameVersion);
+        const engine = createEngine();
+        let actionFactories = gameVersion.getActionFactories(engine);
+
+        // If we don't automate the start of day process let users submit it as an action
+        if(!this.hasAutomaticStartOfDay()) {
+            actionFactories.addSource(new StartOfDaySource());
+        }
+
+        this._interactor = new GameInteractor({
+            engine,
+            gameData,
+            saveHandler,
+            onEntryAdded: this._setStateFromLastEntry.bind(this),
+            actionFactories,
+        });
+
+        try {
+            await this._interactor.loaded;
+        }
+        catch(err) {
+            this.state = "error";
+            this._error = err.message;
+            return;  // failed to load the game bail
+        }
+
+        // Shutdown was called while the interactor was starting bail before we start auto start of day
+        // After this point shutdown with directly cancel auto start of day
+        if(this._hasBeenShutDown) return;
+
+        if(this._openHours?.hasAutomaticStartOfDay?.()) {
+            this._automaticStartOfDay = new AutomaticStartOfDay(this);
+            this.loaded.then(() => this._automaticStartOfDay.start());
+        }
+    }
+
+    _setStateFromLastEntry() {
+        const {running} = this._getLastState();
+        this.state = running ? "running" : "game-over";
+    }
+
+    _getLastState() {
+        const lastEntryId = this._interactor.getLogBook().getLastEntryId();
+        return this._interactor.getGameStateById(lastEntryId);
+    }
+
+    getOpenHours() {
+        return this._gameData.openHours;
+    }
+
+    isGameOpen() {
+        return this._gameData.openHours !== undefined ?
+            this._gameData.openHours.isGameOpen() : true;
+    }
+
+    getStatusText() {
+        if(this.state == "loading") {
+            return "Loading...";
+        }
+
+        if(this.state == "error") {
+            return `Failed to load: ${this._error}`;
+        }
+
+        const logBook = this._interactor.getLogBook();
+
+        if(this.state == "running") {
+            const lastEntry = logBook.getEntry(logBook.getLastEntryId());
+            return `Last action: ${lastEntry.message}`;
+        }
+
+        if(this.state == "game-over") {
+            const {winner} = this._getLastState();
+            return `${winner} is victorious!`;
+        }
+    }
+
+    async shutdown() {
+        this._hasBeenShutDown = true;
+
+        if(this._automaticStartOfDay) {
+            this._automaticStartOfDay.stop();
+        }
+
+        if(this._interactor) {
+            await this._interactor.shutdown();
+        }
+    }
+
+    hasAutomaticStartOfDay() {
+        return !!this._automaticStartOfDay;
+    }
+
+    getInteractor() {
+        if(!this._interactor) {
+            throw new Error(`Game '${this.name}' is in the state ${this.state} and does not have an interactor`);
+        }
+
+        return this._interactor;
+    }
+}

@@ -13,16 +13,16 @@ const buildInfo = process.env.BUILD_INFO;
 function gameAccessor(gameManager) {
     return (req, res, next) => {
         function getGameIfAvailable() {
-            const {loaded, error, interactor} = gameManager.getGame(req.params.gameName);
+            const game = gameManager.getGame(req.params.gameName);
 
-            if(error) {
+            if(game.state == "error") {
                 res.json({
-                    error: `Failed to load game: ${error}`,
+                    error: game.getStatusText(),
                 });
                 return {valid: false};
             }
 
-            if(!loaded) {
+            if(game.state == "loading") {
                 res.json({
                     error: {
                         message: "Game is still loading",
@@ -32,7 +32,7 @@ function gameAccessor(gameManager) {
                 return {valid: false};
             }
 
-            return {valid: true, interactor};
+            return {valid: true, interactor: game.getInteractor(), game};
         }
 
         req.games = {

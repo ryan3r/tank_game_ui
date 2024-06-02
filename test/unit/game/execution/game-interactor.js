@@ -373,7 +373,6 @@ describe("GameInteractor", () => {
             playerName: "fred",
             day: undefined,
             engine: mockEngine,
-            interactor,
             // Initial state converted
             gameState: {
                 converted: true,
@@ -390,7 +389,6 @@ describe("GameInteractor", () => {
             playerName: "fred",
             day: 2,
             engine: mockEngine,
-            interactor,
             gameState: {
                 converted: true,
                 stateNo: 4,
@@ -406,7 +404,6 @@ describe("GameInteractor", () => {
             playerName: "bob",
             day: 3,
             engine: mockEngine,
-            interactor,
             gameState: {
                 converted: true,
                 stateNo: 6,
