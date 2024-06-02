@@ -87,9 +87,9 @@ describe("GameFile", () => {
                 .map(name => gameManager.getGamePromise(name).catch(() => {}))
         );
 
-        const game = await gameManager.getGamePromise(sampleFileBaseName);
+        const game = gameManager.getGame(sampleFileBaseName);
 
-        validateLogBook(game.interactor.getLogBook());
+        validateLogBook(game.getInteractor().getLogBook());
 
         // Files from previous versions should be loaded
         for(let version = MINIMUM_SUPPORTED_FILE_FORMAT_VERSION; version < FILE_FORMAT_VERSION; ++version) {
@@ -97,10 +97,10 @@ describe("GameFile", () => {
         }
 
         // The invalid file should not be loaded
-        assert.equal(gameManager.getGame("bad_file").error, "File format version missing not a valid game file");
-        assert.ok(!gameManager.getGame("bad_file").loaded);
+        assert.equal(gameManager.getGame("bad_file").getStatusText(), "Failed to load: File format version missing not a valid game file");
+        assert.equal(gameManager.getGame("bad_file").state, "error");
 
-        // Invalid games should return an error
-        assert.equal(gameManager.getGame("unknown_file").error, "unknown_file is not a valid game");
+        // Invalid games should return undefined
+        assert.equal(gameManager.getGame("unknown_file"), undefined);
     });
 });

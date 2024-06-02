@@ -38,12 +38,24 @@ export function defineRoutes(app, buildInfo) {
     });
 
     app.post("/api/game/:gameName/turn", async (req, res) => {
-        const {valid, interactor} = req.games.getGameIfAvailable();
+        const {valid, interactor, game} = req.games.getGameIfAvailable();
         if(!valid) return;
 
         const log = req.log || logger;
 
         try {
+            const {canSubmit, error} = game.checkUserCreatedEntry(req.body);
+            if(!canSubmit) {
+                log.info({
+                    msg: "Rejected log book entry (pre submit)",
+                    entry: req.body,
+                    reason: error,
+                });
+
+                res.json({ success: false, error });
+                return;
+            }
+
             const entry = await interactor.addLogBookEntry(req.body);
             res.json({ success: true, entry: entry.serialize() });
         }

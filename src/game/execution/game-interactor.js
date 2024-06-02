@@ -130,12 +130,10 @@ export class GameInteractor {
     }
 
     async _finalizeEntry(entry) {
-        const {allowManualRolls} = this.getSettings();
         const lastState = this.getGameStateById(this._gameData.logBook.getLastEntryId());
         entry = this._gameData.logBook.makeEntryFromRaw(entry);
         entry.finalizeEntry({
             gameState: lastState,
-            allowManualRolls,
             actions: await this.getActions(entry.rawLogEntry.subject),
         });
         return entry;
@@ -155,16 +153,6 @@ export class GameInteractor {
 
     shutdown() {
         return this._engine.shutdown();
-    }
-
-    getSettings() {
-        let settings = this._gameData.gameSettings || {};
-
-        if(settings.allowManualRolls === undefined) {
-            settings.allowManualRolls = true;
-        }
-
-        return settings;
     }
 
     // Some action factories communicate with the backend directly so it's assumed we're on the state before this action is submitted

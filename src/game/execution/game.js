@@ -11,33 +11,34 @@ export class Game {
     }
 
     async _initializeGame({ gameDataPromise, createEngine, saveHandler }) {
-        const gameData = await gameDataPromise;
-        this._openHours = gameData.openHours;
-
-        // Shutdown was called during load bail before we create the interactor
-        // After this point shutdown with directly terminte the interactor
-        if(this._hasBeenShutDown) return;
-
-        this.state = "running";
-
-        const gameVersion = getGameVersion(gameData.logBook.gameVersion);
-        const engine = createEngine();
-        let actionFactories = gameVersion.getActionFactories(engine);
-
-        // If we don't automate the start of day process let users submit it as an action
-        if(!this.hasAutomaticStartOfDay()) {
-            actionFactories.addSource(new StartOfDaySource());
-        }
-
-        this._interactor = new GameInteractor({
-            engine,
-            gameData,
-            saveHandler,
-            onEntryAdded: this._setStateFromLastEntry.bind(this),
-            actionFactories,
-        });
-
         try {
+            const gameData = await gameDataPromise;
+            this._openHours = gameData.openHours;
+            this._gameSettings = gameData.gameSettings;
+
+            // Shutdown was called during load bail before we create the interactor
+            // After this point shutdown with directly terminte the interactor
+            if(this._hasBeenShutDown) return;
+
+            this.state = "running";
+
+            const gameVersion = getGameVersion(gameData.logBook.gameVersion);
+            const engine = createEngine();
+            let actionFactories = gameVersion.getActionFactories(engine);
+
+            // If we don't automate the start of day process let users submit it as an action
+            if(!this.hasAutomaticStartOfDay()) {
+                actionFactories.addSource(new StartOfDaySource());
+            }
+
+            this._interactor = new GameInteractor({
+                engine,
+                gameData,
+                saveHandler,
+                onEntryAdded: this._setStateFromLastEntry.bind(this),
+                actionFactories,
+            });
+
             await this._interactor.loaded;
         }
         catch(err) {
@@ -119,5 +120,53 @@ export class Game {
         }
 
         return this._interactor;
+    }
+
+    getSettings() {
+        let settings = this._gameSettings || {};
+
+        if(settings.allowManualRolls === undefined) {
+            settings.allowManualRolls = true;
+        }
+
+        return settings;
+    }
+
+    checkUserCreatedEntry(rawLogEntry) {
+        if(this.state != "running") {
+            return {
+                canSubmit: false,
+                error: `Cannot submit actions while the game is in the ${this.state} state`,
+            }
+        }
+
+        if(!this.isGameOpen()) {
+            return {
+                canSubmit: false,
+                error: "Cannot submit actions outside of a games open hours",
+            };
+        }
+
+        if(this.hasAutomaticStartOfDay() && (rawLogEntry.day !== undefined || rawLogEntry.action == "start_of_day")) {
+            return {
+                canSubmit: false,
+                error: "Automated start of day is enabled users may not start new days",
+            };
+        }
+
+        if(!this.getSettings().allowManualRolls) {
+            for(const key of Object.keys(rawLogEntry)) {
+                const value = rawLogEntry[key];
+
+                if(value?.type == "die-roll" && value?.manual) {
+                    return {
+                        canSubmit: false,
+                        error: "Manual die rolls are disabled for this game",
+                    };
+                }
+            }
+        }
+
+        return { canSubmit: true };
     }
 }
