@@ -1,5 +1,4 @@
 import { logger } from "#platform/logging.js";
-import { StartOfDayFactory } from "../possible-actions/start-of-day-source.js";
 
 // HACK: Cap the amount of time the timer can be set for so we don't get thrown off by day light savings time
 const MAX_TIMER_INTERVAL = 60 * 60 * 1000; // 1 hour in ms

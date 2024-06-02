@@ -1,4 +1,5 @@
 import { getGameVersion } from "../../versions/index.js";
+import { AutomaticStartOfDay } from "../open-hours/automatic-start-of-day.js";
 import { StartOfDaySource } from "../possible-actions/start-of-day-source.js";
 import { GameInteractor } from "./game-interactor.js";
 
