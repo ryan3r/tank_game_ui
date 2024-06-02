@@ -80,7 +80,6 @@ export class GameManager {
 
             const filePath = path.join(this._gamesFolder, gameFile);
             const {name} = path.parse(gameFile);
-            logger.info(`Loading ${name} from ${filePath}`);
 
             // Load and process the game asyncronously (does not return a promise)
             this._games[name] = loadGameFromFile(filePath, this._createEngine, gameOptions);
@@ -100,7 +99,7 @@ export class GameManager {
     }
 
     getAllGames() {
-        return Object.keys(this._games) || [];
+        return Object.values(this._games) || [];
     }
 
     shutdown() {
@@ -109,10 +108,14 @@ export class GameManager {
 }
 
 export function loadGameFromFile(filePath, createEngine, { saveBack, makeTimeStamp } = {}) {
+    const {name} = path.parse(filePath);
+    logger.info(`Loading ${name} from ${filePath}`);
+
     const gameDataPromise = load(filePath, { saveBack, makeTimeStamp });
     const saveHandler = gameData => save(filePath, gameData);
 
     return new Game({
+        name,
         gameDataPromise,
         createEngine,
         saveHandler,

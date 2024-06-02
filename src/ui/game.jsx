@@ -39,9 +39,7 @@ export function Game({ game, setGame, debug }) {
     }), [gameState, versionConfig]);
 
     const error = infoError || stateError;
-
-    // The user that's currently submitting actions
-    const canSubmitAction = gameState?.running && !gameIsClosed;
+    const canSubmitAction = (gameInfo?.game?.state == "running") && !gameIsClosed;
 
     const setSelectedUser = user => {
         buildTurnDispatch(setSubject(user));
@@ -66,8 +64,10 @@ export function Game({ game, setGame, debug }) {
     }
 
     let gameMessage;
-    if(gameState?.winner !== undefined) {
-        gameMessage = <div className="success message">{gameState?.winner} is victorious!</div>;
+    if(gameInfo !== undefined && gameInfo.game?.state != "running") {
+        const colorClass = gameInfo.game?.state == "game-over" ? "success" : "warning";
+
+        gameMessage = <div className={`${colorClass} message`}>{gameInfo.game?.statusText}</div>;
     }
 
     if(!gameMessage && gameIsClosed) {

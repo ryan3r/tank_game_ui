@@ -1,3 +1,4 @@
+import { prettyifyName } from "../../utils.js";
 import { getGameVersion } from "../../versions/index.js";
 import { AutomaticStartOfDay } from "../open-hours/automatic-start-of-day.js";
 import { StartOfDaySource } from "../possible-actions/start-of-day-source.js";
@@ -8,6 +9,8 @@ export class Game {
     constructor(opts) {
         this.state = "loading";
         this._hasBeenShutDown = false;
+        this.name = opts.name;
+        this.title = prettyifyName(this.name);
         this.loaded = this._initializeGame(opts);
     }
 
@@ -16,6 +19,10 @@ export class Game {
             const gameData = await gameDataPromise;
             this._openHours = gameData.openHours;
             this._gameSettings = gameData.gameSettings;
+
+            if(gameData.title !== undefined) {
+                this.title = gameData.title;
+            }
 
             // Shutdown was called during load bail before we create the interactor
             // After this point shutdown with directly terminte the interactor
@@ -52,14 +59,14 @@ export class Game {
         // After this point shutdown with directly cancel auto start of day
         if(this._hasBeenShutDown) return;
 
-        if(this._openHours?.hasAutomaticStartOfDay?.()) {
+        if(this.state == "running" && this._openHours?.hasAutomaticStartOfDay?.()) {
             this._automaticStartOfDay = new AutomaticStartOfDay(this);
             this.loaded.then(() => this._automaticStartOfDay.start());
         }
     }
 
-    _setStateFromLastEntry() {
-        const {running} = this._getLastState();
+    _setStateFromLastEntry(entryId) {
+        const {running} = this._interactor.getGameStateById(entryId);
         this.state = running ? "running" : "game-over";
     }
 
@@ -69,12 +76,12 @@ export class Game {
     }
 
     getOpenHours() {
-        return this._gameData.openHours;
+        return this._openHours;
     }
 
     isGameOpen() {
-        return this._gameData.openHours !== undefined ?
-            this._gameData.openHours.isGameOpen() : true;
+        return this._openHours !== undefined ?
+            this._openHours.isGameOpen() : true;
     }
 
     getStatusText() {
@@ -90,12 +97,12 @@ export class Game {
 
         if(this.state == "running") {
             const lastEntry = logBook.getEntry(logBook.getLastEntryId());
-            return `Last action: ${lastEntry.message}`;
+            return `Playing, last action: ${lastEntry.message}`;
         }
 
         if(this.state == "game-over") {
             const {winner} = this._getLastState();
-            return `${winner} is victorious!`;
+            return `Game over, ${winner} is victorious!`;
         }
     }
 

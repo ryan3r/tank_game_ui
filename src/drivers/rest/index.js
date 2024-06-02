@@ -15,6 +15,13 @@ function gameAccessor(gameManager) {
         function getGameIfAvailable() {
             const game = gameManager.getGame(req.params.gameName);
 
+            if(!game) {
+                res.json({
+                    error: `${req.params.gameName} is not a game`,
+                });
+                return {valid: false};
+            }
+
             if(game.state == "error") {
                 res.json({
                     error: game.getStatusText(),
