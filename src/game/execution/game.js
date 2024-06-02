@@ -7,7 +7,7 @@ import { GameInteractor } from "./game-interactor.js";
 
 export class Game {
     constructor(opts) {
-        this.state = "loading";
+        this._state = "loading";
         this._hasBeenShutDown = false;
         this.name = opts.name;
         this.title = prettyifyName(this.name);
@@ -28,7 +28,7 @@ export class Game {
             // After this point shutdown with directly terminte the interactor
             if(this._hasBeenShutDown) return;
 
-            this.state = "running";
+            this._state = "running";
 
             const gameVersion = getGameVersion(gameData.logBook.gameVersion);
             const engine = createEngine();
@@ -50,7 +50,7 @@ export class Game {
             await this._interactor.loaded;
         }
         catch(err) {
-            this.state = "error";
+            this._state = "error";
             this._error = err.message;
             return;  // failed to load the game bail
         }
@@ -59,15 +59,26 @@ export class Game {
         // After this point shutdown with directly cancel auto start of day
         if(this._hasBeenShutDown) return;
 
-        if(this.state == "running" && this._openHours?.hasAutomaticStartOfDay?.()) {
+        if(this._state == "running" && this._openHours?.hasAutomaticStartOfDay?.()) {
             this._automaticStartOfDay = new AutomaticStartOfDay(this);
             this.loaded.then(() => this._automaticStartOfDay.start());
         }
     }
 
+    getState() {
+        const isGameOpen = this._openHours !== undefined ?
+            this._openHours.isGameOpen() : true;
+
+        if(!isGameOpen && this._state == "running") {
+            return "off-hours";
+        }
+
+        return this._state;
+    }
+
     _setStateFromLastEntry(entryId) {
         const {running} = this._interactor.getGameStateById(entryId);
-        this.state = running ? "running" : "game-over";
+        this._state = running ? "running" : "game-over";
     }
 
     _getLastState() {
@@ -79,28 +90,27 @@ export class Game {
         return this._openHours;
     }
 
-    isGameOpen() {
-        return this._openHours !== undefined ?
-            this._openHours.isGameOpen() : true;
-    }
-
     getStatusText() {
-        if(this.state == "loading") {
+        if(this.getState() == "loading") {
             return "Loading...";
         }
 
-        if(this.state == "error") {
+        if(this.getState() == "error") {
             return `Failed to load: ${this._error}`;
+        }
+
+        if(this.getState() == "off-hours") {
+            return "Outside of this games scheduled hours";
         }
 
         const logBook = this._interactor.getLogBook();
 
-        if(this.state == "running") {
+        if(this.getState() == "running") {
             const lastEntry = logBook.getEntry(logBook.getLastEntryId());
             return `Playing, last action: ${lastEntry.message}`;
         }
 
-        if(this.state == "game-over") {
+        if(this.getState() == "game-over") {
             const {winner} = this._getLastState();
             return `Game over, ${winner} is victorious!`;
         }
@@ -124,7 +134,7 @@ export class Game {
 
     getInteractor() {
         if(!this._interactor) {
-            throw new Error(`Game '${this.name}' is in the state ${this.state} and does not have an interactor`);
+            throw new Error(`Game '${this.name}' is in the state ${this.getState()} and does not have an interactor`);
         }
 
         return this._interactor;
@@ -141,18 +151,11 @@ export class Game {
     }
 
     checkUserCreatedEntry(rawLogEntry) {
-        if(this.state != "running") {
+        if(this.getState() != "running") {
             return {
                 canSubmit: false,
-                error: `Cannot submit actions while the game is in the ${this.state} state`,
+                error: `Cannot submit actions while the game is in the ${this.getState()} state`,
             }
-        }
-
-        if(!this.isGameOpen()) {
-            return {
-                canSubmit: false,
-                error: "Cannot submit actions outside of a games open hours",
-            };
         }
 
         if(this.hasAutomaticStartOfDay() && (rawLogEntry.day !== undefined || rawLogEntry.action == "start_of_day")) {

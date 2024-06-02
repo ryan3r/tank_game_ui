@@ -39,7 +39,7 @@ export function Game({ game, setGame, debug }) {
     }), [gameState, versionConfig]);
 
     const error = infoError || stateError;
-    const canSubmitAction = (gameInfo?.game?.state == "running") && !gameIsClosed;
+    const canSubmitAction = gameInfo?.game?.state == "running";
 
     const setSelectedUser = user => {
         buildTurnDispatch(setSubject(user));
@@ -68,14 +68,6 @@ export function Game({ game, setGame, debug }) {
         const colorClass = gameInfo.game?.state == "game-over" ? "success" : "warning";
 
         gameMessage = <div className={`${colorClass} message`}>{gameInfo.game?.statusText}</div>;
-    }
-
-    if(!gameMessage && gameIsClosed) {
-        gameMessage =(
-            <div className="warning message">
-                You are currently outside of this game's scheduled hours.  Action submission is disabled.
-            </div>
-        );
     }
 
     const toolBar = (
@@ -120,7 +112,7 @@ export function Game({ game, setGame, debug }) {
                 </div>
                 <div className="centered">
                     <div>
-                        {gameIsClosed ? undefined : <SubmitTurn
+                        {canSubmitAction ? <SubmitTurn
                             context={possibleActionsContext}
                             game={game}
                             builtTurnState={builtTurnState}
@@ -130,7 +122,7 @@ export function Game({ game, setGame, debug }) {
                             debug={debug}
                             entryId={currentTurnMgrState.entryId}
                             isLatestEntry={currentTurnMgrState.isLatestEntry}
-                            allowManualRolls={gameInfo?.gameSettings?.allowManualRolls}></SubmitTurn>}
+                            allowManualRolls={gameInfo?.gameSettings?.allowManualRolls}></SubmitTurn> : undefined}
                     </div>
                 </div>
             </AppContent>

@@ -22,14 +22,14 @@ function gameAccessor(gameManager) {
                 return {valid: false};
             }
 
-            if(game.state == "error") {
+            if(game.getState() == "error") {
                 res.json({
                     error: game.getStatusText(),
                 });
                 return {valid: false};
             }
 
-            if(game.state == "loading") {
+            if(game.getState() == "loading") {
                 res.json({
                     error: {
                         message: "Game is still loading",

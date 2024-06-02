@@ -17,7 +17,7 @@ export function defineRoutes(app, buildInfo) {
         res.json(req.games.gameManager.getAllGames().map(game => ({
             title: game.title,
             name: game.name,
-            state: game.state,
+            state: game.getState(),
             statusText: game.getStatusText(),
         })));
     });
@@ -29,7 +29,7 @@ export function defineRoutes(app, buildInfo) {
         res.json({
             buildInfo,
             game: {
-                state: game.state,
+                state: game.getState(),
                 statusText: game.getStatusText(),
             },
             gameSettings: game.getSettings(),
