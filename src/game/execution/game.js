@@ -3,7 +3,7 @@ import { getGameVersion } from "../../versions/index.js";
 import { AutomaticStartOfDay } from "../open-hours/automatic-start-of-day.js";
 import { StartOfDaySource } from "../possible-actions/start-of-day-source.js";
 import { GameInteractor } from "./game-interactor.js";
-
+import { DateTime } from "luxon";
 
 export class Game {
     constructor(opts) {
@@ -22,6 +22,13 @@ export class Game {
 
             if(gameData.title !== undefined) {
                 this.title = gameData.title;
+            }
+
+            if(gameData.startDate !== undefined) {
+                this._startDate = DateTime.fromFormat(gameData.startDate, "D"); // For en-US MM/DD/YYYY
+                if(!this._startDate.isValid) {
+                    throw new Error(`Failed to parse start date ${gameData.startDate}: ${this._startDate.invalidReason}`);
+                }
             }
 
             // Shutdown was called during load bail before we create the interactor
@@ -66,11 +73,18 @@ export class Game {
     }
 
     getState() {
-        const isGameOpen = this._openHours !== undefined ?
-            this._openHours.isGameOpen() : true;
+        // If the game is ready to start playing check our time based requirements
+        if(this._state == "running") {
+            if(this._startDate != undefined && this._startDate >= DateTime.now()) {
+                return "not-started";
+            }
 
-        if(!isGameOpen && this._state == "running") {
-            return "off-hours";
+            const isGameOpen = this._openHours !== undefined ?
+                this._openHours.isGameOpen() : true;
+
+            if(!isGameOpen) {
+                return "off-hours";
+            }
         }
 
         return this._state;
@@ -91,29 +105,37 @@ export class Game {
     }
 
     getStatusText() {
-        if(this.getState() == "loading") {
+        const state = this.getState();
+
+        if(state == "loading") {
             return "Loading...";
         }
 
-        if(this.getState() == "error") {
+        if(state == "error") {
             return `Failed to load: ${this._error}`;
         }
 
-        if(this.getState() == "off-hours") {
+        if(state == "off-hours") {
             return "Outside of this games scheduled hours";
+        }
+
+        if(state == "not-started") {
+            return `Game starts ${this._startDate.toFormat("DDDD")}`;
         }
 
         const logBook = this._interactor.getLogBook();
 
-        if(this.getState() == "running") {
+        if(state == "running") {
             const lastEntry = logBook.getEntry(logBook.getLastEntryId());
             return `Playing, last action: ${lastEntry.message}`;
         }
 
-        if(this.getState() == "game-over") {
+        if(state == "game-over") {
             const {winner} = this._getLastState();
             return `Game over, ${winner} is victorious!`;
         }
+
+        return `Game is in state ${state}`;
     }
 
     async shutdown() {
