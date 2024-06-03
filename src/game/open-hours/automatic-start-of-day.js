@@ -30,7 +30,7 @@ export class AutomaticStartOfDay {
         if(this.hasGameDayBeenStartedToday(now)) return;
 
         // Game hasn't opened yet don't do anything
-        if(!this._game.getState() != "running") return;
+        if(this._game.getState() != "running") return;
 
         const interactor = this._game.getInteractor();
         let logBook = interactor.getLogBook();
