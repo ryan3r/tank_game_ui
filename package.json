@@ -17,7 +17,6 @@
     "license": "ISC",
     "dependencies": {
         "express": "^4.19.1",
-        "luxon": "^3.4.4",
         "pino": "^9.1.0",
         "pino-http": "^10.1.0",
         "pino-pretty": "^11.1.0"
