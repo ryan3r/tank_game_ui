@@ -136,6 +136,6 @@ export async function testPossibleActions(createEngine, possibleActionsPath) {
         }
     }
     finally {
-        await interactor.shutdown();
+        await game.shutdown();
     }
 }
