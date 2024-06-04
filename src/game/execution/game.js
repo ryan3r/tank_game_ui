@@ -1,8 +1,12 @@
+import { logger } from "#platform/logging.js";
 import { prettyifyName } from "../../utils.js";
-import { getGameVersion } from "../../versions/index.js";
+import { getGameVersion as defaultGetGameVersion } from "../../versions/index.js";
 import { AutomaticStartOfDay } from "../open-hours/automatic-start-of-day.js";
 import { StartOfDaySource } from "../possible-actions/start-of-day-source.js";
 import { GameInteractor } from "./game-interactor.js";
+
+
+const createDefaultInteractor = opts => new GameInteractor(opts);
 
 
 export class Game {
@@ -14,7 +18,7 @@ export class Game {
         this.loaded = this._initializeGame(opts);
     }
 
-    async _initializeGame({ gameDataPromise, createEngine, saveHandler }) {
+    async _initializeGame({ gameDataPromise, createEngine, saveHandler, createInteractor = createDefaultInteractor, getGameVersion = defaultGetGameVersion }) {
         try {
             const gameData = await gameDataPromise;
             this._openHours = gameData.openHours;
@@ -28,8 +32,6 @@ export class Game {
             // After this point shutdown with directly terminte the interactor
             if(this._hasBeenShutDown) return;
 
-            this._state = "running";
-
             const gameVersion = getGameVersion(gameData.logBook.gameVersion);
             const engine = createEngine();
             let actionFactories = gameVersion.getActionFactories(engine);
@@ -39,7 +41,7 @@ export class Game {
                 actionFactories.addSource(new StartOfDaySource());
             }
 
-            this._interactor = new GameInteractor({
+            this._interactor = createInteractor({
                 engine,
                 gameData,
                 saveHandler,
@@ -48,8 +50,11 @@ export class Game {
             });
 
             await this._interactor.loaded;
+
+            this._state = "running";
         }
         catch(err) {
+            logger.warn({ msg: "Failed to load game", err });
             this._state = "error";
             this._error = err.message;
             return;  // failed to load the game bail
