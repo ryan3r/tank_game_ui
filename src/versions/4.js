@@ -1,6 +1,7 @@
 import { GameVersion } from "./base/index.js";
 import { rawV3Config } from "./3.js";
 import { Wall } from "./shared/wall.js";
+import { TankDescriptor } from "./shared/tank.js";
 
 class V4WallDescriptor extends Wall {
     wallUrls = {
@@ -13,10 +14,18 @@ class V4WallDescriptor extends Wall {
     };
 }
 
+class V4TankDescriptor extends TankDescriptor {
+    customTeamIcons = {
+        "abrams": "Tank-Abrams",
+        "centurion": "Tank-Centurion",
+        "leopard": "Tank-Leopard",
+    };
+}
+
 export const version4 = new GameVersion({
     ...rawV3Config,
     entryDescriptors: {
-        ...rawV3Config.entryDescriptors,
+        tank: V4TankDescriptor,
         wall: V4WallDescriptor,
     },
     manualPath: "/manuals/Tank_Game_Rules_v4.pdf",
