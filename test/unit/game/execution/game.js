@@ -2,6 +2,7 @@ import assert from "node:assert";
 import { Game } from "../../../../src/game/execution/game.js";
 import { MockEngine } from "./game-interactor.js";
 import { LogBook } from "../../../../src/game/state/log-book/log-book.js";
+import { PossibleActionSourceSet } from "../../../../src/game/possible-actions/index.js";
 
 class MockInteractor {
     constructor(opts) {
@@ -16,7 +17,7 @@ class MockInteractor {
 class MockVersionConfig {
     getActionFactories(opts) {
         this.opts = opts;
-        return [];
+        return new PossibleActionSourceSet([]);
     }
 }
 
@@ -26,10 +27,15 @@ const getGameVersion = () => new MockVersionConfig();
 
 describe("Game", () => {
     it("can load a basic game", async () => {
+        const createAutoStartOfDay = () => {
+            throw new Error("Auto start of day should not be construced if we don't have open hours");
+        };
+
         let game = new Game({
             createEngine,
             createInteractor,
             getGameVersion,
+            createAutoStartOfDay,
             gameDataPromise: Promise.resolve({
                 logBook: LogBook.deserialize({
                     gameVersion: "3",

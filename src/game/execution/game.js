@@ -7,6 +7,7 @@ import { GameInteractor } from "./game-interactor.js";
 
 
 const createDefaultInteractor = opts => new GameInteractor(opts);
+const createDefaultAutoStartOfDay = game => new AutomaticStartOfDay(game);
 
 
 export class Game {
@@ -18,7 +19,7 @@ export class Game {
         this.loaded = this._initializeGame(opts);
     }
 
-    async _initializeGame({ gameDataPromise, createEngine, saveHandler, createInteractor = createDefaultInteractor, getGameVersion = defaultGetGameVersion }) {
+    async _initializeGame({ gameDataPromise, createEngine, saveHandler, createInteractor = createDefaultInteractor, getGameVersion = defaultGetGameVersion, createAutoStartOfDay = createDefaultAutoStartOfDay }) {
         try {
             const gameData = await gameDataPromise;
             this._openHours = gameData.openHours;
@@ -65,7 +66,7 @@ export class Game {
         if(this._hasBeenShutDown) return;
 
         if(this._state == "running" && this._openHours?.hasAutomaticStartOfDay?.()) {
-            this._automaticStartOfDay = new AutomaticStartOfDay(this);
+            this._automaticStartOfDay = createAutoStartOfDay(this);
             this.loaded.then(() => this._automaticStartOfDay.start());
         }
     }
