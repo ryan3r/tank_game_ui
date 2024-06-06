@@ -20,7 +20,7 @@ function EntityDetails({ descriptor, entity, setSelectedUser, canSubmitAction, c
                 <h2>{title}</h2>
                 {title != subTitle ? <i className="entity-details-title-type">{subTitle}</i> : undefined}
             </div>
-            <AttributeList attributes={entity.resources}></AttributeList>
+            <AttributeList attributes={entity.attributes}></AttributeList>
             {entity.player && canSubmitAction ? (
                 <div className="entity-details-take-action centered">
                     <button onClick={takeActionHandler}>Take Action</button>
@@ -76,7 +76,7 @@ export function EntityTile({ entity, showPopupOnClick, config, setSelectedUser, 
         <div className="board-space-entity-wrapper">
             <div className="board-space-entity" ref={cardRef} onClick={() => showPopupOnClick && setOpened(open => !open)} style={tileStyles}>
                 {label}
-                <div className={`board-space-centered board-space-resource-featured ${label ? "" : "board-space-no-label"}`}>
+                <div className={`board-space-centered board-space-attribute-featured ${label ? "" : "board-space-no-label"}`}>
                     {descriptor.getFeaturedAttribute()}
                 </div>
                 {badges}

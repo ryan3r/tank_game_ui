@@ -34,9 +34,9 @@ function getDiceForShot({ gameState, subject, target }) {
     const targetEntity = gameState.board.getEntityAt(Position.fromHumanReadable(target));
 
     // This target has health we must roll
-    if(targetEntity.resources.health !== undefined) {
+    if(targetEntity.attributes.health !== undefined) {
         const distance = playerEntity.position.distanceTo(targetEntity.position);
-        const numDice = (playerEntity.resources.range.value - distance) + 1;
+        const numDice = (playerEntity.attributes.range.value - distance) + 1;
 
         if(numDice < 0) {
             throw new Error(`Dice were negative (${numDice}) when getting dice for ${player.name} (${playerEntity.position.humanReadable}) shooting ${target}`);
