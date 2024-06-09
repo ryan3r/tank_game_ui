@@ -5,7 +5,7 @@ import { prettyifyName } from "../../utils.js";
 import { AttributeList } from "./attribute-list.jsx";
 
 
-function EntityDetails({ descriptor, entity, setSelectedUser, canSubmitAction, closePopup }) {
+function EntityDetails({ descriptor, entity, setSelectedUser, canSubmitAction, closePopup, versionConfig }) {
     const title = prettyifyName(descriptor.getName() || entity.type);
     const subTitle = prettyifyName(entity.type);
 
@@ -20,7 +20,7 @@ function EntityDetails({ descriptor, entity, setSelectedUser, canSubmitAction, c
                 <h2>{title}</h2>
                 {title != subTitle ? <i className="entity-details-title-type">{subTitle}</i> : undefined}
             </div>
-            <AttributeList attributes={entity.attributes}></AttributeList>
+            <AttributeList attributes={entity.attributes} versionConfig={versionConfig}></AttributeList>
             {entity.player && canSubmitAction ? (
                 <div className="entity-details-take-action centered">
                     <button onClick={takeActionHandler}>Take Action</button>
@@ -83,6 +83,7 @@ export function EntityTile({ entity, showPopupOnClick, config, setSelectedUser, 
             </div>
             <Popup opened={opened} anchorRef={cardRef} onClose={close}>
                 <EntityDetails
+                    versionConfig={config}
                     descriptor={descriptor}
                     entity={entity}
                     canSubmitAction={canSubmitAction}

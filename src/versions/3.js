@@ -4,6 +4,7 @@ import { StartOfDaySource } from "../game/possible-actions/start-of-day-source.j
 import { Position } from "../game/state/board/position.js";
 import { GameVersion } from "./base/index.js";
 import { LogEntryFormatter, baseEntryFunctions } from "./base/log-entry-formatter.js";
+import { commonAttributeDescriptors } from "./shared/attributes.js";
 import { GoldMineDescriptor } from "./shared/gold-mine.js";
 import { TankDescriptor } from "./shared/tank.js";
 import { Wall } from "./shared/wall.js";
@@ -81,6 +82,7 @@ export const rawV3Config = {
         "councilor",
         "senator",
     ],
+    attributeDescriptors: commonAttributeDescriptors,
     manualPath: "/manuals/Tank_Game_Rules_v3.pdf",
     actionFactory,
 };
