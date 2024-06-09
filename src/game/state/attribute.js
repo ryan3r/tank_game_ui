@@ -1,3 +1,5 @@
+import { prettyifyName } from "../../utils.js";
+
 export class Attribute {
     constructor(name, value, max) {
         this.name = name;
@@ -22,8 +24,15 @@ export class Attribute {
     }
 
     toString() {
-        return this.max === undefined ?
-            this.value : `${this.value} / ${this.max}`;
+        if(this.max !== undefined) {
+            return `${this.value} / ${this.max}`;
+        }
+
+        if(typeof this.value == "string") {
+            return prettyifyName(this.value);
+        }
+
+        return this.value;
     }
 }
 
