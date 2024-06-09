@@ -16,43 +16,19 @@ export class Game {
         this._hasBeenShutDown = false;
         this.name = opts.name;
         this.title = prettyifyName(this.name);
-        this.loaded = this._initializeGame(opts);
+        this.loaded = this._initializeGame(opts.gameDataPromise);
+        this._saveHandler = opts.saveHandler;
+        this._factories = {
+            createEngine: opts.createEngine,
+            createInteractor: opts.createInteractor || createDefaultInteractor,
+            getGameVersion:  opts.getGameVersion || defaultGetGameVersion,
+            createAutoStartOfDay: opts.createAutoStartOfDay || createDefaultAutoStartOfDay,
+        };
     }
 
-    async _initializeGame({ gameDataPromise, createEngine, saveHandler, createInteractor = createDefaultInteractor, getGameVersion = defaultGetGameVersion, createAutoStartOfDay = createDefaultAutoStartOfDay }) {
+    async _saveErrorInState(callback) {
         try {
-            const gameData = await gameDataPromise;
-            this._openHours = gameData.openHours;
-            this._gameSettings = gameData.gameSettings;
-
-            if(gameData.title !== undefined) {
-                this.title = gameData.title;
-            }
-
-            // Shutdown was called during load bail before we create the interactor
-            // After this point shutdown with directly terminte the interactor
-            if(this._hasBeenShutDown) return;
-
-            const gameVersion = getGameVersion(gameData.logBook.gameVersion);
-            const engine = createEngine();
-            let actionFactories = gameVersion.getActionFactories(engine);
-
-            // If we don't automate the start of day process let users submit it as an action
-            if(!this.hasAutomaticStartOfDay()) {
-                actionFactories.addSource(new StartOfDaySource());
-            }
-
-            this._interactor = createInteractor({
-                engine,
-                gameData,
-                saveHandler,
-                onEntryAdded: this._setStateFromLastEntry.bind(this),
-                actionFactories,
-            });
-
-            await this._interactor.loaded;
-
-            this._state = "running";
+            await callback();
         }
         catch(err) {
             logger.warn({ msg: "Failed to load game", err });
@@ -60,6 +36,49 @@ export class Game {
             this._error = err.message;
             return;  // failed to load the game bail
         }
+    }
+
+    async _initializeGame(gameDataPromise) {
+        await this._saveErrorInState(async () => {
+            this._gameData = await gameDataPromise;
+            this._openHours = gameData.openHours;
+            this._gameSettings = gameData.gameSettings;
+
+            if(gameData.title !== undefined) {
+                this.title = gameData.title;
+            }
+        });
+
+        await this._runGame();
+    }
+
+    async _runGame() {
+        await this._saveErrorInState(async () => {
+            // Shutdown was called during load bail before we create the interactor
+            // After this point shutdown with directly terminte the interactor
+            if(this._hasBeenShutDown) return;
+
+            const gameVersion = this._factories.getGameVersion(this._gameData.logBook.gameVersion);
+            const engine = this._factories.createEngine();
+            let actionFactories = gameVersion.getActionFactories(engine);
+
+            // If we don't automate the start of day process let users submit it as an action
+            if(!this.hasAutomaticStartOfDay()) {
+                actionFactories.addSource(new StartOfDaySource());
+            }
+
+            this._interactor = this._factories.createInteractor({
+                engine,
+                gameData: this._gameData,
+                saveHandler: this._saveHandler,
+                onEntryAdded: this._setStateFromLastEntry.bind(this),
+                actionFactories,
+            });
+
+            await this._interactor.loaded;
+
+            this._state = "running";
+        });
 
         // Shutdown was called while the interactor was starting bail before we start auto start of day
         // After this point shutdown with directly cancel auto start of day
