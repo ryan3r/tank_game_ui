@@ -5,6 +5,7 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
+        "coverage": "npm test -- --coverage",
         "test": "LOG_LEVEL=error NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --testPathPattern=test/unit",
         "integration-test": "TANK_GAME_ENGINE_SEARCH_DIR=engine/target  NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" jest --testPathPattern=test/integration-test/ --testTimeout=10000",
         "develop-backend": "TANK_GAME_ENGINE_SEARCH_DIR=engine/target BUILD_INFO=$(./scripts/get-version webpack) LOG_LEVEL=debug TANK_GAMES_FOLDER=example/ npm start",
