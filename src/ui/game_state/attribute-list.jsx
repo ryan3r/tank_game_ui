@@ -53,11 +53,12 @@ export function AttributeCategory({ descriptors }) {
                 color: descriptor.getSecondaryTextColor(),
             };
 
+            const name = descriptor.getNameText();
             const valueText = descriptor.getValueText();
 
             return (
-                <div className="pill" style={style}>
-                    {descriptor.getNameText()}
+                <div className="pill" style={style} key={name}>
+                    {name}
                     {valueText !== undefined ?
                         <span className="pill-secondary" style={secondaryStyle}>{valueText}</span> : undefined}
                 </div>
