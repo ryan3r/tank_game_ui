@@ -64,6 +64,22 @@
             }
         },
         {
+            "label": "Full Test Coverage",
+            "type": "process",
+            "command": "npm",
+            "args": ["run", "coverage-full"],
+            "isBackground": true,
+            "problemMatcher": [],
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": true
+            }
+        },
+        {
             "label": "Integration tests",
             "type": "process",
             "command": "npm",
