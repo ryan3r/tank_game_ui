@@ -3,6 +3,7 @@ import { ShootActionSource } from "../game/possible-actions/shoot.js";
 import { Position } from "../game/state/board/position.js";
 import { GameVersion } from "./base/index.js";
 import { LogEntryFormatter, baseEntryFunctions } from "./base/log-entry-formatter.js";
+import { commonAttributeDescriptors } from "./shared/attributes.js";
 import { GoldMineDescriptor } from "./shared/gold-mine.js";
 import { TankDescriptor } from "./shared/tank.js";
 import { Wall } from "./shared/wall.js";
@@ -33,9 +34,9 @@ function getDiceForShot({ gameState, subject, target }) {
     const targetEntity = gameState.board.getEntityAt(Position.fromHumanReadable(target));
 
     // This target has health we must roll
-    if(targetEntity.resources.health !== undefined) {
+    if(targetEntity.attributes.health !== undefined) {
         const distance = playerEntity.position.distanceTo(targetEntity.position);
-        const numDice = (playerEntity.resources.range.value - distance) + 1;
+        const numDice = (playerEntity.attributes.range.value - distance) + 1;
 
         if(numDice < 0) {
             throw new Error(`Dice were negative (${numDice}) when getting dice for ${player.name} (${playerEntity.position.humanReadable}) shooting ${target}`);
@@ -79,6 +80,7 @@ export const rawV3Config = {
         "councilor",
         "senator",
     ],
+    attributeDescriptors: commonAttributeDescriptors,
     manualPath: "/manuals/Tank_Game_Rules_v3.pdf",
     actionFactory,
 };
