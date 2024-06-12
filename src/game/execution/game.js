@@ -41,13 +41,15 @@ export class Game {
     async _initializeGame(gameDataPromise) {
         await this._saveErrorInState(async () => {
             this._gameData = await gameDataPromise;
-            this._openHours = gameData.openHours;
-            this._gameSettings = gameData.gameSettings;
+            this._openHours = this._gameData.openHours;
+            this._gameSettings = this._gameData.gameSettings;
 
-            if(gameData.title !== undefined) {
-                this.title = gameData.title;
+            if(this._gameData.title !== undefined) {
+                this.title = this._gameData.title;
             }
         });
+
+        if(this.getState() == "error") return;
 
         await this._runGame();
     }
@@ -85,7 +87,7 @@ export class Game {
         if(this._hasBeenShutDown) return;
 
         if(this._state == "running" && this._openHours?.hasAutomaticStartOfDay?.()) {
-            this._automaticStartOfDay = createAutoStartOfDay(this);
+            this._automaticStartOfDay = this._factories.createAutoStartOfDay(this);
             this.loaded.then(() => this._automaticStartOfDay.start());
         }
     }
@@ -159,7 +161,7 @@ export class Game {
 
     getInteractor() {
         if(!this._interactor) {
-            throw new Error(`Game '${this.name}' is in the state ${this.getState()} and does not have an interactor`);
+            throw new Error(`Game '${this.name}' is in the state ${this.getState()} and does not have an interactor. (status = ${this.getStatusText()})`);
         }
 
         return this._interactor;
