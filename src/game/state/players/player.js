@@ -29,7 +29,7 @@ export default class Player {
 
     adopt(entity) {
         this.entities.push(entity);
-        entity.player = this;
+        entity.players.push(this);
     }
 
     getControlledAttributes() {

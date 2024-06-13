@@ -43,7 +43,7 @@ describe("Board", () => {
             let board = new Board(2, 2);
             let beyerTank = new Entity("tank", new Position(1, 0), new AttributeHolder());
             let beyer = new Player("Beyer", "tank", [beyerTank]);
-            beyerTank.player = beyer;
+            beyer.adopt(beyerTank);
             board.setEntity(beyerTank);
 
             let players3 = new Players([beyer, ty]);

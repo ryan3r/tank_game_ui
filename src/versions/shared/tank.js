@@ -55,7 +55,7 @@ export class TankDescriptor extends EntityDescriptor {
     }
 
     getName() {
-        return this.entity.player?.name;
+        return this.entity.players[0]?.name;
     }
 
     formatForLogEntry() {
