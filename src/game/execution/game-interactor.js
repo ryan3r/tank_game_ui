@@ -10,7 +10,6 @@ export class GameInteractor {
         this._lock = new PromiseLock();
         this._previousState = gameData.initialGameState;
         this._actionFactories = actionFactories;
-        this._hasBeenShutdown = false;
         this._onEntryAdded = onEntryAdded;
 
         // Process any unprocessed log book entries.
