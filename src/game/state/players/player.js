@@ -31,13 +31,4 @@ export default class Player {
         this.entities.push(entity);
         entity.players.push(this);
     }
-
-    getControlledAttributes() {
-        let controlledAttributes = new AttributeHolder();
-        for(const entity of this.entities) {
-            Object.assign(controlledAttributes, entity.attributes);
-        }
-
-        return controlledAttributes;
-    }
 }
