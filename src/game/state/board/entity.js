@@ -1,4 +1,4 @@
-import { Attribute, AttributeHolder } from "../attribute.js";
+import { AttributeHolder } from "../attribute.js";
 import { Position } from "./position.js";
 
 export default class Entity {

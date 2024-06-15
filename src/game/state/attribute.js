@@ -44,21 +44,32 @@ export class Attribute {
 
 export class AttributeHolder {
     constructor(attributes = []) {
-        for(const attribute of attributes) {
-            this[attribute.name] = attribute;
+        for(const attributeName of Object.getOwnPropertyNames(attributes)) {
+            let attribute = attributes[attributeName];
+            if(!(attribute instanceof Attribute)) {
+                attribute = new Attribute(attributeName, attribute);
+            }
+
+            this[attributeName] = attribute;
         }
     }
 
     static deserialize(rawAttributes) {
-        return new AttributeHolder(
-            Object.keys(rawAttributes).map(attributeName => Attribute.deserialize(rawAttributes[attributeName], attributeName)));
+        let attributes = {};
+
+        for(const attributeName of Object.keys(rawAttributes)) {
+            attributes[attributeName] = Attribute.deserialize(rawAttributes[attributeName], attributeName);
+        }
+
+        return new AttributeHolder(attributes);
     }
 
     serialize() {
         let serialized = {};
 
-        Object.keys(this)
-            .map(attributeName => serialized[attributeName] = this[attributeName].serialize());
+        for(const attributeName of Object.getOwnPropertyNames(this)) {
+            serialized[attributeName] = this[attributeName].serialize();
+        }
 
         return serialized;
     }

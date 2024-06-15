@@ -1,8 +1,5 @@
-import { Attribute, AttributeHolder } from "../attribute.js";
-import { objectMap } from "../../../utils.js";
+import { AttributeHolder } from "../attribute.js";
 import Entity from "./entity.js";
-import { FloorTile } from "./floor-tile.js";
-import { Position } from "./position.js";
 
 export default class Board {
     constructor(width, height) {
@@ -36,7 +33,7 @@ export default class Board {
     }
 
     getEntityAt(position) {
-        return this._entities[position.humanReadable] || (new Entity("empty", new AttributeHolder([ new Attribute("position", position.humanReadable) ])));
+        return this._entities[position.humanReadable] || (new Entity("empty", new AttributeHolder({ "position": position.humanReadable })));
     }
 
     setEntity(entity) {
@@ -49,7 +46,7 @@ export default class Board {
     }
 
     getFloorTileAt(position) {
-        return this._floor[position.humanReadable] || (new Entity("empty", new AttributeHolder([ new Attribute("position", position.humanReadable) ])));
+        return this._floor[position.humanReadable] || (new Entity("empty", new AttributeHolder({ position: position.humanReadable })));
     }
 
     setFloorTile(tile) {

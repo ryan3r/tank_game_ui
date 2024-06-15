@@ -5,7 +5,6 @@
 
 import Board from "../../game/state/board/board.js";
 import Entity from "../../game/state/board/entity.js";
-import { FloorTile } from "../../game/state/board/floor-tile.js";
 import { GameState } from "../../game/state/game-state.js";
 import Player from "../../game/state/players/player.js";
 import Players from "../../game/state/players/players.js";
@@ -26,7 +25,7 @@ export function gameStateFromRawState(rawGameState) {
     });
 
     board = convertBoard(board, rawGameState.board.floor_board, (newBoard, space, position) => {
-        newBoard.setFloorTile(new Entity(space.type, [ new Attribute("position", position) ]));
+        newBoard.setFloorTile(new Entity(space.type, { position }));
     });
 
     let gameState = new GameState(
@@ -54,12 +53,12 @@ function getAttributeName(name, rawEntity) {
 
 
 function convertCouncil(rawCouncil) {
-    let attributes = [
-        new Attribute("coffer", rawCouncil.coffer),
-    ];
+    let attributes = {
+        coffer: rawCouncil.coffer,
+    };
 
     if(rawCouncil.armistice_vote_cap !== undefined) {
-        attributes.push(new Attribute("armistice", rawCouncil.armistice_vote_count, rawCouncil.armistice_vote_cap));
+        attributes.armistice = new Attribute("armistice", rawCouncil.armistice_vote_count, rawCouncil.armistice_vote_cap);
     }
 
     return new AttributeHolder(attributes);
@@ -79,20 +78,20 @@ function shouldKeepAttribute(attributeName, rawEntity) {
 
 
 function entityFromBoard(rawEntity, position, playersByName) {
-    let attributes = [];
+    let attributes = { position };
 
     if(rawEntity.attributes) {
-        attributes = Object.keys(rawEntity.attributes)
-            .filter(name => shouldKeepAttribute(name, rawEntity))
-            .map(name => {
-                return new Attribute(
-                    getAttributeName(name, rawEntity),
-                    rawEntity.attributes[name],
-                    rawEntity.attributes[`${MAX_PREFIX}${name}`]);
-            });
-    }
+        for(const attributeName of Object.keys(rawEntity.attributes)) {
+            if(!shouldKeepAttribute(attributeName, rawEntity)) continue;
 
-    attributes.push(new Attribute("position", position));
+            const actualName = getAttributeName(attributeName, rawEntity);
+
+            attributes[actualName] = new Attribute(
+                actualName,
+                rawEntity.attributes[attributeName],
+                rawEntity.attributes[`${MAX_PREFIX}${attributeName}`]);
+        }
+    }
 
     attributes = new AttributeHolder(attributes);
 
