@@ -1,11 +1,10 @@
-import { AttributeHolder } from "../attribute.js";
 import { Position } from "./position.js";
 
 export default class Entity {
     constructor(type, attributes) {
         this.type = type;
         this.players = [];  // Conrolled by Player
-        this.attributes = new AttributeHolder(attributes);
+        this.attributes = attributes;
     }
 
     get position() {
@@ -21,13 +20,13 @@ export default class Entity {
     }
 
     static deserialize(rawEntity) {
-        return new Entity(rawEntity.type, AttributeHolder.deserialize(rawEntity.attributes))
+        return new Entity(rawEntity.type, rawEntity.attributes);
     }
 
     serialize() {
         return {
             type: this.type,
-            attributes: this.attributes.serialize(),
+            attributes: this.attributes,
         }
     }
 }

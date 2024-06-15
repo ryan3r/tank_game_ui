@@ -2,29 +2,28 @@ import assert from "node:assert";
 import Board from "../../../../../src/game/state/board/board.js";
 import Entity from "../../../../../src/game/state/board/entity.js";
 import { Position } from "../../../../../src/game/state/board/position.js";
-import { AttributeHolder } from "../../../../../src/game/state/attribute.js";
 
 let board = new Board(7, 5);
 
-const tank1 = new Entity("tank", new AttributeHolder({ position: "A1"}));
-const destroyedTank = new Entity("dead-tank", new AttributeHolder({ position: "C4"}));
-const tank2 = new Entity("tank", new AttributeHolder({ position: "G5"}));
-const baloon = new Entity("baloon", new AttributeHolder({ position: "B2"}));
+const tank1 = new Entity("tank", { position: "A1"});
+const destroyedTank = new Entity("dead-tank", { position: "C4"});
+const tank2 = new Entity("tank", { position: "G5"});
+const baloon = new Entity("baloon", { position: "B2"});
 
 board.setEntity(tank1);
 board.setEntity(destroyedTank);
 board.setEntity(tank2);
 board.setEntity(baloon);
 
-const goldMine1 = new Entity("gold_mine", new AttributeHolder({ position: "E5"}));
-const goldMine2 = new Entity("gold_mine", new AttributeHolder({ position: "B4"}));
-const base = new Entity("base", new AttributeHolder({ position: "C4" }));
+const goldMine1 = new Entity("gold_mine", { position: "E5"});
+const goldMine2 = new Entity("gold_mine", { position: "B4"});
+const base = new Entity("base", { position: "C4" });
 board.setFloorTile(goldMine1);
 board.setFloorTile(goldMine2);
 board.setFloorTile(base);
 
-const empty = new Entity("empty", new AttributeHolder({ position: "D3"}));
-const emptyTile = new Entity("empty", new AttributeHolder({ position: "G5"}));
+const empty = new Entity("empty", { position: "D3"});
+const emptyTile = new Entity("empty", { position: "G5"});
 
 
 describe("Board", () => {

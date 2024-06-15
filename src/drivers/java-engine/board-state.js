@@ -9,7 +9,6 @@ import { GameState } from "../../game/state/game-state.js";
 import Player from "../../game/state/players/player.js";
 import Players from "../../game/state/players/players.js";
 import { Position } from "../../game/state/board/position.js";
-import { AttributeHolder } from "../../game/state/attribute.js";
 
 const deadTankAttributesToRemove = ["ACTIONS", "RANGE", "BOUNTY"];
 
@@ -61,7 +60,7 @@ function convertCouncil(rawCouncil) {
         };
     }
 
-    return new AttributeHolder(attributes);
+    return attributes;
 }
 
 function shouldKeepAttribute(attributeName, rawEntity) {
@@ -90,7 +89,7 @@ function entityFromBoard(rawEntity, position, playersByName) {
         }
     }
 
-    attributes = new AttributeHolder(attributes);
+    attributes = attributes;
 
     const player = playersByName[rawEntity.name];
     let entity = new Entity(rawEntity.type, attributes);

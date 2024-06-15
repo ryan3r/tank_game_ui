@@ -1,5 +1,4 @@
 import { Position } from "../board/position.js";
-import { AttributeHolder } from "../attribute.js";
 
 export default class Player {
     constructor(name, type, entities) {

@@ -1,4 +1,3 @@
-import { AttributeHolder } from "../attribute.js";
 import Entity from "./entity.js";
 
 export default class Board {
@@ -33,7 +32,7 @@ export default class Board {
     }
 
     getEntityAt(position) {
-        return this._entities[position.humanReadable] || (new Entity("empty", new AttributeHolder({ "position": position.humanReadable })));
+        return this._entities[position.humanReadable] || (new Entity("empty", { "position": position.humanReadable }));
     }
 
     setEntity(entity) {
@@ -46,7 +45,7 @@ export default class Board {
     }
 
     getFloorTileAt(position) {
-        return this._floor[position.humanReadable] || (new Entity("empty", new AttributeHolder({ position: position.humanReadable })));
+        return this._floor[position.humanReadable] || (new Entity("empty", { position: position.humanReadable }));
     }
 
     setFloorTile(tile) {

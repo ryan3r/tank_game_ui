@@ -1,6 +1,5 @@
 import Board from "./board/board.js";
 import Players from "./players/players.js";
-import { AttributeHolder } from "./attribute.js";
 
 export class GameState {
     constructor(players, board, councilAttributes, running = true, winner = "") {
@@ -17,7 +16,7 @@ export class GameState {
         return new GameState(
             Players.deserialize(rawGameState.players, board),
             board,
-            AttributeHolder.deserialize(rawGameState.council),
+            rawGameState.council,
             rawGameState.running,
             rawGameState.winner,
         );
@@ -27,7 +26,7 @@ export class GameState {
         let raw = {
             players: this.players.serialize(),
             board: this.board.serialize(),
-            council: this.council.serialize(),
+            council: this.council,
             running: this.running,
         };
 
