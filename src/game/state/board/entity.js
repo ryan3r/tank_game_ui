@@ -13,11 +13,11 @@ export default class Entity {
 
         if(position === undefined) return;
 
-        if(!(position.value instanceof Position)) {
-            return Position.fromHumanReadable(position.value)
+        if(!(position instanceof Position)) {
+            return Position.fromHumanReadable(position)
         }
 
-        return position.value;
+        return position;
     }
 
     static deserialize(rawEntity) {

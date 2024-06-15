@@ -9,10 +9,7 @@ import { GameState } from "../../game/state/game-state.js";
 import Player from "../../game/state/players/player.js";
 import Players from "../../game/state/players/players.js";
 import { Position } from "../../game/state/board/position.js";
-import { Attribute, AttributeHolder } from "../../game/state/attribute.js";
-
-// The prefix used for the max value of an attribute
-const MAX_PREFIX = "MAX_";
+import { AttributeHolder } from "../../game/state/attribute.js";
 
 const deadTankAttributesToRemove = ["ACTIONS", "RANGE", "BOUNTY"];
 
@@ -58,14 +55,17 @@ function convertCouncil(rawCouncil) {
     };
 
     if(rawCouncil.armistice_vote_cap !== undefined) {
-        attributes.armistice = new Attribute("armistice", rawCouncil.armistice_vote_count, rawCouncil.armistice_vote_cap);
+        attributes.armistice = {
+            value: rawCouncil.armistice_vote_count,
+            max: rawCouncil.armistice_vote_cap
+        };
     }
 
     return new AttributeHolder(attributes);
 }
 
 function shouldKeepAttribute(attributeName, rawEntity) {
-    if(attributeName == "DEAD" || attributeName.startsWith(MAX_PREFIX)) {
+    if(attributeName == "DEAD") {
         return false;
     }
 
@@ -86,10 +86,7 @@ function entityFromBoard(rawEntity, position, playersByName) {
 
             const actualName = getAttributeName(attributeName, rawEntity);
 
-            attributes[actualName] = new Attribute(
-                actualName,
-                rawEntity.attributes[attributeName],
-                rawEntity.attributes[`${MAX_PREFIX}${attributeName}`]);
+            attributes[actualName] = rawEntity.attributes[attributeName];
         }
     }
 
