@@ -1,4 +1,5 @@
 import { prettyifyName } from "../../utils.js";
+import { Position } from "./board/position.js";
 
 export class Attribute {
     constructor(name, value, max) {
@@ -15,6 +16,10 @@ export class Attribute {
         let serialized = {
             value: this.value,
         };
+
+        if(serialized.value instanceof Position) {
+            serialized.value = serialized.value.humanReadable;
+        }
 
         if(this.max !== undefined) {
             serialized.max = this.max;

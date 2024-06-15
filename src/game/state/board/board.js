@@ -1,4 +1,4 @@
-import { AttributeHolder } from "../attribute.js";
+import { Attribute, AttributeHolder } from "../attribute.js";
 import { objectMap } from "../../../utils.js";
 import Entity from "./entity.js";
 import { FloorTile } from "./floor-tile.js";
@@ -13,12 +13,16 @@ export default class Board {
     }
 
     static deserialize(rawBoard) {
-        // Skip the constructor to avoid filling the board twice
         let board = new Board(rawBoard.width, rawBoard.height);
-        board._entities = objectMap(rawBoard.entities,
-            (entity, humanPos) => Entity.deserialize(entity, Position.fromHumanReadable(humanPos)));
-        board._floor = objectMap(rawBoard.floor,
-            (floor, humanPos) => FloorTile.deserialize(floor, Position.fromHumanReadable(humanPos)));
+
+        for(const rawEntry of rawBoard.entities) {
+            board.setEntity(Entity.deserialize(rawEntry));
+        }
+
+        for(const rawFloorTile of rawBoard.floor) {
+            board.setFloorTile(Entity.deserialize(rawFloorTile));
+        }
+
         return board;
     }
 
@@ -26,13 +30,13 @@ export default class Board {
         return {
             width: this.width,
             height: this.height,
-            entities: objectMap(this._entities, entity => entity.serialize()),
-            floor: objectMap(this._floor, tile => tile.serialize()),
+            entities: Object.values(this._entities).map(entity => entity.serialize()),
+            floor: Object.values(this._floor).map(tile => tile.serialize()),
         };
     }
 
     getEntityAt(position) {
-        return this._entities[position.humanReadable] || (new Entity("empty", position, new AttributeHolder()));
+        return this._entities[position.humanReadable] || (new Entity("empty", new AttributeHolder([ new Attribute("position", position.humanReadable) ])));
     }
 
     setEntity(entity) {
@@ -45,7 +49,7 @@ export default class Board {
     }
 
     getFloorTileAt(position) {
-        return this._floor[position.humanReadable] || (new FloorTile("empty", position));
+        return this._floor[position.humanReadable] || (new Entity("empty", new AttributeHolder([ new Attribute("position", position.humanReadable) ])));
     }
 
     setFloorTile(tile) {

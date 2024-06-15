@@ -3,8 +3,9 @@ import assert from "node:assert";
 import Players from "../../../../../src/game/state/players/players.js";
 import Entity from "../../../../../src/game/state/board/entity.js";
 import { Position } from "../../../../../src/game/state/board/position.js";
-import { AttributeHolder } from "../../../../../src/game/state/attribute.js";
+import { Attribute, AttributeHolder } from "../../../../../src/game/state/attribute.js";
 import Board from "../../../../../src/game/state/board/board.js";
+import { logger } from "#platform/logging.js";
 
 const ty = new Player("Ty", "councilor", []);
 const corey = new Player("Corey", "tank", []);
@@ -41,7 +42,7 @@ describe("Board", () => {
 
         it("can be serialized and deserialized", () => {
             let board = new Board(2, 2);
-            let beyerTank = new Entity("tank", new Position(1, 0), new AttributeHolder());
+            let beyerTank = new Entity("tank", new AttributeHolder([ new Attribute("position", "B1") ]));
             let beyer = new Player("Beyer", "tank", [beyerTank]);
             beyer.adopt(beyerTank);
             board.setEntity(beyerTank);

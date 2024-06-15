@@ -12,8 +12,8 @@ export class Position {
     }
 
     static fromHumanReadable(humanReadable) {
-        const match = humanReadable.match(POSITION_EXPR);
-        if(!match) throw new Error(`Invalid human reabale position: ${humanReadable}`);
+        const match = humanReadable?.match?.(POSITION_EXPR);
+        if(!match) throw new Error(`Invalid human reabale position: ${JSON.stringify(humanReadable)}`);
 
         let x = -1;
         let xStr = match[1];

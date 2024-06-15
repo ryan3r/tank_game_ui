@@ -26,7 +26,7 @@ export function gameStateFromRawState(rawGameState) {
     });
 
     board = convertBoard(board, rawGameState.board.floor_board, (newBoard, space, position) => {
-        newBoard.setFloorTile(new FloorTile(space.type, position));
+        newBoard.setFloorTile(new Entity(space.type, [ new Attribute("position", position) ]));
     });
 
     let gameState = new GameState(
@@ -92,10 +92,12 @@ function entityFromBoard(rawEntity, position, playersByName) {
             });
     }
 
+    attributes.push(new Attribute("position", position));
+
     attributes = new AttributeHolder(attributes);
 
     const player = playersByName[rawEntity.name];
-    let entity = new Entity(rawEntity.type, position, attributes);
+    let entity = new Entity(rawEntity.type, attributes);
 
     if(player) {
         player.adopt(entity);
@@ -125,7 +127,7 @@ function convertBoard(newBoard, board, boardSpaceFactory) {
 
         for(let x = 0; x < row.length; ++x) {
             const position = new Position(x, y);
-            boardSpaceFactory(newBoard, board[y][x], position);
+            boardSpaceFactory(newBoard, board[y][x], position.humanReadable);
         }
     }
 
