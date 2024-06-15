@@ -10,7 +10,7 @@ export default class Entity {
     get position() {
         const {position} = this.attributes;
 
-        if(position === undefined) return;
+        if(position === undefined) return undefined;
 
         if(!(position instanceof Position)) {
             return Position.fromHumanReadable(position)

@@ -89,8 +89,6 @@ function entityFromBoard(rawEntity, position, playersByName) {
         }
     }
 
-    attributes = attributes;
-
     const player = playersByName[rawEntity.name];
     let entity = new Entity(rawEntity.type, attributes);
 
