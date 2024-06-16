@@ -58,7 +58,7 @@ export async function save(filePath, {logBook, initialGameState, openHours, game
         fileFormatVersion: FILE_FORMAT_VERSION,
         gameSettings,
         openHours: openHours.serialize(),
-        logBook: logBook.serialize({ justRawEntries: true }),
+        logBook: logBook.withoutStateInfo().serialize(),
         initialGameState,
     });
 }

@@ -34,6 +34,12 @@ class MockVersionConfig {
     }
 }
 
+class MockLogEntryFormatter {
+    formatLogEntry(logEntry) {
+        return `Start of day ${logEntry.rawLogEntry.day}`;
+    }
+}
+
 function addDayTwo(game) {
     const logbook = game.getInteractor().getLogBook()
     logbook.addEntry(logbook.makeEntryFromRaw({ day: 2 }));
@@ -45,6 +51,17 @@ async function buildTestGame({ autoStartOfDay, isGameOpen = () => true, waitForL
         () => ({ start() {}, }) :
         () => { throw new Error("Auto start of day should not be construced"); };
 
+    let logBook = LogBook.deserialize({
+        gameVersion: "3",
+        rawEntries: [
+            { day: 1 },
+        ],
+    });
+
+    logBook.getEntry(0).updateMessageWithBoardState({
+        logEntryFormatter: new MockLogEntryFormatter(),
+    });
+
     let game = new Game({
         createEngine,
         createInteractor,
@@ -52,12 +69,7 @@ async function buildTestGame({ autoStartOfDay, isGameOpen = () => true, waitForL
         createAutoStartOfDay,
         gameDataPromise: Promise.resolve({
             gameSettings,
-            logBook: LogBook.deserialize({
-                gameVersion: "3",
-                rawEntries: [
-                    { day: 1 },
-                ],
-            }),
+            logBook,
             openHours: {
                 isGameOpen,
                 hasAutomaticStartOfDay() { return autoStartOfDay; },

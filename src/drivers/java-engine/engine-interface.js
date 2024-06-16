@@ -237,7 +237,7 @@ class TankGameEngine {
     async processAction(action) {
         await this._sendRequestAndWait({
             type: "action",
-            ...action.serialize({ justRawEntries: true }),
+            ...action.withoutStateInfo().serialize(),
         });
 
         return this.getBoardState();

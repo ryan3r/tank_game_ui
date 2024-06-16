@@ -1,15 +1,14 @@
 import { Dice } from "../../possible-actions/die.js";
 
 export class LogEntry {
-    constructor(rawLogEntry, versionConfig, message, dieRolls) {
+    constructor(rawLogEntry, message, dieRolls) {
         this.type = rawLogEntry.action || "start_of_day";
         this.rawLogEntry = rawLogEntry;
         this.dieRolls = dieRolls;
-        this.message = message || versionConfig?.formatLogEntry?.(this) || "";
-        this._versionConfig = versionConfig;
+        this.message = message;
     }
 
-    static deserialize(rawEntry, versionConfig) {
+    static deserialize(rawEntry) {
         let message;
         let dieRolls;
         if(rawEntry.savedData !== undefined) {
@@ -19,11 +18,13 @@ export class LogEntry {
             delete rawEntry.savedData;
         }
 
-        return new LogEntry(rawEntry, versionConfig, message, dieRolls);
+        return new LogEntry(rawEntry, message, dieRolls);
     }
 
-    serialize({ justRawEntries } = {}) {
-        if(justRawEntries) return this.rawLogEntry;
+    serialize() {
+        if(this.message == undefined) {
+            return this.rawLogEntry;
+        }
 
         return {
             ...this.rawLogEntry,
@@ -34,11 +35,15 @@ export class LogEntry {
         }
     }
 
+    withoutStateInfo() {
+        return new LogEntry(this.rawLogEntry);
+    }
+
     getTimestamp() {
         return new Date(this.rawLogEntry.timestamp * 1000);
     }
 
-    updateMessageWithBoardState({ previousState, actions }) {
+    updateMessageWithBoardState({ logEntryFormatter, previousState, actions }) {
         this.dieRolls = {};
         const rollFields = Object.keys(this.rawLogEntry)
             .map(key => ({ key, value: this.rawLogEntry[key] }))
@@ -53,7 +58,7 @@ export class LogEntry {
                 .map((die, idx) => die.getSideFromValue(rollField.value.roll[idx]));
         }
 
-        this.message = this._versionConfig.formatLogEntry(this, previousState);
+        this.message = logEntryFormatter.formatLogEntry(this, previousState);
     }
 
     finalizeEntry({ actions }) {

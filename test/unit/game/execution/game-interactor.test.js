@@ -30,12 +30,15 @@ class MockActionFactory {
 }
 
 async function configureInteractor(logEntries, { saveHandler, waitForLoaded = true, processingDelays, versionConfig, actionFactories = [], onEntryAdded } = {}) {
-    let logBook = new LogBook(GAME_VERSION, logEntries, versionConfig);
+    let logBook = new LogBook(GAME_VERSION, logEntries);
     let initialGameState = makeMockState({ stateNo: 1 });
+
+    if(!versionConfig) versionConfig = new FakeVersionConfig();
 
     let mockEngine = new MockEngine();
     mockEngine.processingDelays = processingDelays;
     let interactor = new GameInteractor({
+        logEntryFormatter: versionConfig,
         engine: mockEngine,
         gameData: {
             logBook,
@@ -87,8 +90,9 @@ class FakeVersionConfig {
         // Ignore calls to formatLogEntry from the LogEntry constuctor
         if(gameState) {
             this[callsSym].push([logEntry, gameState]);
-            return "";
         }
+
+        return "";
     }
 }
 
@@ -98,12 +102,12 @@ describe("GameInteractor", () => {
         let versionConfig = new FakeVersionConfig();
 
         let logEntries = [
-            new LogEntry({ action: "sit" }, versionConfig),
-            new LogEntry({ action: "stand" }, versionConfig),
-            new LogEntry({ action: "walk" }, versionConfig),
+            new LogEntry({ action: "sit" }),
+            new LogEntry({ action: "stand" }),
+            new LogEntry({ action: "walk" }),
         ];
 
-        const { interactor, mockEngine, initialGameState } = await configureInteractor(logEntries);
+        const { interactor, mockEngine, initialGameState } = await configureInteractor(logEntries, { versionConfig });
 
         assert.deepEqual(mockEngine.operations, [
             { operation: "set-version", version: GAME_VERSION },
@@ -132,7 +136,7 @@ describe("GameInteractor", () => {
         let versionConfig = new FakeVersionConfig();
 
         let logEntries = [
-            new LogEntry({ action: "sit" }, versionConfig),
+            new LogEntry({ action: "sit" }),
         ];
 
         const { logBook, interactor, mockEngine } = await configureInteractor(logEntries, {versionConfig});
@@ -141,8 +145,9 @@ describe("GameInteractor", () => {
         mockEngine.operations = [];
 
         const rawEntry = { action: "run" };
-        let newEntry = new LogEntry(rawEntry, versionConfig);
+        let newEntry = new LogEntry(rawEntry);
         newEntry.updateMessageWithBoardState({
+            logEntryFormatter: versionConfig,
             previousState: { stateNo: 2 },
         });
         await interactor.addLogBookEntry(rawEntry);
@@ -193,7 +198,7 @@ describe("GameInteractor", () => {
         let versionConfig = new FakeVersionConfig();
 
         const { interactor, mockEngine, logBook } = await configureInteractor([
-            new LogEntry({ type: "action", day: 1 }, versionConfig),
+            new LogEntry({ type: "action", day: 1 }),
         ], {versionConfig});
 
         mockEngine.throwOnNext = true;
@@ -229,9 +234,9 @@ describe("GameInteractor", () => {
         let versionConfig = new FakeVersionConfig();
 
         let logEntries = [
-            new LogEntry({ action: "sit" }, versionConfig),
-            new LogEntry({ action: "stand" }, versionConfig),
-            new LogEntry({ action: "walk" }, versionConfig),
+            new LogEntry({ action: "sit" }),
+            new LogEntry({ action: "stand" }),
+            new LogEntry({ action: "walk" }),
         ];
 
         const initialDelay = 3;
@@ -251,12 +256,14 @@ describe("GameInteractor", () => {
         });
 
         const rawEntry = { action: "run" };
-        let newEntry = new LogEntry(rawEntry, versionConfig);
+        let newEntry = new LogEntry(rawEntry);
         newEntry.updateMessageWithBoardState({
+            logEntryFormatter: versionConfig,
             previousState: { stateNo: 3 },
         });
-        let newEntry2 = new LogEntry(rawEntry, versionConfig);
+        let newEntry2 = new LogEntry(rawEntry);
         newEntry2.updateMessageWithBoardState({
+            logEntryFormatter: versionConfig,
             previousState: { stateNo: 4 },
         });
         mockEngine.processingDelay = firstAddActionDelay;
@@ -351,8 +358,9 @@ describe("GameInteractor", () => {
             },
         });
 
-        assert.deepEqual(getAllLogBookEntries(logBook)[3],
-            new LogEntry({ panda: 12, ...rawEntry }, versionConfig, "", {}));
+        let expectedEntry = new LogEntry({ panda: 12, ...rawEntry }, "", {});
+        expectedEntry.updateMessageWithBoardState({ logEntryFormatter: versionConfig });
+        assert.deepEqual(getAllLogBookEntries(logBook)[3], expectedEntry);
     });
 
     it("can trigger an entry added event for each entry we add", async () => {
@@ -367,9 +375,9 @@ describe("GameInteractor", () => {
         };
 
         let logEntries = [
-            new LogEntry({ action: "sit" }, versionConfig),
-            new LogEntry({ action: "stand" }, versionConfig),
-            new LogEntry({ action: "walk" }, versionConfig),
+            new LogEntry({ action: "sit" }),
+            new LogEntry({ action: "stand" }),
+            new LogEntry({ action: "walk" }),
         ];
 
         const { interactor } = await configureInteractor(logEntries, {

@@ -16,7 +16,7 @@ export async function incrementalPlaythrough(createEngine, testGamePath) {
     };
 
     const versionConfig = getGameVersion(logBook.gameVersion);
-    let emptyLogBook = new LogBook(logBook.gameVersion, [], versionConfig, makeTimeStamp);
+    let emptyLogBook = new LogBook(logBook.gameVersion, [], makeTimeStamp);
 
     let fullEngine = createEngine();
     let incrementalEngine = createEngine();
@@ -27,6 +27,7 @@ export async function incrementalPlaythrough(createEngine, testGamePath) {
         // This triggers a set version, set state, and a series of process actions
         logger.debug("[integration-test] Process actions as a group");
         let fullInteractor = new GameInteractor({
+            logEntryFormatter: versionConfig,
             engine: fullEngine,
             actionFactories: fullFactories,
             gameData: {
@@ -40,6 +41,7 @@ export async function incrementalPlaythrough(createEngine, testGamePath) {
         // This triggers a set version and then a set state and process action for each entry
         logger.debug("[integration-test] Process individual actions");
         let incrementalInteractor = new GameInteractor({
+            logEntryFormatter: versionConfig,
             engine: incrementalEngine,
             actionFactories: incrementalFactories,
             gameData: {

@@ -2,7 +2,7 @@ import { logger } from "#platform/logging.js";
 import { PromiseLock } from "../../utils.js";
 
 export class GameInteractor {
-    constructor({ engine, gameData, saveHandler, actionFactories, onEntryAdded }) {
+    constructor({ engine, gameData, saveHandler, actionFactories, onEntryAdded, logEntryFormatter }) {
         this._saveHandler = saveHandler;
         this._engine = engine;
         this._gameData = gameData;
@@ -11,6 +11,7 @@ export class GameInteractor {
         this._previousState = gameData.initialGameState;
         this._actionFactories = actionFactories;
         this._onEntryAdded = onEntryAdded;
+        this._logEntryFormatter = logEntryFormatter;
 
         // Process any unprocessed log book entries.
         this.loaded = this._processActions();
@@ -46,6 +47,7 @@ export class GameInteractor {
                 this._engine.getGameStateFromEngineState(this._gameData.initialGameState);
 
             logEntry.updateMessageWithBoardState({
+                logEntryFormatter: this._logEntryFormatter,
                 previousState,
                 actions: await this._getActions(logEntry.rawLogEntry.subject, {
                     entryId: entryId,
@@ -82,6 +84,7 @@ export class GameInteractor {
 
         // Format log entry with previous state
         entry.updateMessageWithBoardState({
+            logEntryFormatter: this._logEntryFormatter,
             previousState: this._gameStates[this._gameStates.length - 1],
             actions: await this.getActions(entry.rawLogEntry.subject),
         });

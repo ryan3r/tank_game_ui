@@ -7,10 +7,9 @@ const DEFAULT_TIME_INTERVAL = 20 * 60; // 20 minutes
 
 
 export class LogBook {
-    constructor(gameVersion, entries, versionConfig, makeTimeStamp = defaultMakeTimeStamp) {
+    constructor(gameVersion, entries, makeTimeStamp = defaultMakeTimeStamp) {
         this.gameVersion = gameVersion;
         this._entries = entries;
-        this._versionConfig = versionConfig;
         this._makeTimeStamp = makeTimeStamp;
         this._buildDayMap();
     }
@@ -55,8 +54,6 @@ export class LogBook {
             ];
         }
 
-        const versionConfig = getGameVersion(gameVersion);
-
         let previousTime = 0;
         const entries = rawEntries.map((rawEntry, idx) => {
             if(rawEntry.timestamp === undefined) {
@@ -69,18 +66,23 @@ export class LogBook {
 
             previousTime = rawEntry.timestamp;
 
-            const entry = LogEntry.deserialize(rawEntry, versionConfig);
+            const entry = LogEntry.deserialize(rawEntry);
             return entry;
         });
 
-        return new LogBook(gameVersion, entries, versionConfig, makeTimeStamp);
+        return new LogBook(gameVersion, entries, makeTimeStamp);
     }
 
-    serialize({ justRawEntries } = {}) {
+    serialize() {
         return {
             gameVersion: this.gameVersion,
-            rawEntries: this._entries.map(entry => entry.serialize({ justRawEntries })),
+            rawEntries: this._entries.map(entry => entry.serialize()),
         }
+    }
+
+    withoutStateInfo() {
+        const entries = this._entries.map(entry => entry.withoutStateInfo());
+        return new LogBook(this.gameVersion, entries, this._makeTimeStamp);
     }
 
     getEntry(entryId) {
@@ -89,7 +91,7 @@ export class LogBook {
 
     makeEntryFromRaw(rawEntry) {
         rawEntry.timestamp = this._makeTimeStamp();
-        return new LogEntry(rawEntry, this._versionConfig);
+        return new LogEntry(rawEntry);
     }
 
     addEntry(entry) {

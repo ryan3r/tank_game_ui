@@ -75,6 +75,7 @@ export class Game {
                 saveHandler: this._saveHandler,
                 onEntryAdded: this._setStateFromLastEntry.bind(this),
                 actionFactories,
+                logEntryFormatter: gameVersion,
             });
 
             await this._interactor.loaded;
