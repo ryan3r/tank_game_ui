@@ -169,7 +169,7 @@ export class GameInteractor {
 
         return await this._actionFactories.getActionFactoriesForPlayer({
             playerName,
-            day: logEntry !== undefined ? logEntry.day : logBook.getMaxDay(),
+            day: logEntry !== undefined ? logBook.getDayOfEntryId(entryId) : logBook.getMaxDay(),
             gameState,
             engine: this._engine,
         });

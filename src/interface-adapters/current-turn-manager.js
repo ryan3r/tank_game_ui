@@ -36,8 +36,7 @@ export function useCurrentTurnManager(logBook) {
 
 
 function determineDayRelativeIds(state) {
-    const currentEntry = state._logBook.getEntry(state.entryId);
-    state.today = currentEntry?.day || 0;
+    state.today = state._logBook.getDayOfEntryId(state.entryId) || 0;
     const firstIdOfDay = state._logBook.getFirstEntryIdOfDay(state.today) || 0;
     const lastIdOfDay = state._logBook.getLastEntryIdOfDay(state.today) || 0;
     state.maxEntryIdToday = (lastIdOfDay - firstIdOfDay) + 1;

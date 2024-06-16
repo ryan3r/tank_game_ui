@@ -70,8 +70,9 @@ describe("LogBook", () => {
         // Confirm the indicies point to the correct things
         assert.equal(firstEntryFirstDay.type, "start_of_day");
         assert.equal(firstEntrySecondDay.type, "start_of_day");
-        assert.equal(firstEntryFirstDay.day, 1);
-        assert.equal(firstEntrySecondDay.day, 2);
+
+        assert.equal(logBook.getDayOfEntryId(firstDayIndex), 1);
+        assert.equal(logBook.getDayOfEntryId(secondDayIndex), 2);
 
         assert.equal(logBook.getFirstEntryIdOfDay(1), firstDayIndex);
         assert.equal(logBook.getFirstEntryIdOfDay(2), secondDayIndex);

@@ -36,7 +36,7 @@ class MockActionSet {
 function makeBasicHitEntry(roll) {
     const versionConfig = new MockVersionConfig();
 
-    let hitEntry = new LogEntry(-1, {
+    let hitEntry = new LogEntry({
         action: "shoot",
         subject: "Terence",
         target: "G5",
