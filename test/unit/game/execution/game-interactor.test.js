@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { LogBook } from "../../../../src/game/state/log-book/log-book.js";
 import { GameInteractor } from "../../../../src/game/execution/game-interactor.js";
-import { LogEntry } from "../../../../src/game/state/log-book/entry.js";
+import { LogEntry } from "../../../../src/game/state/log-book/log-entry.js";
 import { PossibleActionSourceSet } from "../../../../src/game/possible-actions/index.js";
 
 const GAME_VERSION = 3;

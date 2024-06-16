@@ -1,5 +1,5 @@
 import { getGameVersion } from "../../../versions/index.js";
-import { LogEntry } from "./entry.js";
+import { LogEntry } from "./log-entry.js";
 
 const defaultMakeTimeStamp = () => Math.floor(Date.now() / 1000);
 
