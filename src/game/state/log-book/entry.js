@@ -1,8 +1,7 @@
 import { Dice } from "../../possible-actions/die.js";
 
 export class LogEntry {
-    constructor(day, rawLogEntry, id, versionConfig, message, dieRolls) {
-        this.id = id;
+    constructor(day, rawLogEntry, versionConfig, message, dieRolls) {
         this.day = day;
         this.type = rawLogEntry.action || "start_of_day";
         this.rawLogEntry = rawLogEntry;
@@ -11,7 +10,7 @@ export class LogEntry {
         this._versionConfig = versionConfig;
     }
 
-    static deserialize(id, previousDay, rawEntry, versionConfig) {
+    static deserialize(previousDay, rawEntry, versionConfig) {
         if(rawEntry.day) previousDay = rawEntry.day;
 
         let message;
@@ -23,7 +22,7 @@ export class LogEntry {
             delete rawEntry.savedData;
         }
 
-        return new LogEntry(previousDay, rawEntry, id, versionConfig, message, dieRolls);
+        return new LogEntry(previousDay, rawEntry, versionConfig, message, dieRolls);
     }
 
     serialize({ justRawEntries } = {}) {

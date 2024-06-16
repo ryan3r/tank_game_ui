@@ -73,9 +73,9 @@ describe("LogBook", () => {
         assert.equal(firstEntryFirstDay.day, 1);
         assert.equal(firstEntrySecondDay.day, 2);
 
-        assert.equal(logBook.getFirstEntryOfDay(1), firstEntryFirstDay);
-        assert.equal(logBook.getFirstEntryOfDay(2), firstEntrySecondDay);
-        assert.equal(logBook.getFirstEntryOfDay(3), undefined);
+        assert.equal(logBook.getFirstEntryIdOfDay(1), firstDayIndex);
+        assert.equal(logBook.getFirstEntryIdOfDay(2), secondDayIndex);
+        assert.equal(logBook.getFirstEntryIdOfDay(3), undefined);
     });
 
     it("can add entries", () => {
@@ -90,6 +90,6 @@ describe("LogBook", () => {
 
         assert.equal(newId, logBook.getLastEntryId());
         assert.equal(3, logBook.getMaxDay());
-        assert.equal(newId, logBook.getFirstEntryOfDay(3).id);
+        assert.equal(newId, logBook.getFirstEntryIdOfDay(3));
     });
 });

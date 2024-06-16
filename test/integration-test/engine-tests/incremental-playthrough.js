@@ -56,16 +56,17 @@ export async function incrementalPlaythrough(createEngine, testGamePath) {
         // Wait for the full interactor to finish loading
         await fullInteractor.loaded;
 
-        for(const entry of logBook) {
+        for(let id = 0; id < logBook.getLength(); ++id) {
+            const entry = logBook.getEntry(id);
             // Compare the entries and states and make sure they match
-            let incrementalEntry = emptyLogBook.getEntry(entry.id).serialize();
+            let incrementalEntry = emptyLogBook.getEntry(id).serialize();
             let fullEntry = entry.serialize();
             // Timestamps won't be in sync ignore them
             delete incrementalEntry.timestamp;
             delete fullEntry.timestamp;
 
             assert.deepEqual(incrementalEntry, fullEntry);
-            assert.deepEqual(fullInteractor.getGameStateById(entry.id), incrementalInteractor.getGameStateById(entry.id));
+            assert.deepEqual(fullInteractor.getGameStateById(id), incrementalInteractor.getGameStateById(id));
         }
     }
     finally {

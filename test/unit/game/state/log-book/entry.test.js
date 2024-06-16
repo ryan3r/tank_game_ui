@@ -45,7 +45,7 @@ function makeBasicHitEntry(roll) {
             manual: true,
             roll,
         },
-    }, -1, versionConfig);
+    }, versionConfig);
 
     // Reset after calling the constructor
     versionConfig.formatArgs = [];
