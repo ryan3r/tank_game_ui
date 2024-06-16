@@ -33,7 +33,7 @@ export function defineRoutes(app, buildInfo) {
                 statusText: game.getStatusText(),
             },
             gameSettings: game.getSettings(),
-            openHours: game.getOpenHours().serialize({ resolved: true }),
+            openHours: game.getOpenHours().asResolved().serialize(),
             logBook: interactor.getLogBook().serialize(),
         });
     });

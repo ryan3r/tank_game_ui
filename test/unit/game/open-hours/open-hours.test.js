@@ -99,10 +99,8 @@ describe("OpenHours", () => {
 
         assert.ok(!maybeOpenHours.isGameOpen(friday0501));
 
-        const resolvedMaybeOpenHours = OpenHours.deserialize(maybeOpenHours.serialize({
-            resolved: true,
-            now: monday0217,
-        }));
+        const resolvedMaybeOpenHours = OpenHours.deserialize(
+            maybeOpenHours.asResolved(monday0217).serialize());
 
         assert.ok(resolvedMaybeOpenHours.isGameOpen(friday0501));
     });
