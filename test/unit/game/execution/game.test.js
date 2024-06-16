@@ -1,8 +1,8 @@
 import assert from "node:assert";
 import { Game } from "../../../../src/game/execution/game.js";
-import { MockEngine } from "./game-interactor.test.js";
 import { LogBook } from "../../../../src/game/state/log-book/log-book.js";
 import { PossibleActionSourceSet } from "../../../../src/game/possible-actions/index.js";
+import { MockEngine } from "./mock-engine.js";
 
 class MockInteractor {
     constructor(opts) {
