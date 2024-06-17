@@ -13,7 +13,7 @@ export default class Entity {
         if(position === undefined) return undefined;
 
         if(!(position instanceof Position)) {
-            return Position.fromHumanReadable(position)
+            return new Position(position)
         }
 
         return position;

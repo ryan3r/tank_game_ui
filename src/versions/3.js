@@ -31,7 +31,7 @@ function getDiceForShot({ gameState, subject, target }) {
     }
 
     const playerEntity = player.entities[0];
-    const targetEntity = gameState.board.getEntityAt(Position.fromHumanReadable(target));
+    const targetEntity = gameState.board.getEntityAt(new Position(target));
 
     // This target has health we must roll
     if(targetEntity.attributes.health !== undefined) {

@@ -28,15 +28,15 @@ const emptyTile = new Entity("empty", { position: "G5"});
 
 describe("Board", () => {
     it("can find the entity at a space", () => {
-        assert.deepEqual(board.getEntityAt(Position.fromHumanReadable("A1")), tank1);
-        assert.deepEqual(board.getEntityAt(Position.fromHumanReadable("C4")), destroyedTank);
-        assert.deepEqual(board.getEntityAt(Position.fromHumanReadable("D3")), empty);
+        assert.deepEqual(board.getEntityAt(new Position("A1")), tank1);
+        assert.deepEqual(board.getEntityAt(new Position("C4")), destroyedTank);
+        assert.deepEqual(board.getEntityAt(new Position("D3")), empty);
     });
 
     it("can find the floor tile at a space", () => {
-        assert.deepEqual(board.getFloorTileAt(Position.fromHumanReadable("B4")), goldMine2);
-        assert.deepEqual(board.getFloorTileAt(Position.fromHumanReadable("C4")), base);
-        assert.deepEqual(board.getFloorTileAt(Position.fromHumanReadable("G5")), emptyTile);
+        assert.deepEqual(board.getFloorTileAt(new Position("B4")), goldMine2);
+        assert.deepEqual(board.getFloorTileAt(new Position("C4")), base);
+        assert.deepEqual(board.getFloorTileAt(new Position("G5")), emptyTile);
     });
 
     it("can be serialize and deserialized", () => {

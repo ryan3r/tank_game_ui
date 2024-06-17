@@ -13,7 +13,7 @@ export default class Player {
 
     static deserialize(rawPlayer, board) {
         const entities = rawPlayer.entities.map(entityPos =>
-            board.getEntityAt(Position.fromHumanReadable(entityPos)));
+            board.getEntityAt(new Position(entityPos)));
 
         return new Player(rawPlayer.name, rawPlayer.type, entities);
     }
