@@ -14,7 +14,8 @@ const deadTankAttributesToRemove = ["ACTIONS", "RANGE", "BOUNTY"];
 
 
 export function gameStateFromRawState(rawGameState) {
-    const playersByName = buildUserLists(rawGameState);
+    let councilPlayers = [];
+    const playersByName = buildUserLists(rawGameState, councilPlayers);
 
     let board = convertBoard(undefined, rawGameState.board.unit_board, (newBoard, rawEntity, position) => {
         newBoard.setEntity(entityFromBoard(rawEntity, position, playersByName));
@@ -27,7 +28,9 @@ export function gameStateFromRawState(rawGameState) {
     let gameState = new GameState(
         new Players(Object.values(playersByName)),
         board,
-        convertCouncil(rawGameState.council),
+        {
+            council: convertCouncil(rawGameState.council, councilPlayers),
+        },
         rawGameState.running,
         rawGameState.winner,
     );
@@ -46,7 +49,7 @@ function getAttributeName(name, rawEntity) {
 }
 
 
-function convertCouncil(rawCouncil) {
+function convertCouncil(rawCouncil, players) {
     let attributes = {
         coffer: rawCouncil.coffer,
     };
@@ -58,7 +61,7 @@ function convertCouncil(rawCouncil) {
         };
     }
 
-    return attributes;
+    return new Entity({ type: "council", attributes, players });
 }
 
 function shouldKeepAttribute(attributeName, rawEntity) {
@@ -126,16 +129,16 @@ function convertBoard(newBoard, board, boardSpaceFactory) {
 }
 
 
-function buildUserLists(rawGameState) {
+function buildUserLists(rawGameState, councilPlayers) {
     let playersByName = {};
-    processCouncil(rawGameState, playersByName);
+    processCouncil(rawGameState, playersByName, councilPlayers);
     findUsersOnGameBoard(rawGameState, playersByName);
 
     return playersByName;
 }
 
 
-function processCouncil(rawGameState, playersByName) {
+function processCouncil(rawGameState, playersByName, councilPlayers) {
     // Ensure that players remain in the same order
     rawGameState.council.council.sort();
     rawGameState.council.senate.sort();
@@ -154,6 +157,8 @@ function processCouncil(rawGameState, playersByName) {
             else {
                 playersByName[userName] = new Player({ name: userName, type: userType });
             }
+
+            councilPlayers.push(playersByName[userName]);
         }
     }
 }

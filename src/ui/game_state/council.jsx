@@ -11,8 +11,8 @@ export function Council({ gameState, config, setSelectedUser, canSubmitAction })
 
     return (
         <>
-            <ArmisticeClock armistice={gameState.council.armistice}></ArmisticeClock>
-            <AttributeList attributes={gameState.council} versionConfig={config} excludedAttributes={EXCLUDED_ATTRIBUTES}></AttributeList>
+            <ArmisticeClock armistice={gameState.metaEntities.council.attributes.armistice}></ArmisticeClock>
+            <AttributeList attributes={gameState.metaEntities.council.attributes} versionConfig={config} excludedAttributes={EXCLUDED_ATTRIBUTES}></AttributeList>
             <div className="user-list">
                 {config.getCouncilPlayerTypes().map(playerType => {
                     const players = gameState.players.getPlayersByType(playerType);
@@ -40,7 +40,8 @@ function Section({ name, users, setSelectedUser, canSubmitAction }) {
             <h3>{prettyifyName(name)}s</h3>
             <ul>
                 {users.map(user => {
-                    const actionButton = user.entities.length === 0 && canSubmitAction ? (
+                    const hasEntitiesOnBoard = user.entities.find(entity => entity.position !== undefined);
+                    const actionButton = !hasEntitiesOnBoard && canSubmitAction ? (
                         <button onClick={() => setSelectedUser(user.name)} className="council-action-button">
                             Take Action
                         </button>
