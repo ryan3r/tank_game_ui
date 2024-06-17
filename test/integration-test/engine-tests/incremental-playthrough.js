@@ -7,7 +7,7 @@ import { OpenHours } from "../../../src/game/open-hours/index.js";
 import { getGameVersion } from "../../../src/versions/index.js";
 
 export async function incrementalPlaythrough(createEngine, testGamePath) {
-    let { logBook, initialGameState } = await load(testGamePath);
+    let { gameVersion, logBook, initialGameState } = await load(testGamePath);
 
     let lastTime = 0;
     const makeTimeStamp = () => {
@@ -15,8 +15,8 @@ export async function incrementalPlaythrough(createEngine, testGamePath) {
         return lastTime;
     };
 
-    const versionConfig = getGameVersion(logBook.gameVersion);
-    let emptyLogBook = new LogBook(logBook.gameVersion, [], makeTimeStamp);
+    const versionConfig = getGameVersion(gameVersion);
+    let emptyLogBook = new LogBook([], makeTimeStamp);
 
     let fullEngine = createEngine();
     let incrementalEngine = createEngine();
@@ -31,6 +31,7 @@ export async function incrementalPlaythrough(createEngine, testGamePath) {
             engine: fullEngine,
             actionFactories: fullFactories,
             gameData: {
+                gameVersion,
                 logBook,
                 initialGameState,
                 openHours: new OpenHours([]),
@@ -45,6 +46,7 @@ export async function incrementalPlaythrough(createEngine, testGamePath) {
             engine: incrementalEngine,
             actionFactories: incrementalFactories,
             gameData: {
+                gameVersion,
                 logBook: emptyLogBook,
                 initialGameState,
                 openHours: new OpenHours([]),

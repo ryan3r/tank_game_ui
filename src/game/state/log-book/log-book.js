@@ -1,4 +1,3 @@
-import { getGameVersion } from "../../../versions/index.js";
 import { LogEntry } from "./log-entry.js";
 
 const defaultMakeTimeStamp = () => Math.floor(Date.now() / 1000);
@@ -7,8 +6,7 @@ const DEFAULT_TIME_INTERVAL = 20 * 60; // 20 minutes
 
 
 export class LogBook {
-    constructor(gameVersion, entries, makeTimeStamp = defaultMakeTimeStamp) {
-        this.gameVersion = gameVersion;
+    constructor(entries, makeTimeStamp = defaultMakeTimeStamp) {
         this._entries = entries;
         this._makeTimeStamp = makeTimeStamp;
         this._buildDayMap();
@@ -43,7 +41,7 @@ export class LogBook {
         }
     }
 
-    static deserialize({gameVersion, rawEntries}, makeTimeStamp) {
+    static deserialize({rawEntries}, makeTimeStamp) {
         // 0 length log books are not supported start day 1 if we have no entries
         if(rawEntries === undefined || rawEntries.length === 0) {
             rawEntries = [
@@ -70,19 +68,18 @@ export class LogBook {
             return entry;
         });
 
-        return new LogBook(gameVersion, entries, makeTimeStamp);
+        return new LogBook(entries, makeTimeStamp);
     }
 
     serialize() {
         return {
-            gameVersion: this.gameVersion,
             rawEntries: this._entries.map(entry => entry.serialize()),
         }
     }
 
     withoutStateInfo() {
         const entries = this._entries.map(entry => entry.withoutStateInfo());
-        return new LogBook(this.gameVersion, entries, this._makeTimeStamp);
+        return new LogBook(entries, this._makeTimeStamp);
     }
 
     getEntry(entryId) {

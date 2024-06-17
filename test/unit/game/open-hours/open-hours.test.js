@@ -3,6 +3,7 @@ import { Schedule } from "../../../../src/game/open-hours/schedule.js";
 import { OpenHours } from "../../../../src/game/open-hours/index.js";
 import { LogBook } from "../../../../src/game/state/log-book/log-book.js";
 import { AutomaticStartOfDay } from "../../../../src/game/open-hours/automatic-start-of-day.js";
+import { LogEntry } from "../../../../src/game/state/log-book/log-entry.js";
 
 function checkIsOpen(scheduleName, schedule, date, expected) {
     assert.equal(schedule.isGameOpen(date), expected, `is ${scheduleName} game open ${date}`);
@@ -129,27 +130,24 @@ describe("OpenHours", () => {
     });
 });
 
-const logBook = LogBook.deserialize({
-    gameVersion: "3",
-    rawEntries: [
-        {
-            day: 1,
-        },
-        {
-            action: "move",
-        },
-        {
-            day: 2,
-            timestamp: makeDate(2024, 7, 21, 12, 0).getTime() / 1000,
-        },
-        {
-            action: "shoot",
-        },
-        {
-            action: "move",
-        },
-    ],
-});
+const logBook = new LogBook([
+    new LogEntry({
+        day: 1,
+    }),
+    new LogEntry({
+        action: "move",
+    }),
+    new LogEntry({
+        day: 2,
+        timestamp: makeDate(2024, 7, 21, 12, 0).getTime() / 1000,
+    }),
+    new LogEntry({
+        action: "shoot",
+    }),
+    new LogEntry({
+        action: "move",
+    }),
+]);
 
 describe("Automatic start of day", () => {
     it("can check if a start of day entry has been added today already", () => {

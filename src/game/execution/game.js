@@ -60,7 +60,7 @@ export class Game {
             // After this point shutdown with directly terminte the interactor
             if(this._hasBeenShutDown) return;
 
-            const gameVersion = this._factories.getGameVersion(this._gameData.logBook.gameVersion);
+            const gameVersion = this._factories.getGameVersion(this._gameData.gameVersion);
             const engine = this._factories.createEngine();
             let actionFactories = gameVersion.getActionFactories(engine);
 
@@ -91,6 +91,10 @@ export class Game {
             this._automaticStartOfDay = this._factories.createAutoStartOfDay(this);
             this.loaded.then(() => this._automaticStartOfDay.start());
         }
+    }
+
+    getGameVersion() {
+        return this._gameData.gameVersion;
     }
 
     getState() {

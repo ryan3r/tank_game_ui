@@ -30,7 +30,7 @@ class MockActionFactory {
 }
 
 async function configureInteractor(logEntries, { saveHandler, waitForLoaded = true, processingDelays, versionConfig, actionFactories = [], onEntryAdded } = {}) {
-    let logBook = new LogBook(GAME_VERSION, logEntries);
+    let logBook = new LogBook(logEntries);
     let initialGameState = makeMockState({ stateNo: 1 });
 
     if(!versionConfig) versionConfig = new FakeVersionConfig();
@@ -41,6 +41,7 @@ async function configureInteractor(logEntries, { saveHandler, waitForLoaded = tr
         logEntryFormatter: versionConfig,
         engine: mockEngine,
         gameData: {
+            gameVersion: GAME_VERSION,
             logBook,
             initialGameState,
         },
@@ -189,6 +190,7 @@ describe("GameInteractor", () => {
 
         const saveData = await promise;
         assert.deepEqual(saveData, {
+            gameVersion: GAME_VERSION,
             initialGameState,
             logBook,
         });

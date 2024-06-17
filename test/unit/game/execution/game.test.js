@@ -3,6 +3,7 @@ import { Game } from "../../../../src/game/execution/game.js";
 import { LogBook } from "../../../../src/game/state/log-book/log-book.js";
 import { PossibleActionSourceSet } from "../../../../src/game/possible-actions/index.js";
 import { MockEngine } from "./mock-engine.js";
+import { LogEntry } from "../../../../src/game/state/log-book/log-entry.js";
 
 class MockInteractor {
     constructor(opts) {
@@ -51,12 +52,9 @@ async function buildTestGame({ autoStartOfDay, isGameOpen = () => true, waitForL
         () => ({ start() {}, }) :
         () => { throw new Error("Auto start of day should not be construced"); };
 
-    let logBook = LogBook.deserialize({
-        gameVersion: "3",
-        rawEntries: [
-            { day: 1 },
-        ],
-    });
+    let logBook = new LogBook([
+        new LogEntry({ day: 1 }),
+    ]);
 
     logBook.getEntry(0).updateMessageWithBoardState({
         logEntryFormatter: new MockLogEntryFormatter(),

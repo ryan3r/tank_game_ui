@@ -1,8 +1,6 @@
 import assert from "node:assert";
 import { LogBook } from "../../../../../src/game/state/log-book/log-book.js";
 
-const GAME_VERSION = 3;
-
 // These should point to the start of day actions in the list below
 const firstDayIndex = 0;
 const secondDayIndex = 2;
@@ -38,7 +36,6 @@ const rawEntries = [
 ];
 
 export const rawLogBook = {
-    gameVersion: GAME_VERSION,
     rawEntries
 };
 

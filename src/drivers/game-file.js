@@ -40,6 +40,7 @@ export async function load(filePath, { saveBack = false, makeTimeStamp } = {}) {
         OpenHours.deserialize(content.openHours) : new OpenHours([]);
 
     const fileData = {
+        gameVersion: content.logBook.gameVersion,
         openHours,
         logBook,
         gameSettings: content.gameSettings,
@@ -53,12 +54,15 @@ export async function load(filePath, { saveBack = false, makeTimeStamp } = {}) {
     return fileData;
 }
 
-export async function save(filePath, {logBook, initialGameState, openHours, gameSettings}) {
+export async function save(filePath, {gameVersion, logBook, initialGameState, openHours, gameSettings}) {
     await writeJson(filePath, {
         fileFormatVersion: FILE_FORMAT_VERSION,
         gameSettings,
         openHours: openHours.serialize(),
-        logBook: logBook.withoutStateInfo().serialize(),
+        logBook: {
+            gameVersion,
+            ...logBook.withoutStateInfo().serialize(),
+        },
         initialGameState,
     });
 }
