@@ -2,11 +2,11 @@ import Player from "../../../../../src/game/state/players/player.js";
 import assert from "node:assert";
 import Players from "../../../../../src/game/state/players/players.js";
 
-const ty = new Player("Ty", "councilor");
-const corey = new Player("Corey", "tank");
-const ryan = new Player("Ryan", "senator");
-const lena = new Player("Lena", "councilor");
-const xavion = new Player("Xavion", "tank");
+const ty = new Player({ name: "Ty", type: "councilor" });
+const corey = new Player({ name: "Corey", type: "tank" });
+const ryan = new Player({ name: "Ryan", type: "senator" });
+const lena = new Player({ name: "Lena", type: "councilor" });
+const xavion = new Player({ name: "Xavion", type: "tank" });
 const players = new Players([ty, ryan, corey, lena, xavion]);
 const players2 = new Players([ty, lena, xavion]);
 
@@ -36,7 +36,7 @@ describe("Board", () => {
         });
 
         it("can be serialized and deserialized", () => {
-            let beyer = new Player("Beyer", "tank");
+            let beyer = new Player({ name: "Beyer", type: "tank" });
             let players3 = new Players([beyer, ty]);
 
             const reSerializedPlayers = Players.deserialize(players3.serialize());

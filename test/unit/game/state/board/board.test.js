@@ -12,7 +12,7 @@ const destroyedTank = new Entity({ type: "dead-tank", position: new Position("C4
 let tank2 = new Entity({ type: "tank", position: new Position("G5") });
 const baloon = new Entity({ type: "baloon", position: new Position("B2") });
 
-let josh = new Player("Josh", "tank");
+let josh = new Player({ name: "Josh", type: "tank" });
 tank2.addPlayer(josh);
 
 board.setEntity(tank1);

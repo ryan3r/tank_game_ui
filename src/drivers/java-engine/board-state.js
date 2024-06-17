@@ -152,7 +152,7 @@ function processCouncil(rawGameState, playersByName) {
                 playersByName[userName].type = userType;
             }
             else {
-                playersByName[userName] = new Player(userName, userType);
+                playersByName[userName] = new Player({ name: userName, type: userType });
             }
         }
     }
@@ -165,7 +165,10 @@ function findUsersOnGameBoard(rawGameState, playersByName) {
             if(rawEntity.name) {
                 let player = playersByName[rawEntity.name];
                 if(!player) {
-                    player = new Player(rawEntity.name, rawEntity.dead ? "council" : "tank");
+                    player = new Player({
+                        name: rawEntity.name,
+                        type: rawEntity.dead ? "council" : "tank",
+                    });
                     playersByName[rawEntity.name] = player;
                 }
             }

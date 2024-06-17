@@ -1,24 +1,17 @@
 export default class Player {
-    constructor(name, type) {
-        this.name = name;
-        this.type = type;
+    constructor(attributes = {}) {
         this.entities = [];
+        this.attributes = attributes;
     }
 
+    get name() { return this.attributes.name; }
+    get type() { return this.attributes.type; }
+
     static deserialize(rawPlayer) {
-        return new Player(rawPlayer.name, rawPlayer.type);
+        return new Player(rawPlayer);
     }
 
     serialize() {
-        return {
-            name: this.name,
-            type: this.type,
-            entities: this.entities.map(entity => entity.position.humanReadable)
-        };
-    }
-
-    adopt(entity) {
-        this.entities.push(entity);
-        entity.players.push(this);
+        return this.attributes;
     }
 }
