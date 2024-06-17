@@ -1,16 +1,13 @@
 import { Position } from "./position.js";
 
 export default class Entity {
-    constructor(type, attributes, players = []) {
+    constructor({ type, position, attributes = {}, players = [] }) {
         this.type = type;
-        this.players = [];  // Conrolled by Player
+        this.position = position;
+        this.players = [];
         this.attributes = attributes;
 
         for(let player of players) this.addPlayer(player);
-    }
-
-    get position() {
-        return this.attributes.position;
     }
 
     addPlayer(player) {
@@ -23,12 +20,14 @@ export default class Entity {
         delete attributes.type;
         delete attributes.players;
 
+        let position;
         if(attributes.position !== undefined) {
-            attributes.position = new Position(attributes.position);
+            position = new Position(attributes.position);
+            delete attributes.position;
         }
 
         const myPlayers = rawEntity.players.map(playerName => players.getPlayerByName(playerName));
-        return new Entity(rawEntity.type, attributes, myPlayers);
+        return new Entity({ type: rawEntity.type, attributes, players: myPlayers, position });
     }
 
     serialize() {

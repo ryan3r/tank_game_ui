@@ -21,7 +21,7 @@ export function gameStateFromRawState(rawGameState) {
     });
 
     board = convertBoard(board, rawGameState.board.floor_board, (newBoard, space, position) => {
-        newBoard.setFloorTile(new Entity(space.type, { position }));
+        newBoard.setFloorTile(new Entity({ type: space.type, position }));
     });
 
     let gameState = new GameState(
@@ -75,7 +75,7 @@ function shouldKeepAttribute(attributeName, rawEntity) {
 
 
 function entityFromBoard(rawEntity, position, playersByName) {
-    let attributes = { position };
+    let attributes = {};
 
     if(rawEntity.attributes) {
         for(const attributeName of Object.keys(rawEntity.attributes)) {
@@ -88,7 +88,7 @@ function entityFromBoard(rawEntity, position, playersByName) {
     }
 
     const player = playersByName[rawEntity.name];
-    let entity = new Entity(rawEntity.type, attributes);
+    let entity = new Entity({ type: rawEntity.type, position, attributes });
 
     if(player) {
         entity.addPlayer(player);

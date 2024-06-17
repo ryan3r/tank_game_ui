@@ -41,7 +41,7 @@ export default class Board {
 
     getEntityAt(position) {
         this._verifyPositon(position, this._entities, "Entity");
-        return this._entities[position.humanReadable] || (new Entity("empty", { position }));
+        return this._entities[position.humanReadable] || (new Entity({ type: "empty", position }));
     }
 
     setEntity(entity) {
@@ -55,7 +55,7 @@ export default class Board {
 
     getFloorTileAt(position) {
         this._verifyPositon(position, this._floor, "Floor tile");
-        return this._floor[position.humanReadable] || (new Entity("empty", { position }));
+        return this._floor[position.humanReadable] || (new Entity({ type: "empty", position }));
     }
 
     setFloorTile(tile) {
