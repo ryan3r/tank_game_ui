@@ -32,8 +32,6 @@ export function gameStateFromRawState(rawGameState) {
         rawGameState.winner,
     );
 
-    gameState.__day = rawGameState.day;
-
     return gameState;
 }
 
@@ -93,7 +91,7 @@ function entityFromBoard(rawEntity, position, playersByName) {
     let entity = new Entity(rawEntity.type, attributes);
 
     if(player) {
-        player.adopt(entity);
+        entity.addPlayer(player);
     }
 
     return entity;
@@ -154,7 +152,7 @@ function processCouncil(rawGameState, playersByName) {
                 playersByName[userName].type = userType;
             }
             else {
-                playersByName[userName] = new Player(userName, userType, []);
+                playersByName[userName] = new Player(userName, userType);
             }
         }
     }
@@ -167,7 +165,7 @@ function findUsersOnGameBoard(rawGameState, playersByName) {
             if(rawEntity.name) {
                 let player = playersByName[rawEntity.name];
                 if(!player) {
-                    player = new Player(rawEntity.name, rawEntity.dead ? "council" : "tank", []);
+                    player = new Player(rawEntity.name, rawEntity.dead ? "council" : "tank");
                     playersByName[rawEntity.name] = player;
                 }
             }

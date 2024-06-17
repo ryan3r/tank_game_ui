@@ -1,21 +1,12 @@
-import { Position } from "../board/position.js";
-
 export default class Player {
-    constructor(name, type, entities) {
+    constructor(name, type) {
         this.name = name;
         this.type = type;
         this.entities = [];
-
-        for(let entity of entities) {
-            this.adopt(entity);
-        }
     }
 
-    static deserialize(rawPlayer, board) {
-        const entities = rawPlayer.entities.map(entityPos =>
-            board.getEntityAt(new Position(entityPos)));
-
-        return new Player(rawPlayer.name, rawPlayer.type, entities);
+    static deserialize(rawPlayer) {
+        return new Player(rawPlayer.name, rawPlayer.type);
     }
 
     serialize() {

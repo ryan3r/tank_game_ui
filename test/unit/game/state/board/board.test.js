@@ -2,13 +2,18 @@ import assert from "node:assert";
 import Board from "../../../../../src/game/state/board/board.js";
 import Entity from "../../../../../src/game/state/board/entity.js";
 import { Position } from "../../../../../src/game/state/board/position.js";
+import Player from "../../../../../src/game/state/players/player.js";
+import Players from "../../../../../src/game/state/players/players.js";
 
 let board = new Board(7, 5);
 
 const tank1 = new Entity("tank", { position: new Position("A1") });
 const destroyedTank = new Entity("dead-tank", { position: new Position("C4") });
-const tank2 = new Entity("tank", { position: new Position("G5") });
+let tank2 = new Entity("tank", { position: new Position("G5") });
 const baloon = new Entity("baloon", { position: new Position("B2") });
+
+let josh = new Player("Josh", "tank");
+tank2.addPlayer(josh);
 
 board.setEntity(tank1);
 board.setEntity(destroyedTank);
@@ -40,7 +45,8 @@ describe("Board", () => {
     });
 
     it("can be serialize and deserialized", () => {
-        const reSerializedBoard = Board.deserialize(board.serialize());
+        let players = new Players([josh]);
+        const reSerializedBoard = Board.deserialize(board.serialize(), players);
         assert.deepEqual(reSerializedBoard, board);
     });
 

@@ -1,15 +1,12 @@
 import Player from "../../../../../src/game/state/players/player.js";
 import assert from "node:assert";
 import Players from "../../../../../src/game/state/players/players.js";
-import Entity from "../../../../../src/game/state/board/entity.js";
-import Board from "../../../../../src/game/state/board/board.js";
-import { Position } from "../../../../../src/game/state/board/position.js";
 
-const ty = new Player("Ty", "councilor", []);
-const corey = new Player("Corey", "tank", []);
-const ryan = new Player("Ryan", "senator", []);
-const lena = new Player("Lena", "councilor", []);
-const xavion = new Player("Xavion", "tank", []);
+const ty = new Player("Ty", "councilor");
+const corey = new Player("Corey", "tank");
+const ryan = new Player("Ryan", "senator");
+const lena = new Player("Lena", "councilor");
+const xavion = new Player("Xavion", "tank");
 const players = new Players([ty, ryan, corey, lena, xavion]);
 const players2 = new Players([ty, lena, xavion]);
 
@@ -39,15 +36,10 @@ describe("Board", () => {
         });
 
         it("can be serialized and deserialized", () => {
-            let board = new Board(2, 2);
-            let beyerTank = new Entity("tank", { position: new Position("B1") });
-            let beyer = new Player("Beyer", "tank", [beyerTank]);
-            beyer.adopt(beyerTank);
-            board.setEntity(beyerTank);
-
+            let beyer = new Player("Beyer", "tank");
             let players3 = new Players([beyer, ty]);
 
-            const reSerializedPlayers = Players.deserialize(players3.serialize(), board);
+            const reSerializedPlayers = Players.deserialize(players3.serialize());
             assert.deepEqual(reSerializedPlayers, players3);
         });
     });

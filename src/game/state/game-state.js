@@ -11,11 +11,11 @@ export class GameState {
     }
 
     static deserialize(rawGameState) {
-        let board = Board.deserialize(rawGameState.board);
+        let players = Players.deserialize(rawGameState.players);
 
         return new GameState(
-            Players.deserialize(rawGameState.players, board),
-            board,
+            players,
+            Board.deserialize(rawGameState.board, players),
             rawGameState.council,
             rawGameState.running,
             rawGameState.winner,
