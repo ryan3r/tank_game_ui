@@ -5,7 +5,7 @@ import { LogBook } from "../../../../../src/game/state/log-book/log-book.js";
 const firstDayIndex = 0;
 const secondDayIndex = 2;
 
-const rawEntries = [
+const rawLogBook = [
     {
         "type": "action",
         "day": 1,
@@ -35,10 +35,6 @@ const rawEntries = [
     },
 ];
 
-export const rawLogBook = {
-    rawEntries
-};
-
 describe("LogBook", () => {
     it("can deserialize and reserialize itself", () => {
         const logBook = LogBook.deserialize(rawLogBook);
@@ -53,7 +49,7 @@ describe("LogBook", () => {
     it("can determine its boundaries", () => {
         const logBook = LogBook.deserialize(rawLogBook);
         assert.equal(logBook.getFirstEntryId(), 0);
-        assert.equal(logBook.getLastEntryId(), rawEntries.length - 1);
+        assert.equal(logBook.getLastEntryId(), rawLogBook.length - 1);
         assert.equal(logBook.getMinDay(), 1);
         assert.equal(logBook.getMaxDay(), 2);
     });

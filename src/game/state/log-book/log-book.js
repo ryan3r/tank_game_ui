@@ -41,7 +41,7 @@ export class LogBook {
         }
     }
 
-    static deserialize({rawEntries}, makeTimeStamp) {
+    static deserialize(rawEntries, makeTimeStamp) {
         // 0 length log books are not supported start day 1 if we have no entries
         if(rawEntries === undefined || rawEntries.length === 0) {
             rawEntries = [
@@ -72,9 +72,7 @@ export class LogBook {
     }
 
     serialize() {
-        return {
-            rawEntries: this._entries.map(entry => entry.serialize()),
-        }
+        return this._entries.map(entry => entry.serialize());
     }
 
     withoutStateInfo() {

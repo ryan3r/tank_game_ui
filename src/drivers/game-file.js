@@ -12,6 +12,23 @@ export const FILE_FORMAT_VERSION = 5;
 export const MINIMUM_SUPPORTED_FILE_FORMAT_VERSION = 5;
 
 
+function migrateToV6(content) {
+    // Move game version to the top level
+    content.gameVersion = content.logBook.gameVersion;
+
+    // v5 log entries used strings for all types (due to a bug) coerce them to the correct types and convert the log book to an array
+    content.logBook = content.logBook.rawEntries?.map?.(rawEntry => ({
+        ...rawEntry, // anything not specified is valid
+        donation: +rawEntry.donation,
+        gold: +rawEntry.gold,
+        bounty: +rawEntry.bounty,
+        hit: typeof rawEntry.hit == "boolean" ?
+            rawEntry.hit :
+            rawEntry.hit == "true",
+    }));
+}
+
+
 export async function load(filePath, { saveBack = false, makeTimeStamp } = {}) {
     let content = await readJson(filePath);
 
@@ -29,10 +46,14 @@ export async function load(filePath, { saveBack = false, makeTimeStamp } = {}) {
 
     const saveUpdatedFile = saveBack && (content.fileFormatVersion < FILE_FORMAT_VERSION);
 
+    if(content.fileFormatVersion == 5) {
+        migrateToV6(content);
+    }
+
     // Make sure we have the config required to load this game.  This
     // does not check if the engine supports this game version.
-    if(!getGameVersion(content.logBook.gameVersion)) {
-        throw new Error(`Game version ${content.logBook.gameVersion} is not supported`);
+    if(!getGameVersion(content.gameVersion)) {
+        throw new Error(`Game version ${content.gameVersion} is not supported`);
     }
 
     const logBook = LogBook.deserialize(content.logBook, makeTimeStamp);
@@ -40,7 +61,7 @@ export async function load(filePath, { saveBack = false, makeTimeStamp } = {}) {
         OpenHours.deserialize(content.openHours) : new OpenHours([]);
 
     const fileData = {
-        gameVersion: content.logBook.gameVersion,
+        gameVersion: content.gameVersion,
         openHours,
         logBook,
         gameSettings: content.gameSettings,
@@ -57,12 +78,10 @@ export async function load(filePath, { saveBack = false, makeTimeStamp } = {}) {
 export async function save(filePath, {gameVersion, logBook, initialGameState, openHours, gameSettings}) {
     await writeJson(filePath, {
         fileFormatVersion: FILE_FORMAT_VERSION,
+        gameVersion,
         gameSettings,
         openHours: openHours.serialize(),
-        logBook: {
-            gameVersion,
-            ...logBook.withoutStateInfo().serialize(),
-        },
+        logBook: logBook.withoutStateInfo().serialize(),
         initialGameState,
     });
 }
