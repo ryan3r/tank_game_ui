@@ -8,25 +8,25 @@ export default class Entity {
     }
 
     get position() {
-        const {position} = this.attributes;
-
-        if(position === undefined) return undefined;
-
-        if(!(position instanceof Position)) {
-            return new Position(position)
-        }
-
-        return position;
+        return this.attributes.position;
     }
 
     static deserialize(rawEntity) {
-        return new Entity(rawEntity.type, rawEntity.attributes);
+        let attributes = Object.assign({}, rawEntity);
+        delete attributes.type;
+
+        if(attributes.position !== undefined) {
+            attributes.position = new Position(attributes.position);
+        }
+
+        return new Entity(rawEntity.type, attributes);
     }
 
     serialize() {
         return {
             type: this.type,
-            attributes: this.attributes,
-        }
+            ...this.attributes,
+            position: this.position?.humanReadable,
+        };
     }
 }

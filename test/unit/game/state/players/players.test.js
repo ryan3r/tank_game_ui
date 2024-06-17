@@ -3,6 +3,7 @@ import assert from "node:assert";
 import Players from "../../../../../src/game/state/players/players.js";
 import Entity from "../../../../../src/game/state/board/entity.js";
 import Board from "../../../../../src/game/state/board/board.js";
+import { Position } from "../../../../../src/game/state/board/position.js";
 
 const ty = new Player("Ty", "councilor", []);
 const corey = new Player("Corey", "tank", []);
@@ -39,7 +40,7 @@ describe("Board", () => {
 
         it("can be serialized and deserialized", () => {
             let board = new Board(2, 2);
-            let beyerTank = new Entity("tank", { position: "B1" });
+            let beyerTank = new Entity("tank", { position: new Position("B1") });
             let beyer = new Player("Beyer", "tank", [beyerTank]);
             beyer.adopt(beyerTank);
             board.setEntity(beyerTank);

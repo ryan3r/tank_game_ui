@@ -31,8 +31,17 @@ export default class Board {
         };
     }
 
+    _verifyPositon(position, entitiesObject, type) {
+        const {humanReadable} = position;
+
+        if(entitiesObject[humanReadable] != undefined && entitiesObject[humanReadable].position.humanReadable != humanReadable) {
+            throw new Error(`${type} at ${humanReadable} thinks it should be at ${entitiesObject[humanReadable].position.humanReadable}`);
+        }
+    }
+
     getEntityAt(position) {
-        return this._entities[position.humanReadable] || (new Entity("empty", { "position": position.humanReadable }));
+        this._verifyPositon(position, this._entities, "Entity");
+        return this._entities[position.humanReadable] || (new Entity("empty", { position }));
     }
 
     setEntity(entity) {
@@ -45,7 +54,8 @@ export default class Board {
     }
 
     getFloorTileAt(position) {
-        return this._floor[position.humanReadable] || (new Entity("empty", { position: position.humanReadable }));
+        this._verifyPositon(position, this._floor, "Floor tile");
+        return this._floor[position.humanReadable] || (new Entity("empty", { position }));
     }
 
     setFloorTile(tile) {

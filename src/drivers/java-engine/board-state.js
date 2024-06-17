@@ -120,7 +120,7 @@ function convertBoard(newBoard, board, boardSpaceFactory) {
 
         for(let x = 0; x < row.length; ++x) {
             const position = new Position(x, y);
-            boardSpaceFactory(newBoard, board[y][x], position.humanReadable);
+            boardSpaceFactory(newBoard, board[y][x], position);
         }
     }
 
