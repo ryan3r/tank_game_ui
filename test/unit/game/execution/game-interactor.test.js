@@ -31,7 +31,7 @@ class MockActionFactory {
 
 async function configureInteractor(logEntries, { saveHandler, waitForLoaded = true, processingDelays, versionConfig, actionFactories = [], onEntryAdded } = {}) {
     let logBook = new LogBook(logEntries);
-    let initialGameState = makeMockState({ stateNo: 1 });
+    let initialGameState = makeMockState({ stateNo: 1, converted: true });
 
     if(!versionConfig) versionConfig = new FakeVersionConfig();
 

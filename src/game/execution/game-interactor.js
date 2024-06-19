@@ -8,7 +8,7 @@ export class GameInteractor {
         this._gameData = gameData;
         this._gameStates = [];
         this._lock = new PromiseLock();
-        this._previousState = gameData.initialGameState;
+        this._previousState = engine.getEngineStateFromGameState(gameData.initialGameState);
         this._actionFactories = actionFactories;
         this._onEntryAdded = onEntryAdded;
         this._logEntryFormatter = logEntryFormatter;
@@ -43,8 +43,7 @@ export class GameInteractor {
             let logEntry = this._gameData.logBook.getEntry(entryId);
 
             // Format log entry with previous state
-            const previousState = this._gameStates[this._gameStates.length - 1] ||
-                this._engine.getGameStateFromEngineState(this._gameData.initialGameState);
+            const previousState = this._gameStates[this._gameStates.length - 1] || this._gameData.initialGameState;
 
             logEntry.updateMessageWithBoardState({
                 logEntryFormatter: this._logEntryFormatter,
@@ -57,7 +56,7 @@ export class GameInteractor {
             // Process the action
             const state = await this._engine.processAction(logEntry);
             this._previousState = state;
-            const gameState = this._engine.getGameStateFromEngineState(state)
+            const gameState = this._engine.getGameStateFromEngineState(state);
             this._gameStates.push(gameState);
 
             if(this._onEntryAdded) {
@@ -164,9 +163,7 @@ export class GameInteractor {
             entryId = logBook.getLength();
         }
 
-        const gameState = entryId > 0 ?
-            this.getGameStateById(entryId - 1) :
-            this._engine.getGameStateFromEngineState(this._gameData.initialGameState);
+        const gameState = entryId > 0 ? this.getGameStateById(entryId - 1) : this._gameData.initialGameState;
 
         const logEntry = logBook.getEntry(entryId);
 

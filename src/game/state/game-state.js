@@ -7,8 +7,11 @@ export class GameState {
         this.players = players;
         this.board = board;
         this.metaEntities = metaEntities;
-        this.running = running;
         this.winner = winner?.length > 0 ? winner : undefined;
+    }
+
+    get running() {
+        return this.winner === undefined;
     }
 
     static deserialize(rawGameState) {
@@ -38,7 +41,6 @@ export class GameState {
             players: this.players.serialize(),
             board: this.board.serialize(),
             metaEntities,
-            running: this.running,
         };
 
         if(this.winner !== undefined) {

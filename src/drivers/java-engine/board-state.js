@@ -48,7 +48,6 @@ function getAttributeName(name, rawEntity) {
     return name;
 }
 
-
 function convertCouncil(rawCouncil, players) {
     let attributes = {
         coffer: rawCouncil.coffer,
@@ -76,7 +75,6 @@ function shouldKeepAttribute(attributeName, rawEntity) {
     return true;
 }
 
-
 function entityFromBoard(rawEntity, position, playersByName) {
     let attributes = {};
 
@@ -99,7 +97,6 @@ function entityFromBoard(rawEntity, position, playersByName) {
 
     return entity;
 }
-
 
 function convertBoard(newBoard, board, boardSpaceFactory) {
     if(!newBoard) {
@@ -128,7 +125,6 @@ function convertBoard(newBoard, board, boardSpaceFactory) {
     return newBoard;
 }
 
-
 function buildUserLists(rawGameState, councilPlayers) {
     let playersByName = {};
     processCouncil(rawGameState, playersByName, councilPlayers);
@@ -136,7 +132,6 @@ function buildUserLists(rawGameState, councilPlayers) {
 
     return playersByName;
 }
-
 
 function processCouncil(rawGameState, playersByName, councilPlayers) {
     // Ensure that players remain in the same order
@@ -163,7 +158,6 @@ function processCouncil(rawGameState, playersByName, councilPlayers) {
     }
 }
 
-
 function findUsersOnGameBoard(rawGameState, playersByName) {
     for(const row of rawGameState.board.unit_board) {
         for(const rawEntity of row) {
@@ -179,4 +173,100 @@ function findUsersOnGameBoard(rawGameState, playersByName) {
             }
         }
     }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+function buildBoard(board, entityFn) {
+    let rawBoard = [];
+
+    for(let y = 0; y < board.height; ++y) {
+        let row = [];
+        rawBoard.push(row);
+
+        for(let x = 0; x < board.width; ++x) {
+            row.push(entityFn(new Position(x, y), board));
+        }
+    }
+
+    return rawBoard;
+}
+
+function buildUnit(position, board) {
+    const entity = board.getEntityAt(position);
+
+    let attributes = {};
+    for(const attributeName of Object.keys(entity.attributes)) {
+        attributes[attributeName.toUpperCase()] = entity.attributes[attributeName];
+    }
+
+    if(entity.type == "tank") {
+        attributes.DEAD = entity.attributes.durability !== undefined;
+
+        for(const removedAttibute of deadTankAttributesToRemove) {
+            if(attributes[removedAttibute] === undefined) {
+                attributes[removedAttibute] = 0;
+            }
+        }
+
+        if(attributes.DURABILITY === undefined) {
+            attributes.DURABILITY = attributes.HEALTH;
+        }
+    }
+
+    return {
+        type: entity.type,
+        name: entity.players[0]?.attributes?.name,
+        position: entity.position.humanReadable,
+        attributes,
+    };
+}
+
+function buildFloor(position, board) {
+    const tile = board.getFloorTileAt(position);
+
+    return {
+        type: tile.type,
+    };
+}
+
+function makeCouncilList(council, playerType) {
+    return council.players
+        .filter(player => player.type == playerType)
+        .map(player => player.name);
+}
+
+function makeCouncil(councilEntity) {
+    let additionalAttributes = {};
+
+    if(councilEntity.attributes.armistice !== undefined) {
+        additionalAttributes = {
+            ...additionalAttributes,
+            armistice_vote_count: councilEntity.attributes.armistice.value,
+            armistice_vote_cap: councilEntity.attributes.armistice.max,
+        };
+    }
+
+    return {
+        type: "council",
+        coffer: councilEntity.attributes.coffer,
+        ...additionalAttributes,
+        council: makeCouncilList(councilEntity, "councilor"),
+        senate: makeCouncilList(councilEntity, "senator"),
+    };
+}
+
+export function gameStateToRawState(gameState) {
+    return {
+        type: "state",
+        running: gameState.running,
+        winner: gameState.running ? "" : gameState.winner,
+        day: 0,
+        board: {
+            type: "board",
+            unit_board: buildBoard(gameState.board, buildUnit),
+            floor_board: buildBoard(gameState.board, buildFloor),
+        },
+        council: makeCouncil(gameState.metaEntities.council),
+    };
 }

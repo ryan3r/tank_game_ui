@@ -19,6 +19,13 @@ export class MockEngine {
         this._currentDelay = 0;
     }
 
+    getEngineStateFromGameState(state) {
+        return makeMockState({
+            converted: false,
+            ...state
+        });
+    }
+
     getGameStateFromEngineState(state) {
         return makeMockState({
             converted: true,

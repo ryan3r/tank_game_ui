@@ -1,0 +1,816 @@
+{
+    "fileFormatVersion": 6,
+    "gameVersion": "3",
+    "gameSettings": {
+        "something": "else"
+    },
+    "openHours": [],
+    "logBook": [
+        {
+            "type": "action",
+            "day": 1,
+            "timestamp": 1200
+        },
+        {
+            "type": "action",
+            "subject": "Beyer",
+            "action": "move",
+            "target": "A10",
+            "timestamp": 1717276041
+        },
+        {
+            "type": "action",
+            "subject": "Steve",
+            "action": "move",
+            "target": "C10",
+            "timestamp": 1717276046
+        },
+        {
+            "type": "action",
+            "subject": "Ryan",
+            "day": 2,
+            "timestamp": 1717276064
+        }
+    ],
+    "initialGameState": {
+        "players": [
+            {
+                "name": "Schmude",
+                "type": "tank"
+            },
+            {
+                "name": "Dan",
+                "type": "tank"
+            },
+            {
+                "name": "Stomp",
+                "type": "tank"
+            },
+            {
+                "name": "Ty",
+                "type": "tank"
+            },
+            {
+                "name": "Bryan",
+                "type": "tank"
+            },
+            {
+                "name": "Trevor",
+                "type": "tank"
+            },
+            {
+                "name": "David",
+                "type": "tank"
+            },
+            {
+                "name": "Lena",
+                "type": "tank"
+            },
+            {
+                "name": "Beyer",
+                "type": "tank"
+            },
+            {
+                "name": "Steve",
+                "type": "tank"
+            },
+            {
+                "name": "Joel",
+                "type": "tank"
+            },
+            {
+                "name": "Xavion",
+                "type": "tank"
+            },
+            {
+                "name": "Ryan",
+                "type": "tank"
+            },
+            {
+                "name": "John",
+                "type": "tank"
+            },
+            {
+                "name": "Isaac",
+                "type": "tank"
+            },
+            {
+                "name": "Corey",
+                "type": "tank"
+            }
+        ],
+        "board": {
+            "width": 11,
+            "height": 11,
+            "entities": [
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "A1",
+                    "players": [
+                        "Schmude"
+                    ]
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "C1",
+                    "players": [
+                        "Dan"
+                    ]
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "D1",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "E1",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "F1",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "G1",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "H1",
+                    "players": []
+                },
+                {
+                    "gold": 8,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "I1",
+                    "players": [
+                        "Stomp"
+                    ]
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "K1",
+                    "players": [
+                        "Ty"
+                    ]
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "D2",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "E2",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "G2",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "H2",
+                    "players": []
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "A3",
+                    "players": [
+                        "Bryan"
+                    ]
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "C3",
+                    "players": [
+                        "Trevor"
+                    ]
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "D3",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "E3",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "F3",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "G3",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "H3",
+                    "players": []
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "I3",
+                    "players": [
+                        "David"
+                    ]
+                },
+                {
+                    "gold": 5,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "K3",
+                    "players": [
+                        "Lena"
+                    ]
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "A4",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "B4",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "C4",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "D4",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "E4",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "F4",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "G4",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "H4",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "I4",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "J4",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "K4",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "A5",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "B5",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "C5",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "D5",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "E5",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "F5",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "G5",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "H5",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "I5",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "J5",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "K5",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "A6",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "C6",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "D6",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "E6",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "F6",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "G6",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "H6",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "I6",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "K6",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "A7",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "B7",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "C7",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "D7",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "E7",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "F7",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "G7",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "H7",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "I7",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "J7",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "K7",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "A8",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "B8",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "C8",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "D8",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "E8",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "F8",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "G8",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "H8",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "I8",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "J8",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "K8",
+                    "players": []
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "A9",
+                    "players": [
+                        "Beyer"
+                    ]
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "C9",
+                    "players": [
+                        "Steve"
+                    ]
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "D9",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "E9",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "F9",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "G9",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "H9",
+                    "players": []
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "I9",
+                    "players": [
+                        "Joel"
+                    ]
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "K9",
+                    "players": [
+                        "Xavion"
+                    ]
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "D10",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "E10",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "G10",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "H10",
+                    "players": []
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "A11",
+                    "players": [
+                        "Ryan"
+                    ]
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "C11",
+                    "players": [
+                        "John"
+                    ]
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "D11",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "E11",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "F11",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "G11",
+                    "players": []
+                },
+                {
+                    "durability": 3,
+                    "type": "wall",
+                    "position": "H11",
+                    "players": []
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "I11",
+                    "players": [
+                        "Isaac"
+                    ]
+                },
+                {
+                    "gold": 0,
+                    "health": 3,
+                    "actions": 0,
+                    "bounty": 0,
+                    "range": 2,
+                    "type": "tank",
+                    "position": "K11",
+                    "players": [
+                        "Corey"
+                    ]
+                }
+            ],
+            "floor": [
+                {
+                    "type": "gold_mine",
+                    "position": "F2",
+                    "players": []
+                },
+                {
+                    "type": "gold_mine",
+                    "position": "B6",
+                    "players": []
+                },
+                {
+                    "type": "gold_mine",
+                    "position": "J6",
+                    "players": []
+                },
+                {
+                    "type": "gold_mine",
+                    "position": "F10",
+                    "players": []
+                }
+            ]
+        },
+        "metaEntities": {
+            "council": {
+                "coffer": 0,
+                "type": "council",
+                "players": []
+            }
+        }
+    }
+}

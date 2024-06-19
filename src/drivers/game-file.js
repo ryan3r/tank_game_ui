@@ -7,8 +7,10 @@ import { logger } from "#platform/logging.js";
 import { OpenHours } from "../game/open-hours/index.js";
 import { getGameVersion } from "../versions/index.js";
 import { Game } from "../game/execution/game.js";
+import { gameStateFromRawState } from "./java-engine/board-state.js";
+import { GameState } from "../game/state/game-state.js";
 
-export const FILE_FORMAT_VERSION = 5;
+export const FILE_FORMAT_VERSION = 6;
 export const MINIMUM_SUPPORTED_FILE_FORMAT_VERSION = 5;
 
 
@@ -17,15 +19,24 @@ function migrateToV6(content) {
     content.gameVersion = content.logBook.gameVersion;
 
     // v5 log entries used strings for all types (due to a bug) coerce them to the correct types and convert the log book to an array
-    content.logBook = content.logBook.rawEntries?.map?.(rawEntry => ({
-        ...rawEntry, // anything not specified is valid
-        donation: +rawEntry.donation,
-        gold: +rawEntry.gold,
-        bounty: +rawEntry.bounty,
-        hit: typeof rawEntry.hit == "boolean" ?
-            rawEntry.hit :
-            rawEntry.hit == "true",
-    }));
+    content.logBook = content.logBook.rawEntries?.map?.(rawEntry => {
+        for(const intValue of ["donation", "gold", "bounty"]) {
+            if(rawEntry[intValue] !== undefined) {
+                rawEntry[intValue] = +rawEntry[intValue];
+            }
+        }
+
+        if(rawEntry.hi !== undefined) {
+            rawEntry.hit = typeof rawEntry.hit == "boolean" ?
+                rawEntry.hit :
+                rawEntry.hit == "true";
+        }
+
+        return rawEntry;
+    });
+
+    // Convert initial state to the ui state format
+    content.initialGameState = gameStateFromRawState(content.initialGameState).serialize();
 }
 
 
@@ -65,7 +76,7 @@ export async function load(filePath, { saveBack = false, makeTimeStamp } = {}) {
         openHours,
         logBook,
         gameSettings: content.gameSettings,
-        initialGameState: content.initialGameState,
+        initialGameState: GameState.deserialize(content.initialGameState),
     };
 
     if(saveUpdatedFile) {
@@ -82,7 +93,7 @@ export async function save(filePath, {gameVersion, logBook, initialGameState, op
         gameSettings,
         openHours: openHours.serialize(),
         logBook: logBook.withoutStateInfo().serialize(),
-        initialGameState,
+        initialGameState: initialGameState.serialize(),
     });
 }
 

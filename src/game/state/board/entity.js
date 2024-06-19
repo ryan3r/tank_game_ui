@@ -23,8 +23,9 @@ export default class Entity {
         let position;
         if(attributes.position !== undefined) {
             position = new Position(attributes.position);
-            delete attributes.position;
         }
+
+        delete attributes.position;
 
         const myPlayers = rawEntity.players.map(playerName => players.getPlayerByName(playerName));
         return new Entity({ type: rawEntity.type, attributes, players: myPlayers, position });

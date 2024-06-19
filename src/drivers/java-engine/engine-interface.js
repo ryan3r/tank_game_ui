@@ -3,7 +3,7 @@ import { spawn } from "node:child_process";
 import fs from "node:fs";
 import { logger } from "#platform/logging.js";
 import path from "node:path";
-import { gameStateFromRawState } from "./board-state.js";
+import { gameStateFromRawState, gameStateToRawState } from "./board-state.js";
 import { JavaEngineSource } from "./possible-action-source.js";
 import { PromiseLock } from "../../utils.js";
 
@@ -214,6 +214,10 @@ class TankGameEngine {
 
     getGameStateFromEngineState(state) {
         return gameStateFromRawState(state);
+    }
+
+    getEngineStateFromGameState(state) {
+        return gameStateToRawState(state);
     }
 
     async getBoardState() {
