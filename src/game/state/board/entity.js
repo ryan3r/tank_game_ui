@@ -27,7 +27,8 @@ export default class Entity {
 
         delete attributes.position;
 
-        const myPlayers = rawEntity.players.map(playerName => players.getPlayerByName(playerName));
+        const myPlayers = (rawEntity.players || [])
+            .map(playerName => players.getPlayerByName(playerName));
         return new Entity({ type: rawEntity.type, attributes, players: myPlayers, position });
     }
 
@@ -36,7 +37,9 @@ export default class Entity {
             ...this.attributes,
             type: this.type,
             position: this.position?.humanReadable,
-            players: this.players.map(player => player.name),
+            players: this.players.length === 0 ?
+                undefined : // Don't include a players field if it's empty
+                this.players.map(player => player.name),
         };
     }
 }
