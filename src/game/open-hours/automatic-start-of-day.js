@@ -35,7 +35,6 @@ export class AutomaticStartOfDay {
         const interactor = this._game.getInteractor();
         let logBook = interactor.getLogBook();
         interactor.addLogBookEntry({
-            type: "action",
             action: "start_of_day",
             day: logBook.getMaxDay() + 1
         });

@@ -200,7 +200,7 @@ describe("GameInteractor", () => {
         let versionConfig = new FakeVersionConfig();
 
         const { interactor, mockEngine, logBook } = await configureInteractor([
-            new LogEntry({ type: "action", day: 1 }),
+            new LogEntry({ day: 1 }),
         ], {versionConfig});
 
         mockEngine.throwOnNext = true;

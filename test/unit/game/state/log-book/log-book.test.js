@@ -74,10 +74,9 @@ describe("LogBook", () => {
 
     it("can add entries", () => {
         let logBook = LogBook.deserialize(rawLogBook, () => 15);
-        const newId = logBook.addEntry(logBook.makeEntryFromRaw({ type: "action", day: 3 }));
+        const newId = logBook.addEntry(logBook.makeEntryFromRaw({ day: 3 }));
 
         assert.deepEqual(logBook.getEntry(newId).withoutStateInfo().serialize(), {
-            type: "action",
             timestamp: 15,
             day: 3,
         });

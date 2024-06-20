@@ -20,6 +20,8 @@ function migrateToV6(content) {
 
     // v5 log entries used strings for all types (due to a bug) coerce them to the correct types and convert the log book to an array
     content.logBook = content.logBook.rawEntries?.map?.(rawEntry => {
+        delete rawEntry.type;
+
         for(const intValue of ["donation", "gold", "bounty"]) {
             if(rawEntry[intValue] !== undefined) {
                 rawEntry[intValue] = +rawEntry[intValue];

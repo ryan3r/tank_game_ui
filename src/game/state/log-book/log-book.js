@@ -46,7 +46,6 @@ export class LogBook {
         if(rawEntries === undefined || rawEntries.length === 0) {
             rawEntries = [
                 {
-                    type: "action",
                     day: 1,
                 }
             ];
