@@ -55,7 +55,7 @@ describe("GameFile", () => {
         });
     }
 
-    xit("loading and saving a file recreates the original file", async () => {
+    it("loading and saving a file recreates the original file", async () => {
         const tempFile = path.join(TEST_FILES, `tank_game_temp_test_file-load-save.json`);
 
         await save(tempFile, await load(sampleFilePath));

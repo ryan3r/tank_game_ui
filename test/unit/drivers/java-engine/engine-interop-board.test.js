@@ -1,49 +1,16 @@
-import fs from "node:fs";
+/* global URL */
 import assert from "node:assert";
+import path from "node:path";
 import { gameStateFromRawState, gameStateToRawState } from "../../../../src/drivers/java-engine/board-state.js";
-import { getAllVersions } from "../../../../src/versions/index.js";
-import { GameState } from "../../../../src/game/state/game-state.js";
+import { FILE_FORMAT_VERSION, load } from "../../../../src/drivers/game-file.js";
 
-const UNIT_TEST_FILES = "test/unit/drivers/test-files";
-
-function exists(filePath) {
-    try {
-        fs.accessSync(filePath);
-        return true;
-    }
-    catch(err) {
-        return false;
-    }
-}
+const SAMPLE_STATE = path.join(path.dirname(new URL(import.meta.url).pathname), `../test-files/tank_game_v3_format_v${FILE_FORMAT_VERSION}.json`);
 
 describe("EngineInterop", () => {
-    describe("BoardState", () => {
-        for(const supportedGameVersion of getAllVersions()) {
-            const JAR_GAME_STATE = `${UNIT_TEST_FILES}/jar-game-state-${supportedGameVersion}.json`;
-            const EXPECTED_UI_STATE = `${UNIT_TEST_FILES}/jar-game-state-${supportedGameVersion}-expected.json`;
-            const GENERATED_ENGINE_STATE = `${UNIT_TEST_FILES}/jar-game-state-${supportedGameVersion}-generated.json`
+    it("can translate to and from the engine state format", async () => {
+        const {initialGameState} = await load(SAMPLE_STATE);
 
-            const hasJarState = exists(JAR_GAME_STATE);
-            const hasExpectedUI = exists(EXPECTED_UI_STATE);
-            const hasGenerated = exists(GENERATED_ENGINE_STATE);
-
-            (hasJarState && hasExpectedUI ? it : xit)(`can deserialize ${supportedGameVersion} state`, () => {
-                const tankGameJarState = JSON.parse(fs.readFileSync(JAR_GAME_STATE, "utf8"));
-                const expectedTankGameJarState = JSON.parse(fs.readFileSync(EXPECTED_UI_STATE, "utf8"));
-
-                const gameState = gameStateFromRawState(tankGameJarState);
-
-                assert.deepEqual(gameState.serialize(), expectedTankGameJarState);
-            });
-
-            (hasGenerated && hasExpectedUI ? it : xit)(`can serialize ${supportedGameVersion} state`, () => {
-                const tankGameState = JSON.parse(fs.readFileSync(EXPECTED_UI_STATE, "utf8"));
-                const expectedGeneratedJarState = JSON.parse(fs.readFileSync(GENERATED_ENGINE_STATE, "utf8"));
-
-                const reversedState = gameStateToRawState(GameState.deserialize(tankGameState));
-
-                assert.deepEqual(reversedState, expectedGeneratedJarState);
-            });
-        }
+        const translated = gameStateFromRawState(gameStateToRawState(initialGameState));
+        assert.deepEqual(translated, initialGameState);
     });
 });
