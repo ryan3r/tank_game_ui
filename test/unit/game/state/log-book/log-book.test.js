@@ -7,28 +7,23 @@ const secondDayIndex = 2;
 
 const rawLogBook = [
     {
-        "type": "action",
         "day": 1,
     },
     {
-        "type": "action",
         "subject": "Corey",
         "target": "I6",
         "hit": true,
         "action": "shoot"
     },
     {
-        "type": "action",
         "day": 2,
     },
     {
-        "type": "action",
         "subject": "Xavion",
         "gold": 5,
         "action": "buy_action"
     },
     {
-        "type": "action",
         "subject": "Corey",
         "target": "H4",
         "action": "move"

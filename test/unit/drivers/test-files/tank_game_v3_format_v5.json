@@ -8,27 +8,25 @@
         "gameVersion": "3",
         "rawEntries": [
             {
-                "type": "action",
+                "action": "start_of_day",
                 "day": 1,
                 "timestamp": 1200
             },
             {
-                "type": "action",
                 "subject": "Beyer",
                 "action": "move",
                 "target": "A10",
                 "timestamp": 1717276041
             },
             {
-                "type": "action",
                 "subject": "Steve",
                 "action": "move",
                 "target": "C10",
                 "timestamp": 1717276046
             },
             {
-                "type": "action",
                 "subject": "Ryan",
+                "action": "start_of_day",
                 "day": 2,
                 "timestamp": 1717276064
             }

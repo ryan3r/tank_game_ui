@@ -29,7 +29,7 @@ class MockActionFactory {
     }
 }
 
-async function configureInteractor(logEntries, { saveHandler, waitForLoaded = true, processingDelays, versionConfig, actionFactories = [], onEntryAdded } = {}) {
+async function configureInteractor(logEntries, { saveHandler, waitForLoaded = true, processingDelays, versionConfig, actionFactories = [], onGameOver } = {}) {
     let logBook = new LogBook(logEntries);
     let initialGameState = makeMockState({ stateNo: 1, converted: true });
 
@@ -47,7 +47,7 @@ async function configureInteractor(logEntries, { saveHandler, waitForLoaded = tr
         },
         saveHandler,
         actionFactories: new PossibleActionSourceSet(actionFactories),
-        onEntryAdded,
+        onGameOver,
     });
 
     if(waitForLoaded) await interactor.loaded;
@@ -365,39 +365,59 @@ describe("GameInteractor", () => {
         assert.deepEqual(getAllLogBookEntries(logBook)[3], expectedEntry);
     });
 
-    it("can trigger an entry added event for each entry we add", async () => {
+    it("can trigger a game over event when we win on load", async () => {
         let versionConfig = new FakeVersionConfig();
 
-        let lastEntryId = -1;
-        let entryCount = 0;
-        const onEntryAdded = entryId => {
-            ++entryCount;
-            assert.ok(lastEntryId < entryId);
-            lastEntryId = entryId;
+        let gameOverTriggered;
+        const onGameOver = (victoryInfo) => {
+            gameOverTriggered = true;
+            assert.equal(victoryInfo, "bla");
         };
 
         let logEntries = [
             new LogEntry({ action: "sit" }),
             new LogEntry({ action: "stand" }),
-            new LogEntry({ action: "walk" }),
+            new LogEntry({ action: "victory" }),
         ];
 
         const { interactor } = await configureInteractor(logEntries, {
             waitForLoaded: false,
-            onEntryAdded,
+            onGameOver,
             versionConfig,
         });
 
         await interactor.loaded;
 
-        assert.equal(entryCount, 3);
-        assert.equal(lastEntryId, 2);
+        assert.ok(gameOverTriggered);
+    });
+
+    it("can trigger a game over event when we win on add", async () => {
+        let versionConfig = new FakeVersionConfig();
+
+        let gameOverTriggered;
+        const onGameOver = (victoryInfo) => {
+            gameOverTriggered = true;
+            assert.equal(victoryInfo, "bla");
+        };
+
+        let logEntries = [
+            new LogEntry({ action: "sit" }),
+            new LogEntry({ action: "stand" }),
+        ];
+
+        const { interactor } = await configureInteractor(logEntries, {
+            waitForLoaded: false,
+            onGameOver,
+            versionConfig,
+        });
+
+        await interactor.loaded;
+
+        assert.ok(!gameOverTriggered);
 
         const rawEntry = { action: "run" };
-        await interactor.addLogBookEntry(rawEntry);
-        await interactor.addLogBookEntry(rawEntry);
+        await interactor.addLogBookEntry({ action: "victory" });
 
-        assert.equal(entryCount, 5);
-        assert.equal(lastEntryId, 4);
+        assert.ok(gameOverTriggered);
     });
 });

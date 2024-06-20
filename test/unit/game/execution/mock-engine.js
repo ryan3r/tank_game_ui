@@ -27,10 +27,13 @@ export class MockEngine {
     }
 
     getGameStateFromEngineState(state) {
-        return makeMockState({
-            converted: true,
-            ...state
-        });
+        return {
+            gameState: makeMockState({
+                converted: true,
+                ...state
+            }),
+            victoryInfo: state.victoryInfo,
+        };
     }
 
     wereAllDelaysApplied() {
@@ -51,8 +54,13 @@ export class MockEngine {
 
         await this._delayOp();
 
+        let extraInfo = {};
+        if(logEntry.type == "victory") {
+            extraInfo.victoryInfo = "bla";
+        }
+
         this.operations.push({ operation: "process-action",  logEntry });
-        return makeMockState({ stateNo: ++this._returnIdx });
+        return makeMockState({ stateNo: ++this._returnIdx, ...extraInfo });
     }
 
     async setBoardState(state) {

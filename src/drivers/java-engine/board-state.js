@@ -31,11 +31,23 @@ export function gameStateFromRawState(rawGameState) {
         {
             council: convertCouncil(rawGameState.council, councilPlayers),
         },
-        rawGameState.running,
-        rawGameState.winner,
     );
 
-    return gameState;
+    let victoryInfo;
+
+    if(rawGameState.winner?.length > 1) {
+        victoryInfo = {
+            type: rawGameState.winner == "Council" ? "armistice_vote" : "last_tank_standing",
+            winners: rawGameState.winner == "Council" ?
+                gameState.metaEntities.council.players :
+                [gameState.players.getPlayerByName(rawGameState.winner)],
+        };
+    }
+
+    return {
+        gameState,
+        victoryInfo,
+    };
 }
 
 function getAttributeName(name, rawEntity) {
@@ -259,8 +271,9 @@ function makeCouncil(councilEntity) {
 export function gameStateToRawState(gameState) {
     return {
         type: "state",
-        running: gameState.running,
-        winner: gameState.running ? "" : gameState.winner,
+        // It's assumed that we only interact with the engine when the game is active
+        running: true,
+        winner: "",
         day: 0,
         board: {
             type: "board",

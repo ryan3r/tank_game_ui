@@ -42,7 +42,7 @@ function migrateToV6(content) {
     });
 
     // Convert initial state to the ui state format
-    content.initialGameState = gameStateFromRawState(content.initialGameState).serialize();
+    content.initialGameState = gameStateFromRawState(content.initialGameState).gameState.serialize();
 }
 
 

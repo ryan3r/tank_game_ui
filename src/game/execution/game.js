@@ -73,14 +73,15 @@ export class Game {
                 engine,
                 gameData: this._gameData,
                 saveHandler: this._saveHandler,
-                onEntryAdded: this._setStateFromLastEntry.bind(this),
+                onGameOver: this._setGameOver.bind(this),
                 actionFactories,
                 logEntryFormatter: gameVersion,
             });
 
             await this._interactor.loaded;
 
-            this._state = "running";
+            // If we're still loading (no game overs) switch to the running state
+            if(this._state == "loading") this._state = "running";
         });
 
         // Shutdown was called while the interactor was starting bail before we start auto start of day
@@ -108,14 +109,9 @@ export class Game {
         return this._state;
     }
 
-    _setStateFromLastEntry(entryId) {
-        const {running} = this._interactor.getGameStateById(entryId);
-        this._state = running ? "running" : "game-over";
-    }
-
-    _getLastState() {
-        const lastEntryId = this._interactor.getLogBook().getLastEntryId();
-        return this._interactor.getGameStateById(lastEntryId);
+    _setGameOver(victoryInfo) {
+        this._state = "game-over";
+        this._victoryInfo = victoryInfo;
     }
 
     getOpenHours() {
@@ -143,8 +139,14 @@ export class Game {
         }
 
         if(this.getState() == "game-over") {
-            const {winner} = this._getLastState();
-            return `Game over, ${winner} is victorious!`;
+            let winners = this._victoryInfo.winners.map(player => player.name).join(", ");
+
+            const lastComa = winners.lastIndexOf(",");
+            if(lastComa !== -1) {
+                winners = winners.slice(0, lastComa) + ", and" + winners.slice(lastComa + 1);
+            }
+
+            return `Game over, ${winners} won by ${prettyifyName(this._victoryInfo.type, { capitalize: false })}!`;
         }
     }
 
@@ -211,5 +213,9 @@ export class Game {
         }
 
         return { canSubmit: true };
+    }
+
+    getVictoryInfo() {
+        return this._victoryInfo;
     }
 }

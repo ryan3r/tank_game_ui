@@ -2,7 +2,7 @@ import { logger } from "#platform/logging.js";
 import { PromiseLock } from "../../utils.js";
 
 export class GameInteractor {
-    constructor({ engine, gameData, saveHandler, actionFactories, onEntryAdded, logEntryFormatter }) {
+    constructor({ engine, gameData, saveHandler, actionFactories, onGameOver, logEntryFormatter }) {
         this._saveHandler = saveHandler;
         this._engine = engine;
         this._gameData = gameData;
@@ -10,7 +10,7 @@ export class GameInteractor {
         this._lock = new PromiseLock();
         this._previousState = engine.getEngineStateFromGameState(gameData.initialGameState);
         this._actionFactories = actionFactories;
-        this._onEntryAdded = onEntryAdded;
+        this._onGameOver = onGameOver;
         this._logEntryFormatter = logEntryFormatter;
 
         // Process any unprocessed log book entries.
@@ -56,11 +56,11 @@ export class GameInteractor {
             // Process the action
             const state = await this._engine.processAction(logEntry);
             this._previousState = state;
-            const gameState = this._engine.getGameStateFromEngineState(state);
+            const {gameState, victoryInfo} = this._engine.getGameStateFromEngineState(state);
             this._gameStates.push(gameState);
 
-            if(this._onEntryAdded) {
-                this._onEntryAdded(entryId);
+            if(this._onGameOver && victoryInfo !== undefined) {
+                this._onGameOver(victoryInfo);
             }
         }
     }
@@ -91,7 +91,7 @@ export class GameInteractor {
         const state = await this._engine.processAction(entry);
         this._previousState = state;
 
-        const gameState = this._engine.getGameStateFromEngineState(state);
+        const {gameState, victoryInfo} = this._engine.getGameStateFromEngineState(state);
 
         this._gameData.logBook.addEntry(entry);
         this._gameStates.push(gameState);
@@ -101,8 +101,8 @@ export class GameInteractor {
             entry,
         });
 
-        if(this._onEntryAdded) {
-            this._onEntryAdded(this._gameData.logBook.getLastEntryId());
+        if(this._onGameOver && victoryInfo !== undefined) {
+            this._onGameOver(victoryInfo);
         }
 
         // Save the modified log book if we know were to save it too
