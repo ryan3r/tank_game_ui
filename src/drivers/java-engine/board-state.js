@@ -9,6 +9,7 @@ import { GameState } from "../../game/state/game-state.js";
 import Player from "../../game/state/players/player.js";
 import Players from "../../game/state/players/players.js";
 import { Position } from "../../game/state/board/position.js";
+import { logger } from "#platform/logging.js";
 
 const deadTankAttributesToRemove = ["ACTIONS", "RANGE", "BOUNTY"];
 
@@ -223,6 +224,7 @@ function buildUnit(position, board) {
 
         if(attributes.DURABILITY === undefined) {
             attributes.DURABILITY = attributes.HEALTH;
+            delete attributes.HEALTH;
         }
     }
 
