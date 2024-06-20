@@ -22,6 +22,10 @@ function migrateToV6(content) {
     content.logBook = content.logBook.rawEntries?.map?.(rawEntry => {
         delete rawEntry.type;
 
+        if(rawEntry.action === undefined && rawEntry.day != undefined) {
+            rawEntry.action = "start_of_day";
+        }
+
         for(const intValue of ["donation", "gold", "bounty"]) {
             if(rawEntry[intValue] !== undefined) {
                 rawEntry[intValue] = +rawEntry[intValue];
