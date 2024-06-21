@@ -5,6 +5,7 @@
 }
 
 .game-board {
+    user-select: none;
     border: 1px solid;
     display: inline-block;
 }

@@ -40,7 +40,8 @@ export function useRouter(paths) {
     }, [setCurrentPage, paths]);
 
     const popStateHandler = useCallback(() => {
-        setPageWrapper(matchUrl(paths));
+        const match = matchUrl(paths);
+        setPageWrapper(match?.name, match?.params);
     }, [setPageWrapper, paths]);
 
     useEffect(() => {
