@@ -31,6 +31,13 @@ export default class Board {
         };
     }
 
+    clone() {
+        let clone = new Board(this.width, this.height);
+        Object.assign(clone._entities, this._entities);
+        Object.assign(clone._floor, this._floor);
+        return clone;
+    }
+
     _verifyPositon(position, entitiesObject, type) {
         const {humanReadable} = position;
 

@@ -225,9 +225,9 @@ export class Game {
 
     getBasicGameInfo() {
         return {
-            gameVersion: game.getGameVersion(),
-            state: game.getState(),
-            statusText: game.getStatusText(),
+            gameVersion: this.getGameVersion(),
+            state: this.getState(),
+            statusText: this.getStatusText(),
         };
     }
 }

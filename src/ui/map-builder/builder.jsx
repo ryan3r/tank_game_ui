@@ -1,11 +1,22 @@
+import { useEffect } from "preact/hooks";
 import { useMap } from "../../drivers/rest/fetcher.js";
+import { selectLocation, setMap, useMapBuilder } from "../../interface-adapters/map-builder.js";
 import { getGameVersion } from "../../versions/index.js";
 import { AppContent } from "../app-content.jsx";
 import { ErrorMessage } from "../error_message.jsx";
 import { GameBoard } from "../game_state/board.jsx";
+import { EditSpace } from "./edit-entity.jsx";
 
 export function MapBuilder({ mapName, debug, navigate }) {
+    const [mapBuilderState, dispatch] = useMapBuilder();
     const [map, error] = useMap(mapName);
+
+    const versionConfig = map?.game?.gameVersion !== undefined ?
+        getGameVersion(map.game.gameVersion) : undefined;
+
+    useEffect(() => {
+        if(map) dispatch(setMap(map));
+    }, [map, dispatch]);
 
     // TODO: Remove boiler plate
     const backToGamesButton = <button onClick={() => navigate("home")}>Back to games</button>;
@@ -23,9 +34,6 @@ export function MapBuilder({ mapName, debug, navigate }) {
             <ErrorMessage error={error}></ErrorMessage>
         </AppContent>;
     }
-
-    const versionConfig = map?.game?.gameVersion !== undefined ?
-        getGameVersion(map.game.gameVersion) : undefined;
     // END TODO: Remove boiler plate
 
     const toolBar = (
@@ -35,12 +43,18 @@ export function MapBuilder({ mapName, debug, navigate }) {
     );
 
     return (
-        <AppContent debugMode={debug} toolbar={toolBar} buildInfo={map?.buildInfo}>
-            <GameBoard
-                board={map?.initialState?.board}
-                config={versionConfig}
-                canSubmitAction={false}
-                locationSelector={{}}></GameBoard>
-        </AppContent>
+        <>
+            <div className="app-sidebar">
+                <EditSpace mapBuilderState={mapBuilderState} dispatch={dispatch}></EditSpace>
+            </div>
+            <AppContent withSidebar debugMode={debug} toolbar={toolBar} buildInfo={map?.buildInfo}>
+                <GameBoard
+                    board={mapBuilderState?.initialState?.board}
+                    config={versionConfig}
+                    canSubmitAction={false}
+                    locationSelector={mapBuilderState.locationSelector}
+                    selectLocation={location => dispatch(selectLocation(location))}></GameBoard>
+            </AppContent>
+        </>
     );
 }
