@@ -20,4 +20,20 @@ export const version4 = new GameVersion({
         wall: V4WallDescriptor,
     },
     manualPath: "/manuals/Tank_Game_Rules_v4.pdf",
+    builderConfig: {
+        ...rawV3Config.builderConfig,
+        entities: {
+            ...rawV3Config.builderConfig.entities,
+            wall: {
+                ...rawV3Config.builderConfig.entities.wall,
+                attributes: {
+                    ...rawV3Config.builderConfig.entities.wall.attributes,
+                    durability: {
+                        ...rawV3Config.builderConfig.entities.wall.attributes.durability,
+                        max: 6,
+                    },
+                },
+            },
+        },
+    },
 });

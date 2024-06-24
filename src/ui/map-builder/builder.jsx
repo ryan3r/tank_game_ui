@@ -15,8 +15,8 @@ export function MapBuilder({ mapName, debug, navigate }) {
         getGameVersion(map.game.gameVersion) : undefined;
 
     useEffect(() => {
-        if(map) dispatch(setMap(map));
-    }, [map, dispatch]);
+        if(map) dispatch(setMap(map, versionConfig.getBuilderConfig()));
+    }, [map, dispatch, versionConfig]);
 
     // TODO: Remove boiler plate
     const backToGamesButton = <button onClick={() => navigate("home")}>Back to games</button>;
