@@ -11,6 +11,31 @@ import Players from "../../game/state/players/players.js";
 import { Position } from "../../game/state/board/position.js";
 import { logger } from "#platform/logging.js";
 
+function invertMapping(object) {
+    let inverted = {};
+    for(const key of Object.keys(object)) {
+        inverted[object[key]] = key;
+    }
+
+    return inverted;
+}
+
+// UI -> Engine
+const ENTITY_CLASS_NAME_MAPPINGS = {
+    "empty": "EmptyUnit",
+    "tank": "TankV3",
+    "wall": "Wall",
+};
+
+const FLOOR_CLASS_NAME_MAPPINGS = {
+    "empty": "WalkableFloor",
+    "gold_mine": "GoldMine",
+};
+
+// Engine -> UI
+const ENTITY_CLASS_NAME_MAPPINGS_INVERTED = invertMapping(ENTITY_CLASS_NAME_MAPPINGS);
+const FLOOR_CLASS_NAME_MAPPINGS_INVERTED = invertMapping(FLOOR_CLASS_NAME_MAPPINGS);
+
 const deadTankAttributesToRemove = ["ACTIONS", "RANGE", "BOUNTY"];
 
 
@@ -23,7 +48,10 @@ export function gameStateFromRawState(rawGameState) {
     });
 
     board = convertBoard(board, rawGameState.board.floor_board, (newBoard, space, position) => {
-        newBoard.setFloorTile(new Entity({ type: space.type, position }));
+        newBoard.setFloorTile(new Entity({
+            type: FLOOR_CLASS_NAME_MAPPINGS_INVERTED[space.class],
+            position,
+        }));
     });
 
     let gameState = new GameState(
@@ -51,14 +79,47 @@ export function gameStateFromRawState(rawGameState) {
     };
 }
 
-function getAttributeName(name, rawEntity) {
+function getAttributeName(name, type, rawAttributes) {
     name = name.toLowerCase();
 
-    if(rawEntity.type == "tank" && !rawEntity.attributes.DEAD && name == "durability") {
+    if(type == "tank" && !rawAttributes.DEAD && name == "durability") {
         return "health";
     }
 
     return name;
+}
+
+function shouldKeepAttribute(attributeName, type, rawAttributes) {
+    if(["DEAD", "POSITION", "PLAYER"].includes(attributeName)) {
+        return false;
+    }
+
+    if(type == "tank" && rawAttributes.DEAD) {
+        return !deadTankAttributesToRemove.includes(attributeName);
+    }
+
+    return true;
+}
+
+function decodeAttributes(type, rawAttributes) {
+    let attributes = {};
+
+    for(const attributeName of Object.keys(rawAttributes)) {
+        if(!shouldKeepAttribute(attributeName, type, rawAttributes)) continue;
+
+        const actualName = getAttributeName(attributeName, type, rawAttributes);
+        attributes[actualName] = rawAttributes[attributeName];
+    }
+
+    return attributes;
+}
+
+function convertPlayer(rawPlayer, playerType) {
+    if(rawPlayer.class != "Player") throw new Error(`Expected player but got ${rawPlayer.class}`);
+
+    let attributes = decodeAttributes(playerType, rawPlayer.attributes);
+    attributes.type = playerType;
+    return new Player(attributes);
 }
 
 function convertCouncil(rawCouncil, players) {
@@ -76,35 +137,19 @@ function convertCouncil(rawCouncil, players) {
     return new Entity({ type: "council", attributes, players });
 }
 
-function shouldKeepAttribute(attributeName, rawEntity) {
-    if(attributeName == "DEAD") {
-        return false;
-    }
-
-    if(rawEntity.type == "tank" && rawEntity.attributes.DEAD) {
-        return !deadTankAttributesToRemove.includes(attributeName);
-    }
-
-    return true;
-}
-
 function entityFromBoard(rawEntity, position, playersByName) {
-    let attributes = {};
+    const type = ENTITY_CLASS_NAME_MAPPINGS_INVERTED[rawEntity.class];
+    let attributes = decodeAttributes(type, rawEntity.attributes);
 
-    if(rawEntity.attributes) {
-        for(const attributeName of Object.keys(rawEntity.attributes)) {
-            if(!shouldKeepAttribute(attributeName, rawEntity)) continue;
+    let entity = new Entity({
+        type,
+        position,
+        attributes,
+    });
 
-            const actualName = getAttributeName(attributeName, rawEntity);
-
-            attributes[actualName] = rawEntity.attributes[attributeName];
-        }
-    }
-
-    const player = playersByName[rawEntity.name];
-    let entity = new Entity({ type: rawEntity.type, position, attributes });
-
-    if(player) {
+    const {PLAYER} = rawEntity.attributes;
+    if(PLAYER) {
+        const player = playersByName[PLAYER.attributes.NAME];
         entity.addPlayer(player);
     }
 
@@ -174,14 +219,13 @@ function processCouncil(rawGameState, playersByName, councilPlayers) {
 function findUsersOnGameBoard(rawGameState, playersByName) {
     for(const row of rawGameState.board.unit_board) {
         for(const rawEntity of row) {
-            if(rawEntity.name) {
-                let player = playersByName[rawEntity.name];
+            let rawPlayer = rawEntity.attributes.PLAYER;
+            if(rawPlayer) {
+                let player = playersByName[rawPlayer.attributes.NAME];
                 if(!player) {
-                    player = new Player({
-                        name: rawEntity.name,
-                        type: rawEntity.dead ? "council" : "tank",
-                    });
-                    playersByName[rawEntity.name] = player;
+                    const type = rawEntity.attributes.DEAD ? "council" : "tank";
+                    player = convertPlayer(rawPlayer, type);
+                    playersByName[player.name] = player;
                 }
             }
         }
@@ -189,6 +233,14 @@ function findUsersOnGameBoard(rawGameState, playersByName) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+function buildPosition(position) {
+    return {
+        class: "Position",
+        x: position.x,
+        y: position.y,
+    };
+}
 
 function buildBoard(board, entityFn) {
     let rawBoard = [];
@@ -203,6 +255,19 @@ function buildBoard(board, entityFn) {
     }
 
     return rawBoard;
+}
+
+function buildPlayer(player) {
+    let attributes = {};
+
+    for(const attributeName of Object.keys(player.attributes)) {
+        attributes[attributeName.toUpperCase()] = player.attributes[attributeName];
+    }
+
+    return {
+        class: "Player",
+        attributes,
+    };
 }
 
 function buildUnit(position, board) {
@@ -228,10 +293,14 @@ function buildUnit(position, board) {
         }
     }
 
+    attributes.POSITION = buildPosition(entity.position);
+
+    if(entity.players.length > 0) {
+        attributes.PLAYER = buildPlayer(entity.players[0]);
+    }
+
     return {
-        type: entity.type,
-        name: entity.players[0]?.attributes?.name,
-        position: entity.position.humanReadable,
+        class: ENTITY_CLASS_NAME_MAPPINGS[entity.type],
         attributes,
     };
 }
@@ -240,7 +309,10 @@ function buildFloor(position, board) {
     const tile = board.getFloorTileAt(position);
 
     return {
-        type: tile.type,
+        class: FLOOR_CLASS_NAME_MAPPINGS[tile.type],
+        attributes: {
+            POSITION: buildPosition(tile.position),
+        },
     };
 }
 
