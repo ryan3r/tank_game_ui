@@ -32,7 +32,7 @@ export function mapBuilderReducer(state, action) {
             ...action.map,
             _builderConfig: action.builderConfig,
             entityTypes: Object.keys(action.builderConfig.entities),
-            floorTypes: Object.keys(action.builderConfig.floorTiles),
+            floorTileTypes: Object.keys(action.builderConfig.floorTiles),
             locationSelector: {
                 isSelecting: true,
                 selectableLocations: generateAllLocations(action.map.initialState.board),
@@ -63,12 +63,16 @@ export function mapBuilderReducer(state, action) {
                 lastSelected,
             },
             editor: {
-                entityEditable,
-                entityType: entity?.type,
-                entityAttribute: Object.assign({}, entity?.attributes),
-                floorTileEditable,
-                floorTileType: floorTile?.type,
-                floorTileAttribute: Object.assign({}, floorTile?.attributes),
+                entity: {
+                    editable: entityEditable,
+                    type: entity?.type,
+                    attributes: Object.assign({}, entity?.attributes),
+                },
+                floorTile: {
+                    editable: floorTileEditable,
+                    type: floorTile?.type,
+                    attributes: Object.assign({}, floorTile?.attributes),
+                },
             },
         };
     }
@@ -93,9 +97,7 @@ export function mapBuilderReducer(state, action) {
 
         let editor = state.editor;
 
-        const typeKey = action.targetType == "entity" ? "entityType" : "floorTileType";
-        const attributeKey = action.targetType == "entity" ? "entityAttribute" : "floorTileAttribute";
-        const targetConfig = state._builderConfig[action.targetType == "entity" ? "entities" : "floorTiles"][action.entityType || state.editor[typeKey]];
+        const targetConfig = state._builderConfig[action.targetType == "entity" ? "entities" : "floorTiles"][action.entityType || state.editor[action.targetType].type];
 
         if(action.type == "set-selected-attribute") {
             const entityValue = makeAttibuteValue(targetConfig, action.name, action.value)
@@ -110,9 +112,12 @@ export function mapBuilderReducer(state, action) {
 
             editor = {
                 ...editor,
-                [attributeKey]: {
-                    ...editor[attributeKey],
-                    [action.name]: action.value,
+                [action.targetType]: {
+                    ...editor[action.targetType],
+                    attributes: {
+                        ...editor[action.targetType].attributes,
+                        [action.name]: action.value,
+                    },
                 },
             };
         }
@@ -127,8 +132,11 @@ export function mapBuilderReducer(state, action) {
 
             editor = {
                 ...editor,
-                [typeKey]: action.entityType,
-                [attributeKey]: Object.assign({}, targetConfig?.defaultAttributes),
+                [action.targetType]: {
+                    editable: true,
+                    type: action.entityType,
+                    attributes: Object.assign({}, targetConfig?.defaultAttributes),
+                }
             };
         }
 

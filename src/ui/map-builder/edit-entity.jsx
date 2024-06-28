@@ -7,7 +7,7 @@ export function EditSpace({ mapBuilderState, dispatch }) {
             <h2>Entity</h2>
             <EditEntity dispatch={dispatch} targetType="entity" mapBuilderState={mapBuilderState}></EditEntity>
             <h2>Floor</h2>
-            <EditEntity dispatch={dispatch} targetType="floor" mapBuilderState={mapBuilderState}></EditEntity>
+            <EditEntity dispatch={dispatch} targetType="floorTile" mapBuilderState={mapBuilderState}></EditEntity>
         </div>
     );
 }
@@ -17,22 +17,19 @@ function EditEntity({ dispatch, targetType, mapBuilderState }) {
         dispatch(setSelectedEntityType(targetType, e.target.value));
     };
 
-    const editableKey = targetType == "entity" ? "entityEditable" : "floorTileEditable";
-    const editable = mapBuilderState?.editor?.[editableKey];
+    const {editable, type, attributes} = mapBuilderState?.editor?.[targetType] || {};
     if(!editable) {
         return (
             <p>Select one or more {prettyifyName(targetType, { capitalize: false, plural: true })} that have the same type and attributes to edit</p>
         );
     }
 
-    const typeKey = targetType == "entity" ? "entityType" : "floorTileType";
-    const attributeKey = targetType == "entity" ? "entityAttribute" : "floorTileAttribute";
-    const attributes = mapBuilderState.editor[attributeKey];
+    console.log(mapBuilderState?.editor?.[targetType]);
 
     // Stop propagation to keep key presses inside the editor from reaching the global key bindings
     return (
         <div onKeyDown={e => e.stopPropagation()}>
-            <select value={mapBuilderState.editor[typeKey]} onChange={selectEntityType}>
+            <select value={type} onChange={selectEntityType}>
                 <option key="empty" value="empty">Empty</option>
                 {mapBuilderState[`${targetType}Types`].map(type => {
                     return (
