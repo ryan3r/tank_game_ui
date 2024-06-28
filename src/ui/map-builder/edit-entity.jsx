@@ -1,12 +1,7 @@
-import { Position } from "../../game/state/board/position.js";
 import { setSelectedAttibute, setSelectedEntityType } from "../../interface-adapters/map-builder.js";
 import { prettyifyName } from "../../utils.js";
 
 export function EditSpace({ mapBuilderState, dispatch }) {
-    if(mapBuilderState.locationSelector.location === undefined) {
-        return <p>Select a location to start editing</p>;
-    }
-
     return (
         <div>
             <h2>Entity</h2>
@@ -21,6 +16,14 @@ function EditEntity({ dispatch, targetType, mapBuilderState }) {
     const selectEntityType = e => {
         dispatch(setSelectedEntityType(targetType, e.target.value));
     };
+
+    const editableKey = targetType == "entity" ? "entityEditable" : "floorTileEditable";
+    const editable = mapBuilderState?.editor?.[editableKey];
+    if(!editable) {
+        return (
+            <p>Select one or more {targetType}s that have the same type and attributes to edit</p>
+        );
+    }
 
     const typeKey = targetType == "entity" ? "entityType" : "floorTileType";
     const attributeKey = targetType == "entity" ? "entityAttribute" : "floorTileAttribute";

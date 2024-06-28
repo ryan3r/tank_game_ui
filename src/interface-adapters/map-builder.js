@@ -44,32 +44,47 @@ export function mapBuilderReducer(state, action) {
 
     if(action.type == "select-location") {
         const {board} = state.initialState;
-        const position = new Position(action.location);
-        const entity = board.getEntityAt(position);
-        const floorTile = board.getFloorTileAt(position);
+
+        let locations = (state.locationSelector.locations || []).slice(0);
+        const locationIndex = locations.indexOf(action.location);
+        if(locationIndex !== -1) {
+            locations.splice(locationIndex, 1);
+        }
+        else {
+            locations.push(action.location);
+        }
+
+        const position = locations.length > 0 ? new Position(locations[0]) : undefined;
+        const entity = position ? board.getEntityAt(position) : undefined;
+        const floorTile = position ? board.getFloorTileAt(position) : undefined;
+
+        const entityEditable = areEntriesCompatible(locations, board.getEntityAt.bind(board));
+        const floorTileEditable = areEntriesCompatible(locations, board.getFloorTileAt.bind(board));
 
         return {
             ...state,
             locationSelector: {
                 ...state.locationSelector,
-                location: action.location,
+                locations,
             },
             editor: {
-                entityType: entity.type,
-                entityAttribute: Object.assign({}, entity.attributes),
-                floorTileType: floorTile.type,
-                floorTileAttribute: Object.assign({}, floorTile.attributes),
+                entityEditable,
+                entityType: entity?.type,
+                entityAttribute: Object.assign({}, entity?.attributes),
+                floorTileEditable,
+                floorTileType: floorTile?.type,
+                floorTileAttribute: Object.assign({}, floorTile?.attributes),
             },
         };
     }
 
     if(action.type == "set-selected-attribute" || action.type == "set-selected-entity-type") {
-        if(state.locationSelector.location === undefined) {
+        if(state.locationSelector.locations?.length < 1) {
             throw new Error(`You must have a location selected to perform ${action.type}`);
         }
 
         let newBoard = state.initialState.board.clone();
-        const position = new Position(state.locationSelector.location);
+        const positions = state.locationSelector.locations.map(location => new Position(location));
 
         const {board} = state.initialState;
 
@@ -91,9 +106,11 @@ export function mapBuilderReducer(state, action) {
             const entityValue = makeAttibuteValue(targetConfig, action.name, action.value)
 
             if(entityValue !== undefined) {
-                let newEnity = getTarget(position).clone();
-                newEnity.attributes[action.name] = entityValue;
-                setTarget(newEnity);
+                for(const position of positions) {
+                    let newEnity = getTarget(position).clone();
+                    newEnity.attributes[action.name] = entityValue;
+                    setTarget(newEnity);
+                }
             }
 
             editor = {
@@ -105,11 +122,13 @@ export function mapBuilderReducer(state, action) {
             };
         }
         else if(action.type == "set-selected-entity-type") {
-            setTarget(new Entity({
-                type: action.entityType,
-                position,
-                attributes: Object.assign({}, targetConfig?.defaultAttributes),
-            }));
+            for(const position of positions) {
+                setTarget(new Entity({
+                    type: action.entityType,
+                    position,
+                    attributes: Object.assign({}, targetConfig?.defaultAttributes),
+                }));
+            }
 
             editor = {
                 ...editor,
@@ -140,6 +159,34 @@ function makeAttibuteValue(targetConfig, name, value) {
 
         return value;
     }
+}
+
+function areEntriesCompatible(locations, getEntityAt) {
+    if(locations.length === 0) return false;
+
+    const firstEntity = getEntityAt(new Position(locations[0]));
+    let firstAttributeKeys = Object.keys(firstEntity.attributes);
+    firstAttributeKeys.sort();
+
+    for(let i = 1; i < locations.length; ++i) {
+        const entity = getEntityAt(new Position(locations[i]));
+
+        if(firstEntity.type != entity.type) return false;
+
+        let attributeKeys = Object.keys(firstEntity.attributes);
+        if(attributeKeys.length != firstAttributeKeys.length) return false;
+        attributeKeys.sort();
+
+        for(let j = 0; j < attributeKeys.length; ++j) {
+            const key = attributeKeys[j];
+            const firstKey = firstAttributeKeys[j];
+            if(key != firstKey || entity.attributes[key] != firstEntity.attributes[key]) {
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
 export function useMapBuilder() {
