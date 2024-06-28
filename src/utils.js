@@ -1,12 +1,23 @@
 import { logger } from "#platform/logging.js";
 
 // Remove _, - and capitalize names
-export function prettyifyName(name, { capitalize = true } = {}) {
+export function prettyifyName(name, { capitalize = true, plural = false } = {}) {
     if(name === undefined) return;
 
-    return name.split(/_|-|\s+/)
+    name = name.split(/_|-|\s+/)
         .map(word => word.length > 0 && capitalize ? (word[0].toUpperCase() + word.slice(1)) : word)
         .join(" ");
+
+    if(plural) {
+        // If the word ends in y replace it with ie
+        if(name[name.length - 1] == "y") {
+            name = name.slice(0, name.length - 1) + "ie";
+        }
+
+        name += "s";
+    }
+
+    return name;
 }
 
 export class PromiseLock {

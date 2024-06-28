@@ -47,8 +47,11 @@ export function GameBoardView({ board, config, setSelectedUser, canSubmitAction,
             const disabled = locationSelector.isSelecting &&
                 !locationSelector.selectableLocations.includes(position.humanReadable);
 
-            const onClick = locationSelector.isSelecting && !disabled ? () => {
-                selectLocation(position.humanReadable);
+            const onClick = locationSelector.isSelecting && !disabled ? (e) => {
+                selectLocation(position.humanReadable, {
+                    ctrlKey: e.ctrlKey,
+                    shiftKey: e.shiftKey,
+                });
             } : undefined;
 
             renderedRow.push(

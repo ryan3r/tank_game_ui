@@ -21,7 +21,7 @@ function EditEntity({ dispatch, targetType, mapBuilderState }) {
     const editable = mapBuilderState?.editor?.[editableKey];
     if(!editable) {
         return (
-            <p>Select one or more {targetType}s that have the same type and attributes to edit</p>
+            <p>Select one or more {prettyifyName(targetType, { capitalize: false, plural: true })} that have the same type and attributes to edit</p>
         );
     }
 
@@ -29,8 +29,9 @@ function EditEntity({ dispatch, targetType, mapBuilderState }) {
     const attributeKey = targetType == "entity" ? "entityAttribute" : "floorTileAttribute";
     const attributes = mapBuilderState.editor[attributeKey];
 
+    // Stop propagation to keep key presses inside the editor from reaching the global key bindings
     return (
-        <div>
+        <div onKeyDown={e => e.stopPropagation()}>
             <select value={mapBuilderState.editor[typeKey]} onChange={selectEntityType}>
                 <option key="empty" value="empty">Empty</option>
                 {mapBuilderState[`${targetType}Types`].map(type => {

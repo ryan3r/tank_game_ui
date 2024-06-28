@@ -42,6 +42,15 @@ export function MapBuilder({ mapName, debug, navigate }) {
         </>
     );
 
+    const selectLocationHandler = (location, keys) => {
+        let mode = "select-space";
+        if(keys.ctrlKey) mode = "toggle-space";
+        if(keys.shiftKey) mode = "select-area";
+        if(keys.ctrlKey && keys.shiftKey) mode = "select-addtional-area"
+
+        dispatch(selectLocation(location, mode));
+    };
+
     return (
         <>
             <div className="app-sidebar">
@@ -53,7 +62,7 @@ export function MapBuilder({ mapName, debug, navigate }) {
                     config={versionConfig}
                     canSubmitAction={false}
                     locationSelector={mapBuilderState.locationSelector}
-                    selectLocation={location => dispatch(selectLocation(location))}></GameBoard>
+                    selectLocation={selectLocationHandler}></GameBoard>
             </AppContent>
         </>
     );
