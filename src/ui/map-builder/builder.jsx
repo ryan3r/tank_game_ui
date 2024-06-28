@@ -1,11 +1,23 @@
 import { useEffect } from "preact/hooks";
 import { useMap } from "../../drivers/rest/fetcher.js";
-import { selectLocation, setMap, useMapBuilder } from "../../interface-adapters/map-builder.js";
+import { clearSelection, deleteSelected, selectLocation, setMap, useMapBuilder } from "../../interface-adapters/map-builder.js";
 import { getGameVersion } from "../../versions/index.js";
 import { AppContent } from "../app-content.jsx";
 import { ErrorMessage } from "../error_message.jsx";
 import { GameBoard } from "../game_state/board.jsx";
 import { EditSpace } from "./edit-entity.jsx";
+import { DELETE, ESCAPE, useGlobalKeyHandler } from "../generic/global-keybinds.js";
+
+function useMapBuilderKeyBinds(dispatch) {
+    useGlobalKeyHandler((e) => {
+        if(e.keyCode == ESCAPE) {
+            dispatch(clearSelection());
+        }
+        else if(e.keyCode == DELETE) {
+            deleteSelected(dispatch);
+        }
+    }, [dispatch]);
+}
 
 export function MapBuilder({ mapName, debug, navigate }) {
     const [mapBuilderState, dispatch] = useMapBuilder();
@@ -17,6 +29,9 @@ export function MapBuilder({ mapName, debug, navigate }) {
     useEffect(() => {
         if(map) dispatch(setMap(map, versionConfig.getBuilderConfig()));
     }, [map, dispatch, versionConfig]);
+
+
+    useMapBuilderKeyBinds(dispatch);
 
     // TODO: Remove boiler plate
     const backToGamesButton = <button onClick={() => navigate("home")}>Back to games</button>;

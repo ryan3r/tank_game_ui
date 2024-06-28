@@ -2,6 +2,9 @@ import { useReducer } from "preact/hooks";
 import { Position } from "../game/state/board/position.js";
 import Entity from "../game/state/board/entity.js";
 
+const TARGET_TYPES = ["entity", "floor"];
+
+
 function generateAllLocations(board) {
     let positions = [];
 
@@ -241,3 +244,10 @@ export const selectLocation = (location, mode) => ({ type: "select-location", lo
 export const clearSelection = () => selectLocation(undefined, "clear");
 export const setSelectedAttibute = (targetType, name, value) => ({ type: "set-selected-attribute", targetType, name, value });
 export const setSelectedEntityType = (targetType, entityType) => ({ type: "set-selected-entity-type", targetType, entityType });
+
+
+export function deleteSelected(dispatch) {
+    for(const targetType of TARGET_TYPES) {
+        dispatch(setSelectedEntityType(targetType, "empty"));
+    }
+}
