@@ -67,7 +67,7 @@ function actionFactory(engine) {
 }
 
 const builderConfig = {
-    entities: {
+    entity: {
         tank: {
             defaultAttributes: {
                 health: 3,
@@ -79,7 +79,7 @@ const builderConfig = {
             attributes: {
                 health: { type: "number", min: 1, max: 3 },
                 range: { type: "number", min: 1 },
-                actions: { type: "number", min: 0, max: 5 },
+                actions: { type: "number", min: 0, max: 5, description: "Tank will start game with actions + 1" },
                 gold: { type: "number", min: 0 },
                 bounty: { type: "number", min: 0 },
             },
@@ -93,7 +93,7 @@ const builderConfig = {
             },
         },
     },
-    floorTiles: {
+    floorTile: {
         gold_mine: {},
     },
 };

@@ -1,6 +1,7 @@
 import { useReducer } from "preact/hooks";
 import { Position } from "../game/state/board/position.js";
 import Entity from "../game/state/board/entity.js";
+import { prettyifyName } from "../utils.js";
 
 const TARGET_TYPES = ["entity", "floor"];
 
@@ -31,8 +32,8 @@ export function mapBuilderReducer(state, action) {
         return {
             ...action.map,
             _builderConfig: action.builderConfig,
-            entityTypes: Object.keys(action.builderConfig.entities),
-            floorTileTypes: Object.keys(action.builderConfig.floorTiles),
+            entityTypes: Object.keys(action.builderConfig.entity),
+            floorTileTypes: Object.keys(action.builderConfig.floorTile),
             locationSelector: {
                 isSelecting: true,
                 selectableLocations: generateAllLocations(action.map.initialState.board),
@@ -67,11 +68,13 @@ export function mapBuilderReducer(state, action) {
                     editable: entityEditable,
                     type: entity?.type,
                     attributes: Object.assign({}, entity?.attributes),
+                    attributeErrors: {},
                 },
                 floorTile: {
                     editable: floorTileEditable,
                     type: floorTile?.type,
                     attributes: Object.assign({}, floorTile?.attributes),
+                    attributeErrors: {},
                 },
             },
         };
@@ -97,10 +100,10 @@ export function mapBuilderReducer(state, action) {
 
         let editor = state.editor;
 
-        const targetConfig = state._builderConfig[action.targetType == "entity" ? "entities" : "floorTiles"][action.entityType || state.editor[action.targetType].type];
+        const targetConfig = state._builderConfig[action.targetType][action.entityType || state.editor[action.targetType].type];
 
         if(action.type == "set-selected-attribute") {
-            const entityValue = makeAttibuteValue(targetConfig, action.name, action.value)
+            const [entityValue, errorMessage] = makeAttibuteValue(targetConfig, action.name, action.value)
 
             if(entityValue !== undefined) {
                 for(const position of positions) {
@@ -117,6 +120,10 @@ export function mapBuilderReducer(state, action) {
                     attributes: {
                         ...editor[action.targetType].attributes,
                         [action.name]: action.value,
+                    },
+                    attributeErrors: {
+                        ...editor[action.targetType].attributeErrors,
+                        [action.name]: errorMessage,
                     },
                 },
             };
@@ -136,6 +143,7 @@ export function mapBuilderReducer(state, action) {
                     editable: true,
                     type: action.entityType,
                     attributes: Object.assign({}, targetConfig?.defaultAttributes),
+                    attributeErrors: {},
                 }
             };
         }
@@ -155,13 +163,20 @@ function makeAttibuteValue(targetConfig, name, value) {
     const attributeConfig = targetConfig.attributes[name];
     if(attributeConfig.type == "number") {
         value = +value;
-        if(isNaN(value)) return;
+        if(isNaN(value)) return [undefined, "Expected a number"];
 
-        if(attributeConfig.min !== undefined && value < attributeConfig.min) return;
-        if(attributeConfig.max !== undefined && value > attributeConfig.max) return;
+        if(attributeConfig.min !== undefined && value < attributeConfig.min) {
+            return [undefined, `${prettyifyName(name)} cannot be less than ${attributeConfig.min}`];
+        }
 
-        return value;
+        if(attributeConfig.max !== undefined && value > attributeConfig.max) {
+            return [undefined, `${prettyifyName(name)} cannot be more than ${attributeConfig.max}`];
+        }
+
+        return [value, undefined];
     }
+
+    return [value, undefined];
 }
 
 function areEntriesCompatible(locations, getEntityAt) {

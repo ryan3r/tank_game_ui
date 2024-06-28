@@ -1,3 +1,4 @@
+import "./builder.css";
 import { useEffect } from "preact/hooks";
 import { useMap } from "../../drivers/rest/fetcher.js";
 import { clearSelection, deleteSelected, selectLocation, setMap, useMapBuilder } from "../../interface-adapters/map-builder.js";
@@ -26,9 +27,11 @@ export function MapBuilder({ mapName, debug, navigate }) {
     const versionConfig = map?.game?.gameVersion !== undefined ?
         getGameVersion(map.game.gameVersion) : undefined;
 
+    const builderConfig = versionConfig?.getBuilderConfig?.();
+
     useEffect(() => {
-        if(map) dispatch(setMap(map, versionConfig.getBuilderConfig()));
-    }, [map, dispatch, versionConfig]);
+        if(map) dispatch(setMap(map, builderConfig));
+    }, [map, dispatch, builderConfig]);
 
 
     useMapBuilderKeyBinds(dispatch);
@@ -69,7 +72,9 @@ export function MapBuilder({ mapName, debug, navigate }) {
     return (
         <>
             <div className="app-sidebar">
-                <EditSpace mapBuilderState={mapBuilderState} dispatch={dispatch}></EditSpace>
+                <div className="map-builder-edit-pane">
+                    <EditSpace mapBuilderState={mapBuilderState} dispatch={dispatch} builderConfig={builderConfig}></EditSpace>
+                </div>
             </div>
             <AppContent withSidebar debugMode={debug} toolbar={toolBar} buildInfo={map?.buildInfo}>
                 <GameBoard
