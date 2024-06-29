@@ -54,9 +54,13 @@ export function MapBuilder({ mapName, debug, navigate }) {
     }
     // END TODO: Remove boiler plate
 
+    const hasSelection = mapBuilderState.locationSelector.locations?.length > 0;
+
     const toolBar = (
         <>
             {backToGamesButton}
+            <button disabled={!hasSelection} onClick={() => dispatch(clearSelection())}>Clear Selection</button>
+            <button disabled={!hasSelection} onClick={() => deleteSelected(dispatch)}>Delete selected</button>
         </>
     );
 

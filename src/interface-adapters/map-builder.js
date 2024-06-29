@@ -3,7 +3,7 @@ import { Position } from "../game/state/board/position.js";
 import Entity from "../game/state/board/entity.js";
 import { prettyifyName } from "../utils.js";
 
-const TARGET_TYPES = ["entity", "floor"];
+const TARGET_TYPES = ["entity", "floorTile"];
 
 
 function generateAllLocations(board) {
