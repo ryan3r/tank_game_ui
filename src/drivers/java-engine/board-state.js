@@ -334,8 +334,8 @@ function makeCouncil(councilEntity) {
     if(councilEntity.attributes.armistice !== undefined) {
         additionalAttributes = {
             ...additionalAttributes,
-            armistice_vote_count: councilEntity.attributes.armistice.value,
-            armistice_vote_cap: councilEntity.attributes.armistice.max,
+            ARMISTICE_COUNT: councilEntity.attributes.armistice.value,
+            ARMISTICE_MAX: councilEntity.attributes.armistice.max,
         };
     }
 
