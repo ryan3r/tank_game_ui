@@ -39,6 +39,7 @@ export function mapBuilderReducer(state, action) {
                 selectableLocations: generateAllLocations(action.map.initialState.board),
             },
             editor: {},
+            resizeBoard: checkCanResize(action.map.initialState.board, action.builderConfig),
         };
     }
 
@@ -157,6 +158,58 @@ export function mapBuilderReducer(state, action) {
             editor,
         };
     }
+
+    if(action.type == "resize-board") {
+        const newBoard = state.initialState.board.cloneAndResize(action.resizeParameters);
+
+        // Transfor selection so it is still in the same place on the new board or is removed if it was on the edge
+        const locations = state.locationSelector.locations !== undefined ?
+            state.locationSelector.locations
+                .map(position => remapPosition(position, newBoard, action.resizeParameters))
+                .filter(position => position !== undefined) :
+            undefined;
+
+        return {
+            ...state,
+            initialState: {
+                ...state.initialState,
+                board: newBoard,
+            },
+            locationSelector: {
+                ...state.locationSelector,
+                // Make all of the locations on the new boar selectable
+                selectableLocations: generateAllLocations(newBoard),
+                locations,
+                lastSelected: state.locationSelector.lastSelected !== undefined ?
+                    remapPosition(state.locationSelector.lastSelected, newBoard, action.resizeParameters) :
+                    undefined,
+            },
+            resizeBoard: checkCanResize(newBoard, state._builderConfig),
+            // Reset the editor if the location we're editing is removed
+            editor: locations?.length > 0 ? state.editor : {},
+        };
+    }
+}
+
+function checkCanResize(board, builderConfig) {
+    return {
+        canGrowX: board.width < builderConfig.board.maxWidth,
+        canGrowY: board.height < builderConfig.board.maxHeight,
+        canShrinkX: board.width > 1,
+        canShrinkY: board.height > 1,
+    };
+}
+
+function remapPosition(position, board, { left = 0, top = 0 }) {
+    try {
+        position = new Position(position);
+        position = new Position(position.x + left, position.y + top);
+        if(!board.isInBounds(position)) return;
+        return position.humanReadable;
+    }
+    catch(err) {
+        return;
+    }
 }
 
 function makeAttibuteValue(targetConfig, name, value) {
@@ -267,6 +320,7 @@ export const selectLocation = (location, mode) => ({ type: "select-location", lo
 export const clearSelection = () => selectLocation(undefined, "clear");
 export const setSelectedAttibute = (targetType, name, value) => ({ type: "set-selected-attribute", targetType, name, value });
 export const setSelectedEntityType = (targetType, entityType) => ({ type: "set-selected-entity-type", targetType, entityType });
+export const resizeBoard = (resizeParameters) => ({ type: "resize-board", resizeParameters });
 
 
 export function deleteSelected(dispatch) {

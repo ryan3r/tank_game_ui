@@ -96,6 +96,10 @@ const builderConfig = {
     floorTile: {
         gold_mine: {},
     },
+    board: {
+        maxWidth: 26,
+        maxHeight: 26,
+    },
 };
 
 // V4 is almost identical to v3 so let it reuse everything

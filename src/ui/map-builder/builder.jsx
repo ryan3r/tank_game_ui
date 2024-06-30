@@ -1,7 +1,7 @@
 import "./builder.css";
 import { useEffect } from "preact/hooks";
 import { useMap } from "../../drivers/rest/fetcher.js";
-import { clearSelection, deleteSelected, selectLocation, setMap, useMapBuilder } from "../../interface-adapters/map-builder.js";
+import { clearSelection, deleteSelected, resizeBoard, selectLocation, setMap, useMapBuilder } from "../../interface-adapters/map-builder.js";
 import { getGameVersion } from "../../versions/index.js";
 import { AppContent } from "../app-content.jsx";
 import { ErrorMessage } from "../error_message.jsx";
@@ -81,12 +81,32 @@ export function MapBuilder({ mapName, debug, navigate }) {
                 </div>
             </div>
             <AppContent withSidebar debugMode={debug} toolbar={toolBar} buildInfo={map?.buildInfo}>
-                <GameBoard
-                    board={mapBuilderState?.initialState?.board}
-                    config={versionConfig}
-                    canSubmitAction={false}
-                    locationSelector={mapBuilderState.locationSelector}
-                    selectLocation={selectLocationHandler}></GameBoard>
+                <div className="map-builder-map-wrapper">
+                    <div class="centered map-builder-resize-board-buttons">
+                        <button onClick={() => dispatch(resizeBoard({ top: 1 }))} disabled={!mapBuilderState?.resizeBoard?.canGrowY}>Grow</button>
+                        <button onClick={() => dispatch(resizeBoard({ top: -1 }))} disabled={!mapBuilderState?.resizeBoard?.canShrinkY}>Shrink</button>
+                    </div>
+                    <div className="map-builder-map-inner-wrapper">
+                        <div class="centered map-builder-side-resize map-builder-resize-board-buttons">
+                            <button onClick={() => dispatch(resizeBoard({ left: 1 }))} disabled={!mapBuilderState?.resizeBoard?.canGrowX}>Grow</button>
+                            <button onClick={() => dispatch(resizeBoard({ left: -1 }))} disabled={!mapBuilderState?.resizeBoard?.canShrinkX}>Shrink</button>
+                        </div>
+                        <GameBoard
+                            board={mapBuilderState?.initialState?.board}
+                            config={versionConfig}
+                            canSubmitAction={false}
+                            locationSelector={mapBuilderState.locationSelector}
+                            selectLocation={selectLocationHandler}></GameBoard>
+                        <div class="centered map-builder-side-resize map-builder-resize-board-buttons">
+                            <button onClick={() => dispatch(resizeBoard({ right: 1 }))} disabled={!mapBuilderState?.resizeBoard?.canGrowX}>Grow</button>
+                            <button onClick={() => dispatch(resizeBoard({ right: -1 }))} disabled={!mapBuilderState?.resizeBoard?.canShrinkX}>Shrink</button>
+                        </div>
+                    </div>
+                    <div class="centered map-builder-resize-board-buttons">
+                        <button onClick={() => dispatch(resizeBoard({ bottom: 1 }))} disabled={!mapBuilderState?.resizeBoard?.canGrowY}>Grow</button>
+                        <button onClick={() => dispatch(resizeBoard({ bottom: -1 }))} disabled={!mapBuilderState?.resizeBoard?.canShrinkY}>Shrink</button>
+                    </div>
+                </div>
             </AppContent>
         </>
     );
