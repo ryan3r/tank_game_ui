@@ -79,7 +79,9 @@ function updateActionData(state) {
         locationSelector._specName = locationSpecs[0].name;
 
         // Reuse the location if it still makes sense
-        if(locationSelector._specName == state.locationSelector._specName && locationSelector.selectableLocations.includes(state.locationSelector.locations[0])) {
+        if(locationSelector._specName == state.locationSelector._specName &&
+                state.locationSelector.locations !== undefined &&
+                locationSelector.selectableLocations.includes(state.locationSelector.locations[0])) {
             locationSelector.locations = state.locationSelector.locations;
         }
     }
