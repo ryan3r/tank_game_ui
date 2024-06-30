@@ -12,32 +12,44 @@ import { Position } from "../../game/state/board/position.js";
 import { logger } from "#platform/logging.js";
 
 
-function invertMapping(object) {
-    let inverted = {};
-    for(const key of Object.keys(object)) {
-        inverted[object[key]] = key;
+const deadTankAttributesToRemove = ["ACTIONS", "RANGE", "BOUNTY"];
+
+function mapTypeToClass(type, boardType, gameVersion) {
+    if(type == "empty") {
+        return boardType == "entity" ? "EmptyUnit" : "WalkableFloor";
     }
 
-    return inverted;
+    if(type == "tank") {
+        switch(gameVersion) {
+            case "3": return "TankV3";
+            case "4": return "TankV3";
+        }
+    }
+
+    const className = {
+        wall: "Wall",
+        gold_mine: "GoldMine",
+    }[type];
+
+    if(className === undefined) throw new Error(`Could not find class name for ${type}`);
+
+    return className;
 }
 
-// UI -> Engine
-const ENTITY_CLASS_NAME_MAPPINGS = {
-    "empty": "EmptyUnit",
-    "tank": "TankV3",
-    "wall": "Wall",
-};
+function mapClassToType(className) {
+    const type = {
+        Wall: "wall",
+        GoldMine: "gold_mine",
+        TankV3: "tank",
+        EmptyUnit: "empty",
+        WalkableFloor: "empty",
+        GlobalCooldownTank: "tank",
+    }[className];
 
-const FLOOR_CLASS_NAME_MAPPINGS = {
-    "empty": "WalkableFloor",
-    "gold_mine": "GoldMine",
-};
+    if(type === undefined) throw new Error(`Could not find type for ${className}`);
 
-// Engine -> UI
-const ENTITY_CLASS_NAME_MAPPINGS_INVERTED = invertMapping(ENTITY_CLASS_NAME_MAPPINGS);
-const FLOOR_CLASS_NAME_MAPPINGS_INVERTED = invertMapping(FLOOR_CLASS_NAME_MAPPINGS);
-
-const deadTankAttributesToRemove = ["ACTIONS", "RANGE", "BOUNTY"];
+    return type;
+}
 
 
 export function gameStateFromRawState(rawGameState) {
@@ -50,7 +62,7 @@ export function gameStateFromRawState(rawGameState) {
 
     board = convertBoard(board, rawGameState.attributes.BOARD.floor_board, (newBoard, space, position) => {
         newBoard.setFloorTile(new Entity({
-            type: FLOOR_CLASS_NAME_MAPPINGS_INVERTED[space.class],
+            type: mapClassToType(space.class),
             position,
         }));
     });
@@ -139,7 +151,7 @@ function convertCouncil(rawCouncil, players) {
 }
 
 function entityFromBoard(rawEntity, position, playersByName) {
-    const type = ENTITY_CLASS_NAME_MAPPINGS_INVERTED[rawEntity.class];
+    const type = mapClassToType(rawEntity.class);
     let attributes = decodeAttributes(type, rawEntity.attributes);
 
     let entity = new Entity({
@@ -271,7 +283,7 @@ function buildPlayer(player) {
     };
 }
 
-function buildUnit(position, board) {
+function buildUnit(position, board, gameVersion) {
     const entity = board.getEntityAt(position);
 
     let attributes = {};
@@ -301,16 +313,16 @@ function buildUnit(position, board) {
     }
 
     return {
-        class: ENTITY_CLASS_NAME_MAPPINGS[entity.type],
+        class: mapTypeToClass(entity.type, "entity", gameVersion),
         attributes,
     };
 }
 
-function buildFloor(position, board) {
+function buildFloor(position, board, gameVersion) {
     const tile = board.getFloorTileAt(position);
 
     return {
-        class: FLOOR_CLASS_NAME_MAPPINGS[tile.type],
+        class: mapTypeToClass(tile.type, "floorTile", gameVersion),
         attributes: {
             POSITION: buildPosition(tile.position),
         },
@@ -350,7 +362,7 @@ function makeCouncil(councilEntity) {
     };
 }
 
-export function gameStateToRawState(gameState) {
+export function gameStateToRawState(gameState, gameVersion) {
     return {
         class: "State",
         attributes: {
@@ -359,8 +371,8 @@ export function gameStateToRawState(gameState) {
             TICK: 0,
             BOARD: {
                 class: "Board",
-                unit_board: buildBoard(gameState.board, buildUnit),
-                floor_board: buildBoard(gameState.board, buildFloor),
+                unit_board: buildBoard(gameState.board, (position, board) => buildUnit(position, board, gameVersion)),
+                floor_board: buildBoard(gameState.board, (position, board) => buildFloor(position, board, gameVersion)),
             },
             COUNCIL: makeCouncil(gameState.metaEntities.council),
             PLAYERS: {

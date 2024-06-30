@@ -227,8 +227,8 @@ class TankGameEngine {
         return gameStateFromRawState(state);
     }
 
-    getEngineStateFromGameState(state) {
-        return gameStateToRawState(state);
+    getEngineStateFromGameState(state, gameVersion) {
+        return gameStateToRawState(state, gameVersion);
     }
 
     async getBoardState() {
@@ -273,7 +273,8 @@ class TankGameEngine {
         const actions = await this.getPossibleActions(player);
         const shootAction = actions.find(action => action.rule == "shoot");
         if(!shootAction) {
-            throw new Error("Failed to find shoot action");
+            // throw new Error("Failed to find shoot action");
+            return [];
         }
 
         const targets = shootAction.fields.find(field => field.name == "target");
