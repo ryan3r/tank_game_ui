@@ -11,6 +11,7 @@ import Players from "../../game/state/players/players.js";
 import { Position } from "../../game/state/board/position.js";
 import { logger } from "#platform/logging.js";
 
+
 function invertMapping(object) {
     let inverted = {};
     for(const key of Object.keys(object)) {
@@ -43,11 +44,11 @@ export function gameStateFromRawState(rawGameState) {
     let councilPlayers = [];
     const playersByName = buildUserLists(rawGameState, councilPlayers);
 
-    let board = convertBoard(undefined, rawGameState.board.unit_board, (newBoard, rawEntity, position) => {
+    let board = convertBoard(undefined, rawGameState.attributes.BOARD.unit_board, (newBoard, rawEntity, position) => {
         newBoard.setEntity(entityFromBoard(rawEntity, position, playersByName));
     });
 
-    board = convertBoard(board, rawGameState.board.floor_board, (newBoard, space, position) => {
+    board = convertBoard(board, rawGameState.attributes.BOARD.floor_board, (newBoard, space, position) => {
         newBoard.setFloorTile(new Entity({
             type: FLOOR_CLASS_NAME_MAPPINGS_INVERTED[space.class],
             position,
@@ -58,18 +59,18 @@ export function gameStateFromRawState(rawGameState) {
         new Players(Object.values(playersByName)),
         board,
         {
-            council: convertCouncil(rawGameState.council, councilPlayers),
+            council: convertCouncil(rawGameState.attributes.COUNCIL, councilPlayers),
         },
     );
 
     let victoryInfo;
 
-    if(rawGameState.winner?.length > 1) {
+    if(rawGameState.attributes.WINNER?.length > 1) {
         victoryInfo = {
-            type: rawGameState.winner == "Council" ? "armistice_vote" : "last_tank_standing",
-            winners: rawGameState.winner == "Council" ?
+            type: rawGameState.attributes.WINNER == "Council" ? "armistice_vote" : "last_tank_standing",
+            winners: rawGameState.attributes.WINNER == "Council" ?
                 gameState.metaEntities.council.players :
-                [gameState.players.getPlayerByName(rawGameState.winner)],
+                [gameState.players.getPlayerByName(rawGameState.attributes.WINNER)],
         };
     }
 
@@ -124,13 +125,13 @@ function convertPlayer(rawPlayer, playerType) {
 
 function convertCouncil(rawCouncil, players) {
     let attributes = {
-        coffer: rawCouncil.coffer,
+        coffer: rawCouncil.attributes.COFFER,
     };
 
     if(rawCouncil.armistice_vote_cap !== undefined) {
         attributes.armistice = {
-            value: rawCouncil.armistice_vote_count,
-            max: rawCouncil.armistice_vote_cap
+            value: rawCouncil.attributes.ARMISTICE_VOTE_COUNT,
+            max: rawCouncil.attributes.ARMISTICE_VOTE_CAP
         };
     }
 
@@ -193,19 +194,19 @@ function buildUserLists(rawGameState, councilPlayers) {
 
 function processCouncil(rawGameState, playersByName, councilPlayers) {
     // Ensure that players remain in the same order
-    rawGameState.council.council.sort();
-    rawGameState.council.senate.sort();
+    rawGameState.attributes.COUNCIL.attributes.COUNCILLORS.elements.sort();
+    rawGameState.attributes.COUNCIL.attributes.SENATORS.elements.sort();
 
     const councilGroups = [
-        [rawGameState.council.council, "councilor"],
-        [rawGameState.council.senate, "senator"]
+        [rawGameState.attributes.COUNCIL.attributes.COUNCILLORS.elements, "councilor"],
+        [rawGameState.attributes.COUNCIL.attributes.SENATORS.elements, "senator"]
     ];
 
     for(const [users, userType] of councilGroups) {
         for(const userName of users) {
             if(playersByName[userName]) {
                 // Being a councelor overrides the user's previous state
-                playersByName[userName].type = userType;
+                playersByName[userName].attributes.type = userType;
             }
             else {
                 playersByName[userName] = new Player({ name: userName, type: userType });
@@ -217,7 +218,7 @@ function processCouncil(rawGameState, playersByName, councilPlayers) {
 }
 
 function findUsersOnGameBoard(rawGameState, playersByName) {
-    for(const row of rawGameState.board.unit_board) {
+    for(const row of rawGameState.attributes.BOARD.unit_board) {
         for(const rawEntity of row) {
             let rawPlayer = rawEntity.attributes.PLAYER;
             if(rawPlayer) {
@@ -317,9 +318,14 @@ function buildFloor(position, board) {
 }
 
 function makeCouncilList(council, playerType) {
-    return council.players
+    const players = council.players
         .filter(player => player.type == playerType)
         .map(player => player.name);
+
+    return {
+        "class": "AttributeList",
+        elements: players,
+    }
 }
 
 function makeCouncil(councilEntity) {
@@ -334,26 +340,33 @@ function makeCouncil(councilEntity) {
     }
 
     return {
-        type: "council",
-        coffer: councilEntity.attributes.coffer,
-        ...additionalAttributes,
-        council: makeCouncilList(councilEntity, "councilor"),
-        senate: makeCouncilList(councilEntity, "senator"),
+        class: "Council",
+        attributes: {
+            COFFER: councilEntity.attributes.coffer,
+            ...additionalAttributes,
+            COUNCILLORS: makeCouncilList(councilEntity, "councilor"),
+            SENATORS: makeCouncilList(councilEntity, "senator"),
+        },
     };
 }
 
 export function gameStateToRawState(gameState) {
     return {
-        type: "state",
-        // It's assumed that we only interact with the engine when the game is active
-        running: true,
-        winner: "",
-        day: 0,
-        board: {
-            type: "board",
-            unit_board: buildBoard(gameState.board, buildUnit),
-            floor_board: buildBoard(gameState.board, buildFloor),
+        class: "State",
+        attributes: {
+            // It's assumed that we only interact with the engine when the game is active
+            RUNNING: true,
+            TICK: 0,
+            BOARD: {
+                class: "Board",
+                unit_board: buildBoard(gameState.board, buildUnit),
+                floor_board: buildBoard(gameState.board, buildFloor),
+            },
+            COUNCIL: makeCouncil(gameState.metaEntities.council),
+            PLAYERS: {
+                class: "AttributeList",
+                elements: gameState.players.getAllPlayers().map(player => buildPlayer(player)),
+            }
         },
-        council: makeCouncil(gameState.metaEntities.council),
     };
 }
