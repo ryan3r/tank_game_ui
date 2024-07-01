@@ -218,4 +218,16 @@ export class Game {
     getVictoryInfo() {
         return this._victoryInfo;
     }
+
+    getInitialState() {
+        return this._gameData.initialGameState;
+    }
+
+    getBasicGameInfo() {
+        return {
+            gameVersion: this.getGameVersion(),
+            state: this.getState(),
+            statusText: this.getStatusText(),
+        };
+    }
 }

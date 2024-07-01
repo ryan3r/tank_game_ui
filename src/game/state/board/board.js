@@ -1,4 +1,5 @@
 import Entity from "./entity.js";
+import { Position } from "./position.js";
 
 export default class Board {
     constructor(width, height) {
@@ -29,6 +30,13 @@ export default class Board {
             entities: Object.values(this._entities).map(entity => entity.serialize()),
             floor: Object.values(this._floor).map(tile => tile.serialize()),
         };
+    }
+
+    clone() {
+        let clone = new Board(this.width, this.height);
+        Object.assign(clone._entities, this._entities);
+        Object.assign(clone._floor, this._floor);
+        return clone;
     }
 
     _verifyPositon(position, entitiesObject, type) {
@@ -69,5 +77,37 @@ export default class Board {
 
     isInBounds(position) {
         return position.x < this.width && position.y < this.height;
+    }
+
+    cloneAndResize({ left = 0, right = 0, top = 0, bottom = 0 } = {}) {
+        const newWidth = this.width + left + right;
+        const newHeight = this.height + top + bottom;
+        let newBoard = new Board(newWidth, newHeight);
+
+        const boardLayers = [
+            ["entity", this._entities],
+            ["floorTile", this._floor],
+        ];
+
+        for(const [targetType, targets] of boardLayers) {
+            for(const entity of Object.values(targets)) {
+                const newX = entity.position.x + left;
+                const newY = entity.position.y + top;
+
+                if(0 <= newX && newX < newWidth && 0 <= newY && newY < newHeight) {
+                    let newEntity = entity.clone();
+                    newEntity.position = new Position(newX, newY);
+
+                    if(targetType == "entity") {
+                        newBoard.setEntity(newEntity);
+                    }
+                    else {
+                        newBoard.setFloorTile(newEntity);
+                    }
+                }
+            }
+        }
+
+        return newBoard;
     }
 }

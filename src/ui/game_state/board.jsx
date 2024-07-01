@@ -29,7 +29,7 @@ export function GameBoard({ board, config, setSelectedUser, canSubmitAction, loc
 }
 
 export function GameBoardView({ board, config, setSelectedUser, canSubmitAction, locationSelector, selectLocation }) {
-    const selectedTarget = locationSelector.location && new Position(locationSelector.location);
+    const selectedTargets = (locationSelector.locations || []);
 
     let letters = [<Tile key="empty-coord" className="board-space-coordinate"></Tile>];
     for(let x = 0; x < board.width; ++x) {
@@ -47,8 +47,11 @@ export function GameBoardView({ board, config, setSelectedUser, canSubmitAction,
             const disabled = locationSelector.isSelecting &&
                 !locationSelector.selectableLocations.includes(position.humanReadable);
 
-            const onClick = locationSelector.isSelecting && !disabled ? () => {
-                selectLocation(position.humanReadable);
+            const onClick = locationSelector.isSelecting && !disabled ? (e) => {
+                selectLocation(position.humanReadable, {
+                    ctrlKey: e.ctrlKey,
+                    shiftKey: e.shiftKey,
+                });
             } : undefined;
 
             renderedRow.push(
@@ -57,7 +60,7 @@ export function GameBoardView({ board, config, setSelectedUser, canSubmitAction,
                     floorTile={board.getFloorTileAt(position)}
                     onClick={onClick}
                     disabled={disabled}
-                    selected={selectedTarget && selectedTarget.x == x && selectedTarget.y == y}
+                    selected={selectedTargets.includes(position.humanReadable)}
                     config={config}
                     canSubmitAction={canSubmitAction}
                     setSelectedUser={setSelectedUser}></Space>

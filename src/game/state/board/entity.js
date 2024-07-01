@@ -15,6 +15,15 @@ export default class Entity {
         this.players.push(player);
     }
 
+    clone() {
+        return new Entity({
+            type: this.type,
+            position: this.position,
+            players: this.players.slice(0),
+            attributes: Object.assign({}, this.attributes),
+        });
+    }
+
     static deserialize(rawEntity, players) {
         let attributes = Object.assign({}, rawEntity);
         delete attributes.type;

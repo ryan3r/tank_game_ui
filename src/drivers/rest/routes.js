@@ -28,11 +28,7 @@ export function defineRoutes(app, buildInfo) {
 
         res.json({
             buildInfo,
-            game: {
-                gameVersion: game.getGameVersion(),
-                state: game.getState(),
-                statusText: game.getStatusText(),
-            },
+            game: game.getBasicGameInfo(),
             gameSettings: game.getSettings(),
             openHours: game.getOpenHours().asResolved().serialize(),
             logBook: interactor.getLogBook().serialize(),
@@ -96,6 +92,18 @@ export function defineRoutes(app, buildInfo) {
 
         const factories = await interactor.getActions(req.params.playerName);
         res.json(factories.serialize());
+    });
+
+    app.get("/api/map/:mapName/", (req, res) => {
+        const {valid, game} = req.games.getGameIfAvailable(req.params.mapName);
+        if(!valid) return;
+
+        res.json({
+            buildInfo,
+            game: game.getBasicGameInfo(),
+            gameSettings: game.getSettings(),
+            initialState: game.getInitialState().serialize(),
+        });
     });
 
     app.use(function(req, res) {
