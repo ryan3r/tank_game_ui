@@ -28,6 +28,17 @@ const TANK_GAME_ENGINE_COMMAND = (function() {
     return command;
 })();
 
+const COUNCIL_ACTIONS = ["bounty", "grant_life", "stimulus"];
+
+function convertLogEntry(logEntry) {
+    let subject = COUNCIL_ACTIONS.includes(logEntry.type) ? "Council" : logEntry.rawLogEntry.subject;
+
+    return {
+        ...logEntry.rawLogEntry,
+        subject,
+    };
+}
+
 // Put ids on the engines so we can differentiate them in logs
 let uniqueIdCounter = 0;
 
@@ -216,8 +227,8 @@ class TankGameEngine {
         return gameStateFromRawState(state);
     }
 
-    getEngineStateFromGameState(state) {
-        return gameStateToRawState(state);
+    getEngineStateFromGameState(state, gameVersion) {
+        return gameStateToRawState(state, gameVersion);
     }
 
     async getBoardState() {
@@ -241,7 +252,7 @@ class TankGameEngine {
     async processAction(action) {
         await this._sendRequestAndWait({
             type: "action",
-            ...action.withoutStateInfo().serialize(),
+            ...convertLogEntry(action),
         });
 
         return this.getBoardState();
@@ -249,8 +260,8 @@ class TankGameEngine {
 
     async setGameVersion(version) {
         await this._sendRequestAndWait({
-            type: "version",
-            version
+            type: "ruleset",
+            ruleset: `version${version}`,
         });
     }
 
@@ -262,7 +273,8 @@ class TankGameEngine {
         const actions = await this.getPossibleActions(player);
         const shootAction = actions.find(action => action.rule == "shoot");
         if(!shootAction) {
-            throw new Error("Failed to find shoot action");
+            // throw new Error("Failed to find shoot action");
+            return [];
         }
 
         const targets = shootAction.fields.find(field => field.name == "target");
